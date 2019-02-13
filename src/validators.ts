@@ -437,12 +437,18 @@ type StrDict<O, Optional extends (true | false) = false> = {
 
 export class ObjectValidator<T = any> {
 
-    readonly validators: { [key in keyof T]: Validator<any, any, any> | ObjectValidator<any>} = {} as any;
+    readonly validators: { [key in keyof T]?: Validator<any, any, any> | ObjectValidator<any>} = {} as any;
 
     readonly str: StrDict<T>;
     readonly obj: { [key in keyof T]: any };
     readonly err: StrDict<T>;
     readonly valid: boolean;
+
+    constructor(validators?: { [key in keyof T]?: Validator<any, any, any> | ObjectValidator<any>}) {
+        if (validators) {
+            this.validators = validators;
+        }
+    }
 
     addValidator(field: keyof T, validator: Validator<any, any, any> | ObjectValidator<any>): this {
         this.validators[field] = validator;

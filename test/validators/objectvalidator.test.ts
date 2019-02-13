@@ -219,6 +219,32 @@ describe("ObjectValidator", () => {
         expect(ov.err).toEqual({ user1: { id: "required" }, user2: { id: "required" } });
     });
 
+    it("should validate deep objects while adding validators to constructor", () => {
+        const nv = new NumberValidator({ required: true });
+        const sv = new StringValidator({ required: true });
+        const ov = new ObjectValidator<{ name: string; profile: { email: string; created: number; } }>({
+            profile: new ObjectValidator<{ email: string; created: number}>({
+                email: sv,
+                created: nv
+            })
+        }).addValidator("name", sv);
+        ov.validate({
+            name: "John",
+            profile: {
+                created: "3214125",
+                email: "john.doe@testmail.com"
+            }
+        });
+        expect(ov.valid).toEqual(true);
+        expect(ov.err).toEqual({
+            name: "",
+            profile: {
+                created: "",
+                email: ""
+            }
+        });
+    });
+
     // extensive tests
 
     it("should validate deep object with multiple ObjectValidators", () => {
