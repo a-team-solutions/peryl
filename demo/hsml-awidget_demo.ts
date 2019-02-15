@@ -44,23 +44,22 @@ class App extends AWidget<AppState> {
         ];
     }
 
-    onAction(action: string, data: any,
-             { state, update, action: actionLocal, actionGlobal }: AWidget<AppState>): void {
+    onAction(action: string, data: any, aWidget: AWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
             case AppActions.title:
                 const title = ((data as Event).target as HTMLInputElement).value;
-                update({ title });
+                aWidget.update({ title });
                 break;
             case AppActions.inc:
-                update({ count: state.count + data as number });
-                setTimeout(actionLocal, 1e3, AppActions.dec, 1); // async call
+                aWidget.update({ count: aWidget.state.count + data as number });
+                setTimeout(aWidget.action, 1e3, AppActions.dec, 1); // async call
                 break;
             case AppActions.dec:
-                update({ count: state.count - data as number });
+                aWidget.update({ count: aWidget.state.count - data as number });
                 break;
             default:
-                actionGlobal(action, data);
+                aWidget.actionGlobal(action, data);
                 break;
         }
     }

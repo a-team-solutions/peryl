@@ -111,18 +111,18 @@ class App1 implements Widget<AppState> {
 
 const app = xWidget<AppState>(App);
 
-app.widgets.onActionGlobal = (action: string, data: any, xwidget: XWidget<any>) => {
-    console.log("action >", action, data, xwidget);
-    switch (xwidget.type) {
+app.widgets.onActionGlobal = (action: string, data: any, xWidget: XWidget<any>) => {
+    console.log("action >", action, data, xWidget);
+    switch (xWidget.type) {
         case "App":
-            onAppAction(action, data, xwidget);
+            onAppAction(action, data, xWidget);
             break;
         default:
             break;
     }
 };
 
-function onAppAction(action: string, data: any, xwidget: XWidget<AppState>): void {
+function onAppAction(action: string, data: any, xWidget: XWidget<AppState>): void {
     switch (action) {
         case "xXx":
             break;

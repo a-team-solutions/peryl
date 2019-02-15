@@ -96,7 +96,7 @@ class App1 implements Widget<AppState> {
         ];
     }
 
-    onAction(action: string, data: any, { actionGlobal }: XWidget<AppState>): void {
+    onAction(action: string, data: any, xWidget: XWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
 
@@ -105,7 +105,7 @@ class App1 implements Widget<AppState> {
                 break;
 
             default:
-                actionGlobal(action, data);
+                xWidget.actionGlobal(action, data);
                 break;
         }
     }

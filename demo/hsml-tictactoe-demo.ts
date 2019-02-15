@@ -51,14 +51,14 @@ class TicTacToe implements Widget<TicTacToeState> {
         ]
     ])
 
-    onAction = (action: string, data: any, xw: XWidget<TicTacToeState>): void => {
+    onAction = (action: string, data: any, xWidget: XWidget<TicTacToeState>): void => {
         console.log("action", action, data);
         switch (action) {
 
             case Actions.mark:
-                xw.state.board[data.y][data.x] = data.turn ? CROS : CIRC;
-                xw.state.turn = data.turn ? 0 : 1;
-                xw.update();
+                xWidget.state.board[data.y][data.x] = data.turn ? CROS : CIRC;
+                xWidget.state.turn = data.turn ? 0 : 1;
+                xWidget.update();
                 break;
 
             case "_mount":
