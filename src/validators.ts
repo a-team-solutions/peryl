@@ -20,8 +20,8 @@ export abstract class Validator<T, O, M> {
     readonly obj: T;
 
     constructor(opts?: O, msgs?: M) {
-        this.opts = opts;
-        this.msgs = msgs;
+        this.opts = opts || {} as O;
+        this.msgs = msgs || {} as M;
     }
 
     protected abstract strToObj(str: string): { obj?: T, err?: string };
@@ -73,7 +73,7 @@ export class SelectValidator extends Validator<string, SelectValidatorOpts, Sele
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
-                    err: msgs && msgs.required
+                    err: msgs.required
                         ? tpl(msgs.required,
                             {
                                 options: opts.options && opts.options.join(", ")
@@ -90,7 +90,7 @@ export class SelectValidator extends Validator<string, SelectValidatorOpts, Sele
         const msgs = this.msgs;
         if ("options" in opts) {
             if (opts.options.indexOf(obj) === -1) {
-                return msgs && msgs.invalid_option
+                return msgs.invalid_option
                     ? tpl(msgs.invalid_option,
                         {
                             option: obj,
@@ -133,7 +133,7 @@ export class StringValidator extends Validator<string, StringValidatorOpts, Stri
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
-                    err: msgs && msgs.required
+                    err: msgs.required
                         ? tpl(msgs.required,
                             {
                                 min: opts.min && ("" + opts.min),
@@ -147,7 +147,7 @@ export class StringValidator extends Validator<string, StringValidatorOpts, Stri
         if ("regexp" in opts) {
             if (!opts.regexp.test(str)) {
                 return {
-                    err: msgs && msgs.invalid_format
+                    err: msgs.invalid_format
                         ? tpl(msgs.invalid_format,
                             {
                                 regexp: opts.regexp && ("" + opts.regexp)
@@ -179,7 +179,7 @@ export class StringValidator extends Validator<string, StringValidatorOpts, Stri
             }
         }
         if (err) {
-            return msgs && msgs.not_in_range
+            return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
                         min: opts.min && ("" + opts.min),
@@ -225,7 +225,7 @@ export class NumberValidator extends Validator<Numeral, NumberValidatorOpts, Num
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
-                    err: msgs && msgs.required
+                    err: msgs.required
                         ? tpl(msgs.required,
                             {
                                 min: opts.min && ("" + opts.min),
@@ -250,7 +250,7 @@ export class NumberValidator extends Validator<Numeral, NumberValidatorOpts, Num
             const num = (n.value() !== null) ? n : numeral(1234.45);
             return {
                 obj: (n.value() !== null) ? n : undefined,
-                err: msgs && msgs.invalid_format
+                err: msgs.invalid_format
                     ? tpl(msgs.invalid_format,
                         {
                             num: this.objToStr(num).str,
@@ -281,7 +281,7 @@ export class NumberValidator extends Validator<Numeral, NumberValidatorOpts, Num
             }
         }
         if (err) {
-            return msgs && msgs.not_in_range
+            return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
                         min: opts.min && ("" + opts.min),
@@ -335,7 +335,7 @@ export class DateTimeValidator extends Validator<Moment, DateTimeValidatorOpts, 
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
-                    err: msgs && msgs.required
+                    err: msgs.required
                         ? tpl(msgs.required,
                             {
                                 min: opts.min && ("" + opts.min),
@@ -348,8 +348,8 @@ export class DateTimeValidator extends Validator<Moment, DateTimeValidatorOpts, 
             }
         }
         const d = moment(str,
-            opts && (opts.format || dateFormatFefault),
-            opts && (opts.locale || localeDefault),
+            opts.format || dateFormatFefault,
+            opts.locale || localeDefault,
             opts.strict || false);
         let err: boolean;
         if (!d.isValid()) {
@@ -362,7 +362,7 @@ export class DateTimeValidator extends Validator<Moment, DateTimeValidatorOpts, 
             const date = d.isValid() ? d : moment(new Date());
             return {
                 obj: d.isValid() ? d : undefined,
-                err: msgs && msgs.invalid_format
+                err: msgs.invalid_format
                     ? tpl(msgs.invalid_format,
                         {
                             date: this.objToStr(date).str,
@@ -393,7 +393,7 @@ export class DateTimeValidator extends Validator<Moment, DateTimeValidatorOpts, 
             }
         }
         if (err) {
-            return msgs && msgs.not_in_range
+            return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
                         min: opts.min && ("" + opts.min),
