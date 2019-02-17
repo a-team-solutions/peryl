@@ -1,12 +1,12 @@
 import "jasmine";
-import { NumberValidator } from "../../src/validators";
+import { NumeralValidator } from "../../src/validators";
 
-describe("NumberValidator", () => {
+describe("NumeralValidator", () => {
 
     // required
 
     it("should test required option", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             required: true
         });
 
@@ -15,7 +15,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test required option [ERROR]", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             required: true
         });
         const result = nv.validate("");
@@ -26,7 +26,7 @@ describe("NumberValidator", () => {
     // min
 
     it("should test min 62 with number 20 [ERROR]", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 62
         });
         const result = nv.validate("20");
@@ -35,7 +35,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test min 62 with number -3 [ERROR]", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 62
         });
         const result = nv.validate("-3");
@@ -44,7 +44,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test min 62 with number 61 [ERROR]", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 62
         });
         const result = nv.validate("61");
@@ -53,7 +53,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test min 62 with number 62", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 62
         });
         const result = nv.validate("62");
@@ -62,7 +62,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test min 62 with number 63", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 62
         });
         const result = nv.validate("63");
@@ -73,7 +73,7 @@ describe("NumberValidator", () => {
     // max
 
     it("should test max 20 with number -11", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             max: 20
         });
         const result = nv.validate("-11");
@@ -82,7 +82,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test max 20 with number 19", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             max: 20
         });
         const result = nv.validate("19");
@@ -91,7 +91,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test max 20 with number 20", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             max: 20
         });
         const result = nv.validate("20");
@@ -100,7 +100,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test max 20 with number 21 [ERROR]", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             max: 20
         });
         const result = nv.validate("21");
@@ -111,7 +111,7 @@ describe("NumberValidator", () => {
     // min && max
 
     it("should test range <0, 33> with number -1 [ERROR]", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 0,
             max: 33
         });
@@ -121,7 +121,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test range <0, 33> with number 0", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 0,
             max: 33
         });
@@ -131,7 +131,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test range <0, 33> with number 1", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 0,
             max: 33
         });
@@ -141,7 +141,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test range <0, 33> with number 32", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 0,
             max: 33
         });
@@ -151,7 +151,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test range <0, 33> with number 33", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 0,
             max: 33
         });
@@ -161,7 +161,7 @@ describe("NumberValidator", () => {
     });
 
     it("should test range <0, 33> with number 34 [ERROR]", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             min: 0,
             max: 33
         });
@@ -173,7 +173,7 @@ describe("NumberValidator", () => {
     // format
 
     it("shoud use format '0,0.0[00]' for 1234,56", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             format: "0,0.0[00]"
         });
         const result = nv.validate("1234,56");
@@ -182,7 +182,7 @@ describe("NumberValidator", () => {
     });
 
     it("shoud use format '0,0.0[00]' for 1 234,56", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             format: "0,0.0[00]"
         });
         const result = nv.validate("1 234,56");
@@ -191,7 +191,7 @@ describe("NumberValidator", () => {
     });
 
     // it("shoud use format '0,0.0[00]' for 1 234,56y", () => {
-    //     const nv = new NumberValidator({
+    //     const nv = new NumeralValidator({
     //         format: "0,0.0[00]"
     //     });
     //     const result = nv.validate("1 234,56y");
@@ -200,7 +200,7 @@ describe("NumberValidator", () => {
     // });
 
     it("shoud use format '0,0.0[00]' for xy [ERROR]", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             format: "0,0.0[00]"
         });
         const result = nv.validate("xy");
@@ -209,7 +209,7 @@ describe("NumberValidator", () => {
     });
 
     it("shoud use format '0,0.0[00]' for xy [ERROR]", () => {
-        const nv = new NumberValidator({
+        const nv = new NumeralValidator({
             format: "0,0.0[00]"
         });
         const result = nv.validate("32,1");

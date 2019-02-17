@@ -30,17 +30,24 @@ export abstract class Validator<T, O, M> {
 
     protected abstract objToStr(obj: T, format?: string): { str?: string, err?: string };
 
-    validate(str: string): { str?: string, obj?: T, err?: string } {
-        (this.str as any) = str;
-        const ots = this.strToObj(str);
-        (this.obj as any) = ots.obj;
-        if (ots.err) {
-            (this.err as any) = ots.err;
-            return { str, obj: ots.obj, err: ots.err };
+    validate(value: string | T): { str?: string, obj?: T, err?: string } {
+        if (typeof value === "string") {
+            (this.str as any) = value;
+            const sto = this.strToObj(value);
+            (this.obj as any) = sto.obj;
+            if (sto.err) {
+                (this.err as any) = sto.err;
+                return { str: value, obj: sto.obj, err: sto.err };
+            }
+            const err = this.objCheck(sto.obj);
+            (this.err as any) = err;
+            return { str: value, obj: sto.obj, err };
+        } else {
+            (this.str as any) = value !== undefined ? ("" + value) : undefined;
+            const err = this.objCheck(value);
+            (this.err as any) = err;
+            return { str: this.str, obj: value, err };
         }
-        const err = this.objCheck(ots.obj);
-        (this.err as any) = err;
-        return { str, obj: ots.obj, err };
     }
 
     format(obj: T, format?: string): { str?: string, err?: string } {
@@ -198,7 +205,7 @@ export class StringValidator extends Validator<string, StringValidatorOpts, Stri
 
 export const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
 
-export interface NumberValidatorOpts {
+export interface NumeralValidatorOpts {
     required?: boolean;
     min?: number;
     max?: number;
@@ -207,15 +214,15 @@ export interface NumberValidatorOpts {
     strict?: boolean;
 }
 
-export interface NumberValidatorMsgs {
+export interface NumeralValidatorMsgs {
     required?: string;
     invalid_format?: string;
     not_in_range?: string;
 }
 
-export class NumberValidator extends Validator<Numeral, NumberValidatorOpts, NumberValidatorMsgs> {
+export class NumeralValidator extends Validator<Numeral, NumeralValidatorOpts, NumeralValidatorMsgs> {
 
-    constructor(opts?: NumberValidatorOpts, msgs?: NumberValidatorMsgs) {
+    constructor(opts?: NumeralValidatorOpts, msgs?: NumeralValidatorMsgs) {
         super(opts, msgs);
     }
 
@@ -308,7 +315,7 @@ export class NumberValidator extends Validator<Numeral, NumberValidatorOpts, Num
 
 }
 
-export interface DateTimeValidatorOpts {
+export interface MomentValidatorOpts {
     required?: boolean;
     min?: moment.Moment;
     max?: moment.Moment;
@@ -317,15 +324,15 @@ export interface DateTimeValidatorOpts {
     strict?: boolean;
 }
 
-export interface DateTimeValidatorMsgs {
+export interface MomentValidatorMsgs {
     required?: string;
     invalid_format?: string;
     not_in_range?: string;
 }
 
-export class DateTimeValidator extends Validator<Moment, DateTimeValidatorOpts, DateTimeValidatorMsgs> {
+export class MomentValidator extends Validator<Moment, MomentValidatorOpts, MomentValidatorMsgs> {
 
-    constructor(opts?: DateTimeValidatorOpts, msgs?: DateTimeValidatorMsgs) {
+    constructor(opts?: MomentValidatorOpts, msgs?: MomentValidatorMsgs) {
         super(opts, msgs);
     }
 
@@ -421,6 +428,152 @@ export class DateTimeValidator extends Validator<Moment, DateTimeValidatorOpts, 
 
 }
 
+export interface NumberValidatorOpts {
+    required?: boolean;
+    min?: number;
+    max?: number;
+}
+
+export interface NumberValidatorMsgs {
+    required?: string;
+    invalid_format?: string;
+    not_in_range?: string;
+}
+
+export class NumberValidator extends Validator<number, NumberValidatorOpts, NumberValidatorMsgs> {
+
+    constructor(opts?: NumberValidatorOpts, msgs?: NumberValidatorMsgs) {
+        super(opts, msgs);
+    }
+
+    protected strToObj(str: string): { obj?: number, err?: string } {
+        const opts = this.opts;
+        const msgs = this.msgs;
+        if ("required" in opts) {
+            if (opts.required && !str) {
+                return {
+                    err: msgs.required
+                        ? tpl(msgs.required,
+                            {
+                                min: opts.min && ("" + opts.min),
+                                max: opts.max && ("" + opts.max)
+                            })
+                        : requiredMsg
+                };
+            }
+        }
+        const n = Number(str);
+        let err: boolean;
+        if (str !== this.objToStr(n).str) {
+            err = true;
+        }
+        if (err) {
+            const num = isNaN(n) ? 1234.45 : n;
+            return {
+                obj: isNaN(n) ? undefined : n,
+                err: msgs.invalid_format
+                    ? tpl(msgs.invalid_format,
+                        {
+                            num: this.objToStr(num).str
+                        })
+                    : invalidFormatMsg
+                };
+        }
+        return { obj: n };
+    }
+
+    protected objCheck(obj: number): string {
+        const opts = this.opts;
+        const msgs = this.msgs;
+        let err: boolean;
+        if ("max" in opts) {
+            if (obj > opts.max) {
+                err = true;
+            }
+        }
+        if ("min" in opts) {
+            if (obj < opts.min) {
+                err = true;
+            }
+        }
+        if (err) {
+            return msgs.not_in_range
+                ? tpl(msgs.not_in_range,
+                    {
+                        min: opts.min && ("" + opts.min),
+                        max: opts.max && ("" + opts.max)
+                    })
+                : notInRangeMsg;
+        }
+        return "";
+    }
+
+    protected objToStr(obj: number, format?: string): { str?: string, err?: string } {
+        return {
+            str: obj ? ("" + obj) : undefined
+        };
+    }
+
+}
+
+export interface ArrayValidatorOpts {
+    required?: boolean;
+    min?: number;
+    max?: number;
+}
+
+export interface ArrayValidatorMsgs {
+    required?: string;
+    not_in_range?: string;
+    invalid_format?: string;
+}
+
+export class ArrayValidator<T = any> {
+
+    readonly validator: Validator<T, any, any> | ObjectValidator<T>;
+    readonly opts: ArrayValidatorOpts;
+    readonly str: string[] | StrDict<T>[];
+    readonly obj: T[] | { [key in keyof T]: any }[];
+    readonly err: string[] | StrDict<T>[];
+    readonly valid: boolean;
+
+    constructor(validator: Validator<T, any, any> | ObjectValidator<T>,
+                opts?: ArrayValidatorOpts) {
+        this.validator = validator;
+        this.opts = opts || {};
+    }
+
+    validate(data: string[] | T[]): this {
+        (this.str as any) = [];
+        (this.obj as any) = [];
+        (this.err as any) = [];
+        (this.valid as any) = true;
+
+        const validator = this.validator;
+
+        if (validator instanceof ObjectValidator) {
+            (data as any).forEach((d: any) => {
+                const r = (validator as ObjectValidator<T>).validate(d);
+                (this.str as StrDict<T>[]).push(r.str);
+                (this.obj as { [key in keyof T]: any }[]).push(r.obj);
+                (this.err as StrDict<T>[]).push(r.err);
+                console.log(r.valid, "----", d);
+                !r.valid && ((this.valid as any) = false);
+            });
+        } else { // Validator<T, any, any>
+            (data as any).forEach((d: any) => {
+                const r = (validator as Validator<T, any, any>).validate(d);
+                this.str.push(r.str);
+                this.obj.push(r.obj);
+                this.err.push(r.err);
+                r.err && ((this.valid as any) = false);
+            });
+        }
+        return this;
+    }
+
+}
+
 type StrDict<O, Optional extends (true | false) = false> = {
     0: string,
     1: string[],
@@ -437,20 +590,20 @@ type StrDict<O, Optional extends (true | false) = false> = {
 
 export class ObjectValidator<T = any> {
 
-    readonly validators: { [key in keyof T]?: Validator<any, any, any> | ObjectValidator<any>} = {} as any;
+    readonly validators: { [key in keyof T]?: Validator<any, any, any> | ObjectValidator<any> | ArrayValidator<any>} = {} as any;
 
     readonly str: StrDict<T>;
     readonly obj: { [key in keyof T]: any };
     readonly err: StrDict<T>;
     readonly valid: boolean;
 
-    constructor(validators?: { [key in keyof T]?: Validator<any, any, any> | ObjectValidator<any>}) {
+    constructor(validators?: { [key in keyof T]?: Validator<any, any, any> | ObjectValidator<any> | ArrayValidator<any>}) {
         if (validators) {
             this.validators = validators;
         }
     }
 
-    addValidator(field: keyof T, validator: Validator<any, any, any> | ObjectValidator<any>): this {
+    addValidator(field: keyof T, validator: Validator<any, any, any> | ObjectValidator<any> | ArrayValidator<any>): this {
         this.validators[field] = validator;
         return this;
     }
@@ -462,12 +615,15 @@ export class ObjectValidator<T = any> {
         const result = Object.keys(this.validators)
             .reduce(
                 (acc, k) => {
-                    const value = (d as any)[k];
+                    const value = (d as any)[k] === undefined ? "" : (d as any)[k];
                     const validator = (this.validators as any)[k];
 
                     let res: any;
                     if (validator instanceof ObjectValidator) {
                         res = validator.validate(value, (defaults as any)[k] || {});
+                        !res.valid && (acc.valid = false);
+                    } else if (validator instanceof ArrayValidator) {
+                        res = validator.validate(value);
                         !res.valid && (acc.valid = false);
                     } else {
                         res = validator.validate(value);
@@ -550,7 +706,7 @@ function tpl(tmpl: string, data: { [k: string]: string }): string {
 
 // console.log();
 
-// const nv = new NumberValidator(
+// const nv = new NumeralValidator(
 //     {
 //         required: true,
 //         min: 3,
@@ -583,7 +739,7 @@ function tpl(tmpl: string, data: { [k: string]: string }): string {
 
 // console.log();
 
-// const dv = new DateTimeValidator(
+// const dv = new MomentValidator(
 //     {
 //         required: true,
 //         locale: "sk",
@@ -646,7 +802,7 @@ function tpl(tmpl: string, data: { [k: string]: string }): string {
 
 // const dov = new ObjectValidator<ReportFormData>()
 //             .addValidator("spz", new StringValidator({ required: true }))
-//             .addValidator("tachometer", new NumberValidator({ required: true, min: 1 } ))
+//             .addValidator("tachometer", new NumeralValidator({ required: true, min: 1 } ))
 //             .addValidator("dateCreated", new StringValidator({ required: true }))
 //             .addValidator("user", new ObjectValidator<ReportFormData["user"]>()
 //                 .addValidator("email", new StringValidator({ required: true}))
@@ -674,3 +830,41 @@ function tpl(tmpl: string, data: { [k: string]: string }): string {
 //             email: "sadmaskdmk2@dsadsamkl.com"
 //         }
 //     });
+
+// const av = new ArrayValidator<number>(new NumberValidator());
+// const r = av.validate([345, 123]);
+// console.log(r);
+
+
+// interface D {
+//     a: number;
+//     b?: string;
+// }
+
+// const av = new ArrayValidator<D>(new ObjectValidator<D>()
+//     .addValidator("a", new NumberValidator())
+//     .addValidator("b", new StringValidator({ required: true }))
+// );
+
+// const d: D[] = [
+//     { a: 123, b: "text" },
+//     // { a: 5.6, b: "" }
+//     { a: 5.6 }
+// ];
+
+// const r = av.validate(d);
+// console.log(r);
+
+// const ro = new ObjectValidator<D>()
+//     .addValidator("a", new NumberValidator())
+//     .addValidator("b", new StringValidator({ required: true }))
+//     .validate({
+//         a: "5.6",
+//         b: undefined
+//         // b: "text"
+//     });
+// console.log("---", ro);
+
+// const v = new StringValidator({ required: true });
+// const sr = v.validate(undefined);
+// console.log(sr);
