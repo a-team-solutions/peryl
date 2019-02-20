@@ -1,7 +1,7 @@
 import {
     StringValidator,
-    NumberValidator,
-    DateTimeValidator,
+    NumeralValidator,
+    MomentValidator,
     ObjectValidator
 } from "../src/validators";
 import * as moment from "moment";
@@ -38,7 +38,7 @@ const sv = new StringValidator(
 
 console.log();
 
-const nv = new NumberValidator(
+const nv = new NumeralValidator(
     {
         required: true,
         min: 3,
@@ -71,7 +71,7 @@ const nv = new NumberValidator(
 
 console.log();
 
-const dv = new DateTimeValidator(
+const dv = new MomentValidator(
     {
         required: true,
         locale: "sk",
@@ -134,7 +134,7 @@ interface ReportFormData {
 
 const dov = new ObjectValidator<ReportFormData>()
             .addValidator("spz", new StringValidator({ required: true }))
-            .addValidator("tachometer", new NumberValidator({ required: true, min: 1 } ))
+            .addValidator("tachometer", new NumeralValidator({ required: true, min: 1 } ))
             .addValidator("dateCreated", new StringValidator({ required: true }))
             .addValidator("user", new ObjectValidator<ReportFormData["user"]>()
                 .addValidator("email", new StringValidator({ required: true}))
