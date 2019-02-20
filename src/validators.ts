@@ -672,6 +672,64 @@ function tpl(tmpl: string, data: { [k: string]: string }): string {
         .reduce((t, d) => t.replace(new RegExp(`\\$\\{${d[0]}\\}`, "g"), d[1]), tmpl);
 }
 
+export class FormValidator<T = any> {
+
+    readonly validators: { [key in keyof T]: Validator<any, any, any> } = {} as any;
+
+    readonly str: { [key in keyof T]: string };
+    readonly obj: { [key in keyof T]: any };
+    readonly err: { [key in keyof T]: string };
+    readonly valid: boolean;
+
+    addValidator(field: keyof T, validator: Validator<any, any, any>): this {
+        this.validators[field] = validator;
+        return this;
+    }
+
+    validate(data: { [key in keyof T]: string },
+             defaults?: { [key in keyof T]: string }): this {
+        const d = { ...defaults as object, ...data as object };
+        const res = Object.keys(this.validators)
+            .reduce(
+                (a, k) => {
+                    const v = (d as any)[k];
+                    const r = (this.validators as any)[k].validate(v);
+                    (a.str as any)[k] = r.str;
+                    (a.obj as any)[k] = r.obj;
+                    (a.err as any)[k] = r.err;
+                    r.err && (a.valid = false);
+                    return a;
+                },
+                { str: {}, obj: {}, err: {}, valid: true });
+        (this.str as any) = res.str;
+        (this.obj as any) = res.obj;
+        (this.err as any) = res.err;
+        (this.valid as any) = res.valid;
+        return this;
+    }
+
+    format(data: { [key in keyof T]: any }): this {
+        const res = Object.keys(this.validators)
+            .reduce(
+                (a, k) => {
+                    const v = (data as any)[k];
+                    const r = (this.validators as any)[k].format(v);
+                    (a.str as any)[k] = r.str;
+                    (a.obj as any)[k] = v;
+                    (a.err as any)[k] = r.err;
+                    r.err && (a.valid = false);
+                    return a;
+                },
+                { str: {}, obj: {}, err: {}, valid: true });
+        (this.str as any) = res.str;
+        (this.obj as any) = res.obj;
+        (this.err as any) = res.err;
+        (this.valid as any) = res.valid;
+        return this;
+    }
+
+}
+
 // TEST
 
 // import "numeral/locales";
@@ -774,6 +832,19 @@ function tpl(tmpl: string, data: { [k: string]: string }): string {
 // });
 
 // console.log();
+
+// const data = { str: "123a", num: "123.45", date: "02.01.2019 12:12" };
+
+// const ov = new FormValidator<typeof data>()
+//     .addValidator("str", sv)
+//     .addValidator("num", nv)
+//     .addValidator("date", dv)
+//     .validate(data);
+
+// // console.log(ov);
+
+// ov.format(ov.obj);
+// console.log(ov);
 
 // const data = { str: "123a", num: "123.45", date: "02.01.2019 12:12" };
 
