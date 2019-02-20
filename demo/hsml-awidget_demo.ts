@@ -1,4 +1,4 @@
-import { AWidget, Action } from "../src/hsml-awidget";
+import { AWidget, Action, Manage } from "../src/hsml-awidget";
 import { Hsmls } from "../src/hsml";
 
 interface AppState {
@@ -20,7 +20,7 @@ class App extends AWidget<AppState> {
         count: 77
     };
 
-    view(state: AppState, action: Action): Hsmls {
+    view(state: AppState, action: Action, manage: Manage): Hsmls {
         return [
             ["h2", [state.title]],
             ["p", [
@@ -40,7 +40,8 @@ class App extends AWidget<AppState> {
                 ["button", { on: ["click", AppActions.dec, 1] }, ["-"]],
                 ["button", { on: ["click", AppActions.inc, 2] }, ["+"]],
                 ["button", { on: ["click", AppActions.xXx] }, [AppActions.xXx]]
-            ]]
+            ]],
+            ["p", state.title ? manage<AppState>(App1, state) : []]
         ];
     }
 
@@ -65,6 +66,42 @@ class App extends AWidget<AppState> {
     }
 }
 
+
+enum App1Actions {
+    xXx = "xXx"
+}
+
+class App1 extends AWidget<AppState> {
+
+    state = {
+        title: "Counter sec",
+        count: 33
+    };
+
+    view(state: AppState, action: Action, manage: Manage): Hsmls {
+        return [
+            ["h3", [state.title]],
+            ["p", [
+                ["em", ["Count"]], ": ", state.count,
+                " ",
+                ["button", { on: ["click", App1Actions.xXx] }, [App1Actions.xXx]]
+            ]]
+        ];
+    }
+
+    onAction(action: string, data: any, { actionGlobal }: AWidget<AppState>): void {
+        // console.log("action:", action, data);
+        switch (action) {
+            case App1Actions.xXx:
+                console.log(App1Actions.xXx);
+                break;
+            default:
+                actionGlobal(action, data);
+                break;
+        }
+    }
+
+}
 
 AWidget.onActionGlobal = (action: string, data: any,
                           { update }: AWidget<AppState>): void => {
