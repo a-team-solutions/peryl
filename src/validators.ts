@@ -516,6 +516,48 @@ export class NumberValidator extends Validator<number, NumberValidatorOpts, Numb
 
 }
 
+export interface BooleanValidatorOpts {
+    required?: boolean;
+}
+
+export interface BooleanValidatorMsgs {
+    required?: string;
+}
+
+export class BooleanValidator extends Validator<boolean, BooleanValidatorOpts, BooleanValidatorMsgs> {
+
+    constructor(opts?: BooleanValidatorOpts, msgs?: BooleanValidatorMsgs) {
+        super(opts, msgs);
+    }
+
+    protected strToObj(str: string): { obj?: boolean, err?: string } {
+        const opts = this.opts;
+        const msgs = this.msgs;
+        if ("required" in opts) {
+            if (opts.required && !str) {
+                return {
+                    err: msgs.required
+                        ? tpl(msgs.required, {})
+                        : requiredMsg
+                };
+            }
+        }
+        const b = Boolean(str);
+        return { obj: b };
+    }
+
+    protected objCheck(obj: boolean): string {
+        return "";
+    }
+
+    protected objToStr(obj: boolean, format?: string): { str?: string, err?: string } {
+        return {
+            str: "" + obj
+        };
+    }
+
+}
+
 export interface ArrayValidatorOpts {
     required?: boolean;
     min?: number;
