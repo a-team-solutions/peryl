@@ -54,20 +54,16 @@ class TicTacToe implements Widget<TicTacToeState> {
     onAction = (action: string, data: any, xWidget: XWidget<TicTacToeState>): void => {
         console.log("action", action, data);
         switch (action) {
-
             case Actions.mark:
                 xWidget.state.board[data.y][data.x] = data.turn ? CROS : CIRC;
                 xWidget.state.turn = data.turn ? 0 : 1;
                 xWidget.update();
                 break;
-
             case "_mount":
             case "_umount":
                 break;
-
             default:
                 console.warn("action unhandled:", action, data, this);
-                break;
         }
     }
 

@@ -41,14 +41,9 @@ class App implements Widget<AppState> {
                 ["button", { on: ["click", AppActions.inc, 2] }, ["+"]]
             ]],
             state.title
-                ? ["div", state.title ? manage<AppState>(App1, state) : ["app"]]
+                ? ["div", state.title ? manage<AppState>(SubApp, state) : ["app"]]
                 : ""
-            // ["div",
-            //     // { _widget: this.app1 }
-            //     // this.app1
-            //     // XWidget.hsml(App1)
-            //     state.title ? XWidget.hsml<AppState>(App1, state) : "app"
-            // ]
+            // ["div", state.title ? XWidget.hsml<AppState>(SubApp, state) : ["app"]]
         ];
     }
 
@@ -68,16 +63,15 @@ class App implements Widget<AppState> {
                 break;
             default:
                 actionGlobal(action, data);
-                break;
         }
     }
 }
 
-enum App1Actions {
+enum SubAppActions {
     xXx = "xXx"
 }
 
-class App1 implements Widget<AppState> {
+class SubApp implements Widget<AppState> {
 
     state = {
         title: "Counter sec",
@@ -90,7 +84,7 @@ class App1 implements Widget<AppState> {
             ["p", [
                 ["em", ["Count"]], ": ", state.count,
                 " ",
-                ["button", { on: ["click", App1Actions.xXx] }, [App1Actions.xXx]]
+                ["button", { on: ["click", SubAppActions.xXx] }, [SubAppActions.xXx]]
             ]]
         ];
     }
@@ -98,39 +92,36 @@ class App1 implements Widget<AppState> {
     onAction(action: string, data: any, { actionGlobal }: XWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
-            case App1Actions.xXx:
-                console.log(App1Actions.xXx);
+            case SubAppActions.xXx:
+                console.log(SubAppActions.xXx);
                 break;
             default:
                 actionGlobal(action, data);
-                break;
         }
     }
 
 }
 
-const app = xWidget<AppState>(App);
 
-app.widgets.onActionGlobal = (action: string, data: any, xWidget: XWidget<any>) => {
+function onActionGlobal(action: string, data: any, xWidget: XWidget<any>) {
     console.log("action >", action, data, xWidget);
     switch (xWidget.type) {
         case "App":
             onAppAction(action, data, xWidget);
             break;
-        default:
-            break;
     }
-};
+}
 
 function onAppAction(action: string, data: any, xWidget: XWidget<AppState>): void {
     switch (action) {
         case "xXx":
             break;
-        default:
-            break;
     }
 }
 
-app.mount(document.getElementById("app"));
+const app = xWidget<AppState>(App)
+    .onActionGlobal(onActionGlobal)
+    .mount(document.getElementById("app"));
+
 
 (self as any).app = app;

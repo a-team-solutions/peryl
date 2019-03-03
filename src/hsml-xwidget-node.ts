@@ -1,5 +1,5 @@
 import { Hsml, Hsmls, HsmlFnc, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx } from "./hsml";
-import { Class, Widget, Widgets, XWidget, Manage, Action } from "./hsml-xwidget";
+import { Class, Widget, Widgets, XWidget, Manage, Action, OnAction } from "./hsml-xwidget";
 import { hsmls2html, hsmls2htmls } from "./hsml-html";
 
 export function xWidgetHtml<S>(wClass: Class<Widget<S>>,
@@ -43,6 +43,11 @@ export function xWidget<S>(wClass: Class<Widget<S>>): XWidget<S> {
 
         actionGlobal = (action: string, data?: any): void => {
             this.widgets.onActionGlobal(action, data, this);
+        }
+
+        onActionGlobal(onAction: OnAction<S>): this {
+            this.widgets.onActionGlobal = onAction;
+            return this;
         }
 
         render = (): Hsmls => {

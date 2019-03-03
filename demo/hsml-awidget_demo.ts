@@ -41,7 +41,7 @@ class App extends AWidget<AppState> {
                 ["button", { on: ["click", AppActions.inc, 2] }, ["+"]],
                 ["button", { on: ["click", AppActions.xXx] }, ["xXx"]]
             ]],
-            ["p", state.title ? manage<AppState>(App1, state) : []]
+            ["p", state.title ? manage<AppState>(SubApp, state) : []]
         ];
     }
 
@@ -66,11 +66,11 @@ class App extends AWidget<AppState> {
 }
 
 
-enum App1Actions {
+enum SubAppActions {
     xXx = "xXx"
 }
 
-class App1 extends AWidget<AppState> {
+class SubApp extends AWidget<AppState> {
 
     state = {
         title: "Counter sec",
@@ -83,7 +83,7 @@ class App1 extends AWidget<AppState> {
             ["p", [
                 ["em", ["Count"]], ": ", state.count,
                 " ",
-                ["button", { on: ["click", App1Actions.xXx] }, [App1Actions.xXx]]
+                ["button", { on: ["click", SubAppActions.xXx] }, [SubAppActions.xXx]]
             ]]
         ];
     }
@@ -91,7 +91,7 @@ class App1 extends AWidget<AppState> {
     onAction(action: string, data: any, widget: AWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
-            case App1Actions.xXx:
+            case SubAppActions.xXx:
                 console.log(action);
                 break;
             default:

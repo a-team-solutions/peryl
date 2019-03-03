@@ -65,6 +65,11 @@ export function xWidget<S>(wClass: Class<Widget<S>>): XWidget<S> {
             this.widgets.onActionGlobal(action, data, this);
         }
 
+        onActionGlobal(onAction: OnAction<S>): this {
+            this.widgets.onActionGlobal = onAction;
+            return this;
+        }
+
         render = (): Hsmls => {
             return this.view(this.state, this.action, manage);
         }

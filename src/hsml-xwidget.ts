@@ -24,6 +24,7 @@ export interface XWidget<S> extends HsmlHandlerCtx, Widget<S> {
     state: S;
     action: Action;
     actionGlobal: Action;
+    onActionGlobal: (onAction: OnAction<S>) => this;
     render: () => Hsmls;
     mount: (e: Element) => this;
     umount: () => this;

@@ -42,14 +42,9 @@ class App implements Widget<AppState> {
                 ["button", { on: ["click", Actions.inc, 2] }, ["+"]]
             ]],
             state.title
-                ? ["div", state.title ? manage<AppState>(App1, state) : ["app"]]
+                ? ["div", state.title ? manage<AppState>(SubApp, state) : ["app"]]
                 : ""
-            // ["div",
-            //     // { _widget: this.app1 }
-            //     // this.app1
-            //     // XWidget.hsml(App1)
-            //     state.title ? XWidget.hsml<AppState>(App1, state) : "app"
-            // ]
+            // ["div", state.title ? XWidget.hsml<AppState>(SubApp, state) : ["app"]]
         ];
     }
 
@@ -57,28 +52,23 @@ class App implements Widget<AppState> {
              { state, update, action: actionLocal, actionGlobal }: XWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
-
             case Actions.title:
                 update({ title: ((data as Event).target as HTMLInputElement).value });
                 break;
-
             case Actions.inc:
                 update({ count: state.count + data as number });
                 setTimeout(actionLocal, 1e3, Actions.dec, 1); // async call
                 break;
-
             case Actions.dec:
                 update({ count: state.count - data as number });
                 break;
-
             default:
                 actionGlobal(action, data);
-                break;
         }
     }
 }
 
-class App1 implements Widget<AppState> {
+class SubApp implements Widget<AppState> {
 
     state = {
         title: "Counter sec",
@@ -99,14 +89,11 @@ class App1 implements Widget<AppState> {
     onAction(action: string, data: any, xWidget: XWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
-
             case Actions.xXx:
                 console.log(Actions.xXx);
                 break;
-
             default:
                 xWidget.actionGlobal(action, data);
-                break;
         }
     }
 
