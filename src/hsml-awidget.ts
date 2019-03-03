@@ -60,6 +60,11 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
         AWidget.onActionGlobal(action, data, this);
     }
 
+    onActionGlobal(onAction: OnAction<S>): this {
+        AWidget.onActionGlobal = onAction;
+        return this;
+    }
+
     render = (): Hsmls => {
         return this.view(this.state, this.action, manage);
     }

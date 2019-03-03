@@ -39,29 +39,28 @@ class App extends AWidget<AppState> {
                 " ",
                 ["button", { on: ["click", AppActions.dec, 1] }, ["-"]],
                 ["button", { on: ["click", AppActions.inc, 2] }, ["+"]],
-                ["button", { on: ["click", AppActions.xXx] }, [AppActions.xXx]]
+                ["button", { on: ["click", AppActions.xXx] }, ["xXx"]]
             ]],
             ["p", state.title ? manage<AppState>(App1, state) : []]
         ];
     }
 
-    onAction(action: string, data: any, aWidget: AWidget<AppState>): void {
+    onAction(action: string, data: any, widget: AWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
             case AppActions.title:
                 const title = ((data as Event).target as HTMLInputElement).value;
-                aWidget.update({ title });
+                widget.update({ title });
                 break;
             case AppActions.inc:
-                aWidget.update({ count: aWidget.state.count + data as number });
-                setTimeout(aWidget.action, 1e3, AppActions.dec, 1); // async call
+                widget.update({ count: widget.state.count + data as number });
+                setTimeout(widget.action, 1e3, AppActions.dec, 1); // async call
                 break;
             case AppActions.dec:
-                aWidget.update({ count: aWidget.state.count - data as number });
+                widget.update({ count: widget.state.count - data as number });
                 break;
             default:
-                aWidget.actionGlobal(action, data);
-                break;
+                widget.actionGlobal(action, data);
         }
     }
 }
@@ -89,29 +88,31 @@ class App1 extends AWidget<AppState> {
         ];
     }
 
-    onAction(action: string, data: any, { actionGlobal }: AWidget<AppState>): void {
+    onAction(action: string, data: any, widget: AWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
             case App1Actions.xXx:
-                console.log(App1Actions.xXx);
+                console.log(action);
                 break;
             default:
-                actionGlobal(action, data);
-                break;
+                widget.actionGlobal(action, data);
         }
     }
 
 }
 
-AWidget.onActionGlobal = (action: string, data: any,
-                          { update }: AWidget<AppState>): void => {
+
+function onActionGlobal(action: string, data: any, widget: AWidget<AppState>) {
     console.log(action, data);
     switch (action) {
-        case "xXx": update({ title: "xXx" }); break;
-        default: break;
+        case "xXx":
+            widget.update({ title: "xXx" });
+            break;
     }
-};
+}
 
-const app = new App().mount(document.getElementById("app"));
+const app = new App()
+    .onActionGlobal(onActionGlobal)
+    .mount(document.getElementById("app"));
 
 (self as any).app = app;
