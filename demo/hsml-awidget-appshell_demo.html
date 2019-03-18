@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>pREST hsml awidget (flux) appshell demo</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <style>
+        #snackbar {
+            visibility: hidden;
+            position: fixed;
+            z-index: 1000;
+            left: 24px;
+            bottom: 24px;
+            min-width: 250px;
+            margin-right: 24px;
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+            font-size: 17px;
+            padding: 16px;
+            border-radius: 2px;
+        }
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="../build/hsml-awidget-appshell_demo.js"></script>
+</body>
+</html>
