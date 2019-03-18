@@ -16,10 +16,19 @@ const manage: Manage = <S>(wClass: Class<AWidget<S>>, state?: S): HsmlFnc | Hsml
     return (e: Element) => {
         if ((e as any).widget) {
             const w = (e as any).widget as AWidget<S>;
-            if (state !== undefined) {
-                w.state = state;
+            if (w.type === wClass.name) {
+                if (state !== undefined) {
+                    w.state = state;
+                }
+                w.update();
+            } else {
+                w.umount();
+                const w1 = new wClass();
+                if (state !== undefined) {
+                    w1.state = state;
+                }
+                w1.mount(e);
             }
-            w.update();
         } else {
             const w = new wClass();
             if (state !== undefined) {
@@ -63,6 +72,10 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
     onActionGlobal(onAction: OnAction<S>): this {
         AWidget.onActionGlobal = onAction;
         return this;
+    }
+
+    widgets(): AWidget<any>[] {
+        return Object.values(AWidget.mounted);
     }
 
     render = (): Hsmls => {

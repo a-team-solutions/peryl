@@ -29,10 +29,19 @@ const manage: Manage = <S>(wClass: Class<Widget<S>>, state?: S): HsmlFnc | Hsmls
     return (e: Element) => {
         if ((e as any).widget) {
             const w = (e as any).widget as XWidget<S>;
-            if (state !== undefined) {
-                w.state = state;
+            if (w.type === wClass.name) {
+                if (state !== undefined) {
+                    w.state = state;
+                }
+                w.update();
+            } else {
+                w.umount();
+                const w1 = xWidget<S>(wClass);
+                if (state !== undefined) {
+                    w1.state = state;
+                }
+                w1.mount(e);
             }
-            w.update();
         } else {
             const w = xWidget<S>(wClass);
             if (state !== undefined) {
