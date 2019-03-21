@@ -91,8 +91,8 @@ export interface AppShellState {
     title: string;
     subtitle: string;
     menu: boolean;
-    sidebar: any;
-    content: any;
+    sidebar: Class<AWidget<any>>;
+    content: Class<AWidget<any>>;
     snackbar: string;
 }
 
