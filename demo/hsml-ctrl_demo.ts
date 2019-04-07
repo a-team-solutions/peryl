@@ -90,6 +90,8 @@ const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<A
 };
 
 
+// client side app rendering
+
 const onActionGlobal: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>) => {
     console.log(action, data);
     switch (action) {
@@ -105,9 +107,10 @@ const a = ctrlApp<AppState>(appState, appView, appOnAction)
 
 (self as any).app = a;
 
-// server side rendering
+
+// server side html rendering
 
 ctrlHtml<AppState>(appState, appView, html => console.log(html), true);
 
 const h = ctrlHtmls<AppState>(appState, appView, true);
-console.dir(h);
+console.log(h);

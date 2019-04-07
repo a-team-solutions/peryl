@@ -59,7 +59,6 @@ const manage: Manage = <S>(view: View<S>, onAction: OnAction<S>, state?: S): Hsm
     };
 };
 
-
 export function ctrlApp<S>(state: S, view: View<S>, onAction: OnAction<S>): Ctrl<S> {
     return new Ctrl<S>(state, view, onAction);
 }
