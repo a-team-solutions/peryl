@@ -35,7 +35,6 @@ const manage: Manage = <S>(view: View<S>, onAction: OnAction<S>, state?: S): Hsm
     return (e: Element) => {
         if ((e as any).ctrl) {
             const w = (e as any).ctrl as Ctrl<S>;
-            console.log("----", w.view.name, view.name, w.view.name === view.name);
             if (w.view.name === view.name) {
                 if (state !== undefined) {
                     w.state = state;
@@ -61,7 +60,7 @@ const manage: Manage = <S>(view: View<S>, onAction: OnAction<S>, state?: S): Hsm
 };
 
 
-export function app<S>(state: S, view: View<S>, onAction: OnAction<S>): Ctrl<S> {
+export function ctrlApp<S>(state: S, view: View<S>, onAction: OnAction<S>): Ctrl<S> {
     return new Ctrl<S>(state, view, onAction);
 }
 

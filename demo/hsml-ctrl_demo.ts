@@ -1,4 +1,4 @@
-import { Ctrl, Action, Manage, View, OnAction, ctrlHtml, ctrlHtmls } from "../src/hsml-ctrl";
+import { Ctrl, Action, Manage, View, OnAction, ctrlApp, ctrlHtml, ctrlHtmls } from "../src/hsml-ctrl";
 import { Hsmls } from "../src/hsml";
 
 interface AppState {
@@ -43,22 +43,22 @@ const appView: View<AppState> = (state: AppState, action: Action, manage: Manage
     ];
 };
 
-const appOnAction: OnAction<AppState> = (action: string, data: any, widget: Ctrl<AppState>): void  => {
+const appOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void  => {
     // console.log("action:", action, data);
     switch (action) {
         case AppActions.title:
             const title = ((data as Event).target as HTMLInputElement).value;
-            widget.update({ title });
+            ctrl.update({ title });
             break;
         case AppActions.inc:
-            widget.update({ count: widget.state.count + data as number });
-            setTimeout(widget.action, 1e3, AppActions.dec, 1); // async call
+            ctrl.update({ count: ctrl.state.count + data as number });
+            setTimeout(ctrl.action, 1e3, AppActions.dec, 1); // async call
             break;
         case AppActions.dec:
-            widget.update({ count: widget.state.count - data as number });
+            ctrl.update({ count: ctrl.state.count - data as number });
             break;
         default:
-            widget.actionGlobal(action, data);
+            ctrl.actionGlobal(action, data);
     }
 };
 
@@ -78,28 +78,28 @@ const subView: View<AppState> = (state: AppState, action: Action, manage: Manage
     ];
 };
 
-const subOnAction: OnAction<AppState> = (action: string, data: any, widget: Ctrl<AppState>): void  => {
+const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void  => {
     // console.log("action:", action, data);
     switch (action) {
         case SubAppActions.xXx:
             console.log(action);
             break;
         default:
-            widget.actionGlobal(action, data);
+            ctrl.actionGlobal(action, data);
     }
 };
 
 
-const onActionGlobal: OnAction<AppState> = (action: string, data: any, widget: Ctrl<AppState>) => {
+const onActionGlobal: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>) => {
     console.log(action, data);
     switch (action) {
         case "xXx":
-            widget.update({ title: "xXx" });
+            ctrl.update({ title: "xXx" });
             break;
     }
 };
 
-const a = new Ctrl<AppState>(appState, appView, appOnAction)
+const a = ctrlApp<AppState>(appState, appView, appOnAction)
     .onActionGlobal(onActionGlobal)
     .mount(document.getElementById("app"));
 
