@@ -1,0 +1,39 @@
+# - any static content must be placed under a public/ directory
+# - artifacts with a path to the public/ directory must be defined
+
+# pages:
+#   stage: deploy
+#   script:
+#   - mkdir .public
+#   - cp -r * .public
+#   - mv .public public
+#   artifacts:
+#     paths:
+#     - public
+#   only:
+#   - master
+
+
+image: node:9
+
+pages:
+    cache:
+        paths:
+        - node_modules/
+
+    script:
+    - pwd
+    - ls -lah
+    - npm install
+    - npm run dist
+    - npx cpx 'dist/**/!(*.map)' 'public/' -u -v
+    - npm run build
+    - npx cpx 'build/**/' 'public/build/' -u -v
+    - npx cpx 'demo/**/' 'public/demo/' -u -v
+
+    artifacts:
+        paths:
+        - public
+
+    only:
+    - master

@@ -50,7 +50,7 @@
     "clean:all": "npm run clean; rm -rf node_modules; cd tools; npm run clean:all",
     "tslint": "tslint --project tsconfig.json",
     "build:watch": "webpack --mode development --watch",
-    "build": "webpack --mode production",
+    "build": "webpack --mode development # --mode production",
     "demo": "npm run build:watch",
     "dist": "rm -rf dist; tsc --declaration --outDir dist",
     "test": "npm run tslint; npm run test:jasmine; npm run build",

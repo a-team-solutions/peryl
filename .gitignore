@@ -5,6 +5,7 @@ _*
 
 dist/
 build/
+public/
 tmp/
 
 node_modules/
