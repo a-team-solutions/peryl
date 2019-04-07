@@ -20,7 +20,7 @@ const widgets: Widgets = {
 
 let __count = 0;
 
-const manage: Manage = <S>(wClass: Class<Widget<S>>, state?: S): HsmlFnc | Hsmls  => {
+const manage: Manage = <S>(wClass: Class<Widget<S>>, state?: S): HsmlFnc | Hsmls => {
     return new wClass().view(state, actionNode, manage);
 };
 

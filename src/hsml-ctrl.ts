@@ -17,7 +17,7 @@ export type Manage = <S>(view: View<S>, onAction: OnAction<S>, state?: S) => Hsm
 
 const actionHtml: Action = (action: string, data: any) => { };
 
-const manageHtml: Manage = <S>(view: View<S>, onAction: OnAction<S>, state?: S): HsmlFnc | Hsmls  => {
+const manageHtml: Manage = <S>(view: View<S>, onAction: OnAction<S>, state?: S): HsmlFnc | Hsmls => {
     return view(state, actionHtml, manageHtml);
 };
 
@@ -31,7 +31,7 @@ export function ctrlHtmls<S>(state: S, view: View<S>, pretty = false): string {
 
 // client
 
-const manage: Manage = <S>(view: View<S>, onAction: OnAction<S>, state?: S): HsmlFnc | Hsmls  => {
+const manage: Manage = <S>(view: View<S>, onAction: OnAction<S>, state?: S): HsmlFnc | Hsmls => {
     return (e: Element) => {
         if ((e as any).ctrl) {
             const w = (e as any).ctrl as Ctrl<S>;

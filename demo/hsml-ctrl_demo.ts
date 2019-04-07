@@ -43,7 +43,7 @@ const appView: View<AppState> = (state: AppState, action: Action, manage: Manage
     ];
 };
 
-const appOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void  => {
+const appOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void => {
     // console.log("action:", action, data);
     switch (action) {
         case AppActions.title:
@@ -78,7 +78,7 @@ const subView: View<AppState> = (state: AppState, action: Action, manage: Manage
     ];
 };
 
-const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void  => {
+const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void => {
     // console.log("action:", action, data);
     switch (action) {
         case SubAppActions.xXx:
