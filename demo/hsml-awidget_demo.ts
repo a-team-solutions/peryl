@@ -116,3 +116,6 @@ const app = new App()
     .mount(document.getElementById("app"));
 
 (self as any).app = app;
+
+const h = app.toHtml();
+console.log(h);

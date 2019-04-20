@@ -16,7 +16,7 @@ export class Sidebar extends AWidget<SidebarState> {
         title: "Sidebar"
     };
 
-    view(state: AppShellState, action: Action, manage: Manage): Hsmls {
+    view(state: SidebarState, action: Action, manage: Manage): Hsmls {
         const menu = [
             { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
             { url: "#Content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
@@ -69,7 +69,7 @@ export class Content extends AWidget<ContentState> {
         title: "Content"
     };
 
-    view(state: AppShellState, action: Action, manage: Manage): Hsmls {
+    view(state: ContentState, action: Action, manage: Manage): Hsmls {
         return [
             ["h1", [state.title, ": ", this.id]]
         ];

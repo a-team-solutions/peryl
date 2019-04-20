@@ -2,7 +2,7 @@ import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export type View<S> = (state: S, action: Action) => Hsmls;
+export type View<S> = (state: S, action: Action, manage: Manage) => Hsmls;
 
 export type Action = (action: string, data?: any) => void;
 
