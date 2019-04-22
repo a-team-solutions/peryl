@@ -71,7 +71,8 @@ export class Content extends AWidget<ContentState> {
 
     view(state: ContentState, action: Action, manage: Manage): Hsmls {
         return [
-            ["h1", [state.title, ": ", this.id]]
+            ["h1", [state.title, ": ", this.id]],
+            ["p", ["text text text"]]
         ];
     }
 

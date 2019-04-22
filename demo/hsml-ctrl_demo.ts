@@ -1,5 +1,6 @@
-import { Ctrl, Action, Manage, View, OnAction, ctrlApp, ctrlHtml, ctrlHtmls } from "../src/hsml-ctrl";
+import { ICtrl, Action, Manage, View, OnAction, ctrlHtml, ctrlHtmls } from "../src/hsml-ctrl";
 import { Hsmls } from "../src/hsml";
+import { ctrlApp } from "../src/hsml-ctrl-web";
 
 interface AppState {
     title: string;
@@ -39,11 +40,11 @@ const appView: View<AppState> = (state: AppState, action: Action, manage: Manage
             ["button", { on: ["click", AppActions.inc, 2] }, ["+"]],
             ["button", { on: ["click", AppActions.xXx] }, ["xXx"]]
         ]],
-        ["p", state.title ? manage<AppState>(subView, subOnAction, state) : []]
+        ["p", state.title ? manage<AppState>(state, subView, subOnAction) : []]
     ];
 };
 
-const appOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void => {
+const appOnAction: OnAction<AppState> = (action: string, data: any, ctrl: ICtrl<AppState>): void => {
     // console.log("action:", action, data);
     switch (action) {
         case AppActions.title:
@@ -78,7 +79,7 @@ const subView: View<AppState> = (state: AppState, action: Action, manage: Manage
     ];
 };
 
-const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void => {
+const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: ICtrl<AppState>): void => {
     // console.log("action:", action, data);
     switch (action) {
         case SubAppActions.xXx:
@@ -90,9 +91,9 @@ const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<A
 };
 
 
-// client side app rendering
+// Client side app rendering
 
-const onActionGlobal: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>) => {
+const onActionGlobal: OnAction<AppState> = (action: string, data: any, ctrl: ICtrl<AppState>) => {
     console.log(action, data);
     switch (action) {
         case "xXx":
@@ -101,14 +102,14 @@ const onActionGlobal: OnAction<AppState> = (action: string, data: any, ctrl: Ctr
     }
 };
 
-const a = ctrlApp<AppState>(appState, appView, appOnAction)
+const a = ctrlApp<AppState>(appState, appView, appOnAction, "app")
     .onActionGlobal(onActionGlobal)
     .mount(document.getElementById("app"));
 
 (self as any).app = a;
 
 
-// server side html rendering
+// Server side html rendering
 
 ctrlHtml<AppState>(appState, appView, html => console.log(html), true);
 
