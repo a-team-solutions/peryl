@@ -17,7 +17,7 @@ export const sidebarView: View<SidebarState> = (state: SidebarState, action: Act
     const menu = [
         { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
         { url: "#Content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
-        { url: "#Sidebar", label: "Sidebar", icon: "i.fas.fa-fw.fa-bell" }
+        { url: "#Form", label: "Form", icon: "i.fas.fa-fw.fa-bell" }
     ];
     const nbsp = "\u00a0 ";
     return [
@@ -85,6 +85,142 @@ export const contentOnAction = (action: string, data: any, ctrl: ICtrl<ContentSt
 };
 
 export const content: Component<ContentState> = [contentState, contentView, contentOnAction, "content"];
+
+
+export interface FormState {
+    title: string;
+    data: { [name: string]: any };
+}
+
+export enum FormActions {
+    title = "title",
+    formData = "form-data",
+    formSubmit = "form-submit"
+}
+
+export const formState = {
+    title: "Form",
+    data: {}
+};
+
+export const formView: View<FormState> = (state: FormState, action: Action, manage: Manage): Hsmls => {
+    return [
+        ["h1", [state.title]],
+        ["form.w3-container", [
+            ["p", [
+                ["label", ["Name",
+                    ["input.w3-input", {
+                        type: "text", name: "name",
+                        on: ["change", FormActions.formData]
+                    }]
+                ]]
+            ]],
+            ["p", [
+                ["label", ["Age",
+                    ["input.w3-input", {
+                        type: "number", name: "age",
+                        on: ["change", FormActions.formData]
+                    }]
+                ]]
+            ]],
+            ["p", [
+                ["label", [
+                    ["input.w3-check", {
+                        type: "checkbox", name: "single", checked: true,
+                        on: ["change", FormActions.formData]
+                    }],
+                    " Single"
+                ]]
+            ]],
+            ["p", [
+                ["label", [
+                    ["input.w3-radio", {
+                        type: "radio", name: "gender", value: "male", checked: true,
+                        on: ["change", FormActions.formData]
+                    }],
+                    " Male"
+                ]],
+                ["br"],
+                ["label", [
+                    ["input.w3-radio", {
+                        type: "radio", name: "gender", value: "female", checked: false,
+                        on: ["change", FormActions.formData]
+                    }],
+                    " Female"
+                ]]
+            ]],
+            ["p", [
+                ["select.w3-select", {
+                    name: "option",
+                    on: ["change", FormActions.formData]
+                }, [
+                    ["option",
+                        { value: "", disabled: true, selected: true },
+                        ["Children"]
+                    ],
+                    ["option", { value: "1" }, ["1 child"]],
+                    ["option", { value: "2" }, ["2 children"]],
+                    ["option", { value: "3" }, ["3 children"]]
+                ]]
+            ]],
+            ["button.w3-btn.w3-blue",
+                { type: "submit", on: ["click", FormActions.formSubmit] },
+                ["Submit"]
+            ]
+        ]]
+    ];
+};
+
+function formDataCollect(e: Event, data: { [name: string]: string }): void {
+    e.preventDefault();
+    const el = (e.target as HTMLElement);
+    const nn = el.nodeName;
+    switch (nn) {
+        case "INPUT":
+            const iel = (el as HTMLInputElement);
+            switch (iel.type) {
+                case "text":
+                case "number":
+                case "radio":
+                    data[iel.name] = iel.value;
+                    break;
+                case "checkbox":
+                    data[iel.name] = "" + iel.checked;
+                    break;
+            }
+            break;
+        case "SELECT":
+            const sel = (el as HTMLSelectElement);
+            data[sel.name] = sel.value;
+            break;
+        default:
+            console.warn("unknowen form element", nn);
+            return undefined;
+    }
+}
+
+export const formOnAction = (action: string, data: any, ctrl: ICtrl<FormState>): void => {
+    console.log("action:", action, data);
+    switch (action) {
+        case FormActions.title:
+            ctrl.update({ title: data as string });
+            break;
+        case FormActions.formData:
+            formDataCollect(data, ctrl.state.data);
+            // TODO: formDataValidate(ctrl.state.data);
+            break;
+        case FormActions.formSubmit:
+            data.preventDefault();
+            console.dir(JSON.stringify(ctrl.state.data, null, 4));
+            ctrl.actionGlobal(action, ctrl.state.data);
+            break;
+        default:
+            ctrl.actionGlobal(action, data);
+    }
+    // console.log(ctrl.state.data);
+};
+
+export const form: Component<FormState> = [formState, formView, formOnAction, "form"];
 
 
 export interface AppShellState {

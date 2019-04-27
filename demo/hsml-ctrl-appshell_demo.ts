@@ -1,6 +1,6 @@
 import { Component, ICtrl } from "../src/hsml-ctrl";
 import { ctrlApp } from "../src/hsml-ctrl-web";
-import { AppShellState, AppShellActions, content, sidebar, appShell } from "./hsml-ctrl-appshell-components_demo";
+import { AppShellState, AppShellActions, content, form, appShell } from "./hsml-ctrl-appshell-components_demo";
 import { Hash } from "../src/hash";
 
 function onActionGlobal(action: string, data: any, ctrl: ICtrl<AppShellState>) {
@@ -22,7 +22,7 @@ setTimeout(() => {
 
 const contents: { [k: string]: Component<any> } = {
     Content: content,
-    Sidebar: sidebar
+    Form: form
 };
 
 new Hash<string>()
