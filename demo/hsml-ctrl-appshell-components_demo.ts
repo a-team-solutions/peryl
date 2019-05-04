@@ -1,5 +1,5 @@
 import { Component, Action, Manage, View, ICtrl, OnAction } from "../src/hsml-ctrl";
-import { Hsmls, Hsml } from "../src/hsml";
+import { Hsmls, Hsml, join } from "../src/hsml";
 
 export interface SidebarState {
     title: string;
@@ -87,9 +87,17 @@ export const contentOnAction = (action: string, data: any, ctrl: ICtrl<ContentSt
 export const content: Component<ContentState> = [contentState, contentView, contentOnAction, "content"];
 
 
+export interface FormModel {
+    name: string;
+    age: number;
+    married: boolean;
+    gender: string;
+    sport: string;
+}
+
 export interface FormState {
     title: string;
-    data: { [name: string]: any };
+    model: FormModel;
 }
 
 export enum FormActions {
@@ -100,17 +108,30 @@ export enum FormActions {
 
 export const formState = {
     title: "Form",
-    data: {}
+    model: {
+        name: "Ema",
+        age: 33,
+        married: false,
+        gender: "female",
+        sport: "gymnastics"
+    }
 };
 
 export const formView: View<FormState> = (state: FormState, action: Action, manage: Manage): Hsmls => {
+    const genders = [
+        { label: "Male", value: "male" },
+        { label: "Female", value: "female" }
+    ];
+    const sports = ["football", "gymnastics"];
     return [
         ["h1", [state.title]],
         ["form.w3-container", [
             ["p", [
                 ["label", ["Name",
                     ["input.w3-input", {
-                        type: "text", name: "name",
+                        type: "text",
+                        name: "name",
+                        value: state.model.name,
                         on: ["change", FormActions.formData]
                     }]
                 ]]
@@ -118,7 +139,9 @@ export const formView: View<FormState> = (state: FormState, action: Action, mana
             ["p", [
                 ["label", ["Age",
                     ["input.w3-input", {
-                        type: "number", name: "age",
+                        type: "number",
+                        name: "age",
+                        value: state.model.age,
                         on: ["change", FormActions.formData]
                     }]
                 ]]
@@ -126,41 +149,46 @@ export const formView: View<FormState> = (state: FormState, action: Action, mana
             ["p", [
                 ["label", [
                     ["input.w3-check", {
-                        type: "checkbox", name: "single", checked: true,
+                        type: "checkbox",
+                        name: "married",
+                        checked: state.model.married,
                         on: ["change", FormActions.formData]
                     }],
-                    " Single"
+                    " Married"
                 ]]
             ]],
-            ["p", [
-                ["label", [
-                    ["input.w3-radio", {
-                        type: "radio", name: "gender", value: "male", checked: true,
-                        on: ["change", FormActions.formData]
-                    }],
-                    " Male"
-                ]],
-                ["br"],
-                ["label", [
-                    ["input.w3-radio", {
-                        type: "radio", name: "gender", value: "female", checked: false,
-                        on: ["change", FormActions.formData]
-                    }],
-                    " Female"
-                ]]
-            ]],
+            ["p",
+                join(
+                    genders.map<Hsml>(g => (
+                        ["label", [
+                            ["input.w3-radio", {
+                                type: "radio",
+                                name: "gender",
+                                value: g.value,
+                                checked: state.model.gender === g.value,
+                                on: ["change", FormActions.formData]
+                            }],
+                            " ", g.label
+                        ]]
+                    )),
+                    ["br"]
+                )
+            ],
             ["p", [
                 ["select.w3-select", {
-                    name: "option",
+                    name: "sport",
                     on: ["change", FormActions.formData]
                 }, [
                     ["option",
                         { value: "", disabled: true, selected: true },
-                        ["Children"]
+                        ["Sport"]
                     ],
-                    ["option", { value: "1" }, ["1 child"]],
-                    ["option", { value: "2" }, ["2 children"]],
-                    ["option", { value: "3" }, ["3 children"]]
+                    ...sports.map<Hsml>(s => (
+                        ["option",
+                            { value: s, selected: s === state.model.sport },
+                            [s]
+                        ])
+                    )
                 ]]
             ]],
             ["button.w3-btn.w3-blue",
@@ -171,7 +199,7 @@ export const formView: View<FormState> = (state: FormState, action: Action, mana
     ];
 };
 
-function formDataCollect(e: Event, data: { [name: string]: string }): void {
+function formDataCollect(e: Event, data: any): void {
     e.preventDefault();
     const el = (e.target as HTMLElement);
     const nn = el.nodeName;
@@ -185,7 +213,7 @@ function formDataCollect(e: Event, data: { [name: string]: string }): void {
                     data[iel.name] = iel.value;
                     break;
                 case "checkbox":
-                    data[iel.name] = "" + iel.checked;
+                    data[iel.name] = iel.checked;
                     break;
             }
             break;
@@ -206,18 +234,18 @@ export const formOnAction = (action: string, data: any, ctrl: ICtrl<FormState>):
             ctrl.update({ title: data as string });
             break;
         case FormActions.formData:
-            formDataCollect(data, ctrl.state.data);
+            formDataCollect(data, ctrl.state.model);
             // TODO: formDataValidate(ctrl.state.data);
+            console.log(ctrl.state.model);
             break;
         case FormActions.formSubmit:
             data.preventDefault();
-            console.dir(JSON.stringify(ctrl.state.data, null, 4));
-            ctrl.actionGlobal(action, ctrl.state.data);
+            console.dir(JSON.stringify(ctrl.state.model, null, 4));
+            ctrl.actionGlobal(action, ctrl.state.model);
             break;
         default:
             ctrl.actionGlobal(action, data);
     }
-    // console.log(ctrl.state.data);
 };
 
 export const form: Component<FormState> = [formState, formView, formOnAction, "form"];
