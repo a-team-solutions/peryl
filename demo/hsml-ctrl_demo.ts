@@ -28,6 +28,7 @@ const appView: View<AppState> = (state: AppState, action: Action, manage: Manage
                 {
                     type: "text",
                     value: state.title,
+                    // on: ["input", e => action(AppActions.title, (e.target as HTMLInputElement).value)],
                     // on: ["input", Actions.title, e => (e.target as HTMLInputElement).value]
                     on: ["input", AppActions.title]
                 }
@@ -48,6 +49,7 @@ const appOnAction: OnAction<AppState> = (action: string, data: any, ctrl: ICtrl<
     // console.log("action:", action, data);
     switch (action) {
         case AppActions.title:
+            // const title = data;
             const title = ((data as Event).target as HTMLInputElement).value;
             ctrl.update({ title });
             break;

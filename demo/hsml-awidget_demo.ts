@@ -29,6 +29,7 @@ class App extends AWidget<AppState> {
                     {
                         type: "text",
                         value: state.title,
+                        // on: ["input", e => action(AppActions.title, (e.target as HTMLInputElement).value)],
                         // on: ["input", Actions.title, e => (e.target as HTMLInputElement).value]
                         on: ["input", AppActions.title]
                     }
@@ -49,6 +50,7 @@ class App extends AWidget<AppState> {
         // console.log("action:", action, data);
         switch (action) {
             case AppActions.title:
+                // const title = data;
                 const title = ((data as Event).target as HTMLInputElement).value;
                 widget.update({ title });
                 break;
