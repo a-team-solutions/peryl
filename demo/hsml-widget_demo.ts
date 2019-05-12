@@ -27,6 +27,10 @@ class HelloWidget extends Widget {
         console.log("onUmount", this.type, this.id);
     }
 
+    onAction(action: string, data: any): void {
+        console.log("onAction", action, data);
+    }
+
     render(): Hsmls {
         return [
             ["input~i",
