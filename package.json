@@ -1,6 +1,6 @@
 {
   "name": "prest-lib",
-  "version": "1.1.8",
+  "version": "1.2.0",
   "description": "pREST TypeScript library and tools for rapid web development",
   "keywords": [
     "pREST",
