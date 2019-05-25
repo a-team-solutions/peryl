@@ -5,13 +5,13 @@ export type Component<S> = [S, View<S>, OnAction<S>, string?];
 
 export type View<S> = (state: S, action: Action, manage: Manage) => Hsmls;
 
-export type OnAction<S> = (action: string, data: any, ctrl: ICtrl<S>) => void;
+export type OnAction<S> = (action: string, data: any, ctrl: Ctrl<S>) => void;
 
 export type Action = (action: string, data?: any) => void;
 
 export type Manage = <S>(state: S, view: View<S>, onAction: OnAction<S>, type?: string) => HsmlFnc | Hsmls;
 
-export interface ICtrl<S> {
+export interface Ctrl<S> {
     type: string;
     id: string;
     dom: Element;
@@ -24,7 +24,7 @@ export interface ICtrl<S> {
     action(action: string, data?: any): void;
     actionGlobal(action: string, data?: any): void;
     onActionGlobal(onAction: OnAction<S>): this;
-    ctrls(): ICtrl<any>[];
+    ctrls(): Ctrl<any>[];
     render(): Hsmls;
     onHsml(action: string, data: HsmlAttrOnData, e: Event): void;
     mount(e: Element): this;
@@ -42,10 +42,10 @@ const manageHtml: Manage = <S>(state: S, view: View<S>, onAction: OnAction<S>): 
     return view(state, actionHtml, manageHtml);
 };
 
-export function ctrlHtml<S>(state: S, view: View<S>, onHtml: (html: string) => void, pretty = false): void {
+export function svacHtml<S>(state: S, view: View<S>, onHtml: (html: string) => void, pretty = false): void {
     hsmls2html(view(state, actionHtml, manageHtml), onHtml, pretty);
 }
 
-export function ctrlHtmls<S>(state: S, view: View<S>, pretty = false): string {
+export function svacHtmls<S>(state: S, view: View<S>, pretty = false): string {
     return hsmls2htmls(view(state, actionHtml, manageHtml), pretty).join("");
 }

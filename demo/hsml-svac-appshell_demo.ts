@@ -1,9 +1,9 @@
-import { Component, ICtrl } from "../src/hsml-ctrl";
-import { ctrlApp } from "../src/hsml-ctrl-web";
-import { AppShellState, AppShellActions, content, form, appShell } from "./hsml-ctrl-appshell-components_demo";
+import { Component, Ctrl } from "../src/hsml-svac";
+import { SvaCtrl } from "../src/hsml-svac-ctrl";
+import { AppShellState, AppShellActions, content, form, appShell } from "./hsml-svac-appshell-components_demo";
 import { Hash } from "../src/hash";
 
-function onActionGlobal(action: string, data: any, ctrl: ICtrl<AppShellState>) {
+function onActionGlobal(action: string, data: any, ctrl: Ctrl<AppShellState>) {
     console.log(action, data, ctrl);
     switch (action) {
         case "xXx":
@@ -12,7 +12,7 @@ function onActionGlobal(action: string, data: any, ctrl: ICtrl<AppShellState>) {
     }
 }
 
-const app = ctrlApp(...appShell)
+const app = new SvaCtrl<AppShellState>(...appShell)
     .onActionGlobal(onActionGlobal)
     .mount(document.getElementById("app"));
 

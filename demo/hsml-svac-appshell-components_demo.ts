@@ -1,4 +1,4 @@
-import { Component, Action, Manage, View, ICtrl, OnAction } from "../src/hsml-ctrl";
+import { Component, Action, Manage, View, Ctrl, OnAction } from "../src/hsml-svac";
 import { Hsmls, Hsml, join } from "../src/hsml";
 
 export interface SidebarState {
@@ -40,7 +40,7 @@ export const sidebarView: View<SidebarState> = (state: SidebarState, action: Act
     ];
 };
 
-export const sidebarOnAction: OnAction<SidebarState> = (action: string, data: any, ctrl: ICtrl<SidebarState>): void => {
+export const sidebarOnAction: OnAction<SidebarState> = (action: string, data: any, ctrl: Ctrl<SidebarState>): void => {
     console.log("action:", action, data);
     switch (action) {
         case SidebarActions.title:
@@ -73,7 +73,7 @@ export const contentView: View<ContentState> = (state: ContentState, action: Act
     ];
 };
 
-export const contentOnAction = (action: string, data: any, ctrl: ICtrl<ContentState>): void => {
+export const contentOnAction = (action: string, data: any, ctrl: Ctrl<ContentState>): void => {
     console.log("action:", action, data);
     switch (action) {
         case ContentActions.title:
@@ -227,7 +227,7 @@ function formDataCollect(e: Event, data: any): void {
     }
 }
 
-export const formOnAction = (action: string, data: any, ctrl: ICtrl<FormState>): void => {
+export const formOnAction = (action: string, data: any, ctrl: Ctrl<FormState>): void => {
     console.log("action:", action, data);
     switch (action) {
         case FormActions.title:
@@ -374,7 +374,7 @@ export const appShellView: View<AppShellState> = (state: AppShellState, action: 
     ];
 };
 
-export const appShellOnAction: OnAction<AppShellState> = (action: string, data: any, ctrl: ICtrl<AppShellState>): void => {
+export const appShellOnAction: OnAction<AppShellState> = (action: string, data: any, ctrl: Ctrl<AppShellState>): void => {
     console.log("action:", action, data);
     switch (action) {
         case AppShellActions.title:

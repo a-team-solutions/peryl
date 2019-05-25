@@ -1,6 +1,6 @@
-import { ICtrl, Action, Manage, View, OnAction, ctrlHtml, ctrlHtmls } from "../src/hsml-ctrl";
+import { Ctrl, Action, Manage, View, OnAction, svacHtml, svacHtmls } from "../src/hsml-svac";
 import { Hsmls } from "../src/hsml";
-import { ctrlApp } from "../src/hsml-ctrl-web";
+import { SvaCtrl } from "../src/hsml-svac-ctrl";
 
 interface AppState {
     title: string;
@@ -45,7 +45,7 @@ const appView: View<AppState> = (state: AppState, action: Action, manage: Manage
     ];
 };
 
-const appOnAction: OnAction<AppState> = (action: string, data: any, ctrl: ICtrl<AppState>): void => {
+const appOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void => {
     // console.log("action:", action, data);
     switch (action) {
         case AppActions.title:
@@ -81,7 +81,7 @@ const subView: View<AppState> = (state: AppState, action: Action, manage: Manage
     ];
 };
 
-const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: ICtrl<AppState>): void => {
+const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>): void => {
     // console.log("action:", action, data);
     switch (action) {
         case SubAppActions.xXx:
@@ -95,7 +95,7 @@ const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: ICtrl<
 
 // Client side app rendering
 
-const onActionGlobal: OnAction<AppState> = (action: string, data: any, ctrl: ICtrl<AppState>) => {
+const onActionGlobal: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<AppState>) => {
     console.log(action, data);
     switch (action) {
         case "xXx":
@@ -104,16 +104,16 @@ const onActionGlobal: OnAction<AppState> = (action: string, data: any, ctrl: ICt
     }
 };
 
-const a = ctrlApp<AppState>(appState, appView, appOnAction, "app")
+const app = new SvaCtrl<AppState>(appState, appView, appOnAction, "app")
     .onActionGlobal(onActionGlobal)
     .mount(document.getElementById("app"));
 
-(self as any).app = a;
+(self as any).app = app;
 
 
 // Server side html rendering
 
-ctrlHtml<AppState>(appState, appView, html => console.log(html), true);
+svacHtml<AppState>(appState, appView, html => console.log(html), true);
 
-const h = ctrlHtmls<AppState>(appState, appView, true);
+const h = svacHtmls<AppState>(appState, appView, true);
 console.log(h);
