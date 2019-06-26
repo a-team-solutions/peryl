@@ -211,11 +211,11 @@ const merge = <T extends { [k: string]: any }>(target: T, source: Partial<T>): T
         Object.keys(source).forEach(key => {
             if (isMergeble(source[key])) {
                 if (!target[key]) {
-                    target[key] = {};
+                    (target as any)[key] = {};
                 }
                 merge(target[key], source[key]);
             } else {
-                target[key] = source[key];
+                (target as any)[key] = source[key];
             }
         });
     } else {

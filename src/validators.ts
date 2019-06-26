@@ -599,15 +599,14 @@ export class ArrayValidator<T = any> {
                 (this.str as StrDict<T>[]).push(r.str);
                 (this.obj as { [key in keyof T]: any }[]).push(r.obj);
                 (this.err as StrDict<T>[]).push(r.err);
-                console.log(r.valid, "----", d);
                 !r.valid && ((this.valid as any) = false);
             });
         } else { // Validator<T, any, any>
             (data as any).forEach((d: any) => {
                 const r = (validator as Validator<T, any, any>).validate(d);
-                this.str.push(r.str);
+                this.str.push(r.str as any);
                 this.obj.push(r.obj);
-                this.err.push(r.err);
+                this.err.push(r.err as any);
                 r.err && ((this.valid as any) = false);
             });
         }
@@ -961,7 +960,7 @@ export class FormValidator<T = any> {
 
 // const d: D[] = [
 //     { a: 123, b: "text" },
-//     // { a: 5.6, b: "" }
+//     // { a: 5.6, b: "" },
 //     { a: 5.6 }
 // ];
 
