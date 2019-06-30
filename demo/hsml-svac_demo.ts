@@ -1,6 +1,6 @@
-import { Ctrl, Action, Manage, View, OnAction, svacHtml, svacHtmls } from "../src/hsml-svac";
+import { Action, Manage, svacHtml, svacHtmls } from "../src/hsml-svac";
 import { Hsmls } from "../src/hsml";
-import { SvaCtrl } from "../src/hsml-svac-ctrl";
+import { svacDef, svacApp, OnAction, Ctrl, View } from "../src/hsml-svac-ctrl";
 
 interface AppState {
     title: string;
@@ -41,7 +41,7 @@ const appView: View<AppState> = (state: AppState, action: Action, manage: Manage
             ["button", { on: ["click", AppActions.inc, 2] }, ["+"]],
             ["button", { on: ["click", AppActions.xXx] }, ["xXx"]]
         ]],
-        ["p", state.title ? manage<AppState>(state, subView, subOnAction) : []]
+        ["p", state.title ? manage<AppState>(subView, state) : []]
     ];
 };
 
@@ -65,6 +65,7 @@ const appOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<A
     }
 };
 
+svacDef(appState, appView, appOnAction, "App");
 
 enum SubAppActions {
     xXx = "xXx"
@@ -92,6 +93,8 @@ const subOnAction: OnAction<AppState> = (action: string, data: any, ctrl: Ctrl<A
     }
 };
 
+svacDef(appState, subView, subOnAction, "Sub");
+
 
 // Client side app rendering
 
@@ -104,7 +107,7 @@ const onActionGlobal: OnAction<AppState> = (action: string, data: any, ctrl: Ctr
     }
 };
 
-const app = new SvaCtrl<AppState>(appState, appView, appOnAction, "app")
+const app = svacApp<AppState>(appView)
     .onActionGlobal(onActionGlobal)
     .mount(document.getElementById("app"));
 

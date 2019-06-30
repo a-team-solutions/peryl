@@ -1,12 +1,25 @@
-import { View, OnAction, Manage, Ctrl } from "./hsml-svac";
+import { Manage, Action } from "./hsml-svac";
 import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-const manage: Manage = <S>(state: S, view: View<S>, onAction: OnAction<S>, type?: string): HsmlFnc | Hsmls => {
+export interface View<S> {
+    (state: S, action: Action, manage: Manage): Hsmls;
+    svac_type?: string;
+    svac_state?: S;
+    svac_onAction?: OnAction<S>;
+}
+
+export type Component<S> = [S, View<S>, OnAction<S>, string?];
+
+export type OnAction<S> = (action: string, data: any, ctrl: Ctrl<S>) => void;
+
+const manage: Manage = <S>(view: View<S>, state?: S): HsmlFnc | Hsmls => {
     return (e: Element) => {
+        const type = (view as any).svac_type;
+        const onAction = view.svac_onAction;
         if ((e as any).ctrl) {
-            const c = (e as any).ctrl as SvaCtrl<S>;
+            const c = (e as any).ctrl as Ctrl<S>;
             if (c.view === view) {
                 if (state !== undefined) {
                     c.state = state;
@@ -14,16 +27,16 @@ const manage: Manage = <S>(state: S, view: View<S>, onAction: OnAction<S>, type?
                 c.update();
             } else {
                 c.umount();
-                const c1 = new SvaCtrl(state, view, onAction, type);
+                const c1 = new Ctrl(state, view, onAction, type);
                 if (state !== undefined) {
                     c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new SvaCtrl(state, view, onAction, type);
+            const c = new Ctrl(state, view, onAction, type);
             if (state !== undefined) {
-                c.state = state;
+                c.state = (view as any).svac_state;
             }
             c.mount(e);
         }
@@ -31,18 +44,31 @@ const manage: Manage = <S>(state: S, view: View<S>, onAction: OnAction<S>, type?
     };
 };
 
-export class SvaCtrl<S> implements Ctrl<S>, HsmlHandlerCtx {
+export function svacApp<S>(view: View<S>, state?: S): Ctrl<S> {
+    return new Ctrl<S>(view.svac_state, view, view.svac_onAction, view.svac_type);
+}
+
+export function svacDef<S>(state: S,
+                           view: View<S>,
+                           onAction: OnAction<S>,
+                           type?: string): void {
+    view.svac_type = type || view.name;
+    view.svac_state = state;
+    view.svac_onAction = onAction;
+}
+
+export class Ctrl<S> implements HsmlHandlerCtx {
 
     private static __count = 0;
 
-    static readonly mounted: { [ctrl: string]: SvaCtrl<any> } = {};
+    static readonly mounted: { [ctrl: string]: Ctrl<any> } = {};
 
     static onActionGlobal: OnAction<any> = (action: string, data: any, ctrl: Ctrl<any>): void => {
         console.log("action:", action, data, ctrl);
     }
 
     readonly type: string = "Ctrl";
-    readonly id: string = this.type + "-" + SvaCtrl.__count++;
+    readonly id: string = this.type + "-" + Ctrl.__count++;
     readonly dom: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
@@ -64,16 +90,16 @@ export class SvaCtrl<S> implements Ctrl<S>, HsmlHandlerCtx {
     }
 
     actionGlobal = (action: string, data?: any): void => {
-        SvaCtrl.onActionGlobal(action, data, this);
+        Ctrl.onActionGlobal(action, data, this);
     }
 
     onActionGlobal(onAction: OnAction<S>): this {
-        SvaCtrl.onActionGlobal = onAction;
+        Ctrl.onActionGlobal = onAction;
         return this;
     }
 
-    ctrls(): SvaCtrl<any>[] {
-        return Object.values(SvaCtrl.mounted);
+    ctrls(): Ctrl<any>[] {
+        return Object.values(Ctrl.mounted);
     }
 
     render = (): Hsmls => {
@@ -91,11 +117,11 @@ export class SvaCtrl<S> implements Ctrl<S>, HsmlHandlerCtx {
         !e && console.warn("invalit element", e);
         if (e) {
             if ("ctrl" in e) {
-                const c = (e as any).ctrl as SvaCtrl<S>;
+                const c = (e as any).ctrl as Ctrl<S>;
                 c && c.umount();
             }
             if (!this.dom) {
-                SvaCtrl.mounted[this.id] = this;
+                Ctrl.mounted[this.id] = this;
                 (this as any).dom = e;
                 (e as any).ctrl = this;
                 const hsmls = (this as any).render();
@@ -109,14 +135,14 @@ export class SvaCtrl<S> implements Ctrl<S>, HsmlHandlerCtx {
 
     umount = (): this => {
         if (this.dom) {
-            delete SvaCtrl.mounted[this.id];
+            delete Ctrl.mounted[this.id];
             this.action("_umount", this.dom);
             if (this.dom.hasAttribute("ctrl")) {
                 this.dom.removeAttribute("ctrl");
             }
             const cNodes = this.dom.querySelectorAll("[ctrl]");
             for (let i = 0; i < cNodes.length; i++) {
-                const c = (cNodes[i] as any).ctrl as SvaCtrl<S>;
+                const c = (cNodes[i] as any).ctrl as Ctrl<S>;
                 c && c.umount();
             }
             while (this.dom.firstChild /*.hasChildNodes()*/) {
@@ -167,7 +193,7 @@ export class SvaCtrl<S> implements Ctrl<S>, HsmlHandlerCtx {
                 if (!this.dom) {
                     (this as any).dom = e;
                     (e as any).ctrl = this;
-                    SvaCtrl.mounted[this.id] = this;
+                    Ctrl.mounted[this.id] = this;
                     this.action("_mount", this.dom);
                 }
             });
@@ -192,7 +218,7 @@ export class SvaCtrl<S> implements Ctrl<S>, HsmlHandlerCtx {
 (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
     nodes.forEach(node => {
         if (node.nodeType === 1 && "ctrl" in node) {
-            const c = (node as any).ctrl as SvaCtrl<any>;
+            const c = (node as any).ctrl as Ctrl<any>;
             c && c.umount();
         }
     });

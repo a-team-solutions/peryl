@@ -1,5 +1,6 @@
-import { Component, Action, Manage, View, Ctrl, OnAction } from "../src/hsml-svac";
+import { Action, Manage, View } from "../src/hsml-svac";
 import { Hsmls, Hsml, join } from "../src/hsml";
+import { svacDef, OnAction, Component, Ctrl } from "../src/hsml-svac-ctrl";
 
 export interface SidebarState {
     title: string;
@@ -51,7 +52,9 @@ export const sidebarOnAction: OnAction<SidebarState> = (action: string, data: an
     }
 };
 
-export const sidebar: Component<SidebarState> = [sidebarState, sidebarView, sidebarOnAction, "sidebar"];
+export const sidebar: Component<SidebarState> = [sidebarState, sidebarView, sidebarOnAction, "Sidebar"];
+
+svacDef(...sidebar);
 
 
 export interface ContentState {
@@ -84,7 +87,9 @@ export const contentOnAction = (action: string, data: any, ctrl: Ctrl<ContentSta
     }
 };
 
-export const content: Component<ContentState> = [contentState, contentView, contentOnAction, "content"];
+export const content: Component<ContentState> = [contentState, contentView, contentOnAction, "Content"];
+
+svacDef(...content);
 
 
 export interface FormModel {
@@ -208,9 +213,11 @@ function formDataCollect(e: Event, data: any): void {
             const iel = (el as HTMLInputElement);
             switch (iel.type) {
                 case "text":
-                case "number":
                 case "radio":
                     data[iel.name] = iel.value;
+                    break;
+                case "number":
+                    data[iel.name] = Number(iel.value);
                     break;
                 case "checkbox":
                     data[iel.name] = iel.checked;
@@ -248,7 +255,9 @@ export const formOnAction = (action: string, data: any, ctrl: Ctrl<FormState>): 
     }
 };
 
-export const form: Component<FormState> = [formState, formView, formOnAction, "form"];
+export const form: Component<FormState> = [formState, formView, formOnAction, "Form"];
+
+svacDef(...form);
 
 
 export interface AppShellState {
@@ -348,7 +357,7 @@ export const appShellView: View<AppShellState> = (state: AppShellState, action: 
                     display: state.menu ? "block" : "none"
                 }
             },
-            manage<any>(...state.sidebar)
+            manage<any>(state.sidebar[1], state.sidebar[0])
         ],
         // overlay
         ["div#overlay.w3-overlay.w3-hide-large.w3-animate-opacity~overlay",
@@ -364,7 +373,7 @@ export const appShellView: View<AppShellState> = (state: AppShellState, action: 
         // main
         ["div.w3-main", { style: "margin-left:300px;margin-top:43px;" }, [
             ["div.w3-container~content",
-                manage<any>(...state.content)
+                manage<any>(state.content[1], state.content[0])
             ]
         ]],
         // snackbar
@@ -401,4 +410,6 @@ export const appShellOnAction: OnAction<AppShellState> = (action: string, data: 
     }
 };
 
-export const appShell: Component<AppShellState> = [appShellState, appShellView, appShellOnAction, "appShell"];
+export const appShell: Component<AppShellState> = [appShellState, appShellView, appShellOnAction, "AppShell"];
+
+svacDef(...appShell);

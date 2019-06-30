@@ -1,6 +1,5 @@
-import { Component, Ctrl } from "../src/hsml-svac";
-import { SvaCtrl } from "../src/hsml-svac-ctrl";
-import { AppShellState, AppShellActions, content, form, appShell } from "./hsml-svac-appshell-components_demo";
+import { svacApp, Component, Ctrl } from "../src/hsml-svac-ctrl";
+import { AppShellState, AppShellActions, content, form, appShellView } from "./hsml-svac-appshell-components_demo";
 import { Hash } from "../src/hash";
 
 function onActionGlobal(action: string, data: any, ctrl: Ctrl<AppShellState>) {
@@ -12,7 +11,7 @@ function onActionGlobal(action: string, data: any, ctrl: Ctrl<AppShellState>) {
     }
 }
 
-const app = new SvaCtrl<AppShellState>(...appShell)
+const app = svacApp<AppShellState>(appShellView)
     .onActionGlobal(onActionGlobal)
     .mount(document.getElementById("app"));
 
