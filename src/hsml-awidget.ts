@@ -209,7 +209,7 @@ const merge = <T extends { [k: string]: any }>(target: T, source: Partial<T>): T
                 }
                 merge(target[key], source[key]);
             } else {
-                (target as any) = source[key];
+                (target as any)[key] = source[key];
             }
         });
     } else {
