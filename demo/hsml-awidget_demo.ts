@@ -62,7 +62,7 @@ class App extends AWidget<AppState> {
                 widget.update({ count: widget.state.count - data as number });
                 break;
             default:
-                widget.actionGlobal(action, data);
+                widget.appAction(action, data);
         }
     }
 }
@@ -97,14 +97,14 @@ class SubApp extends AWidget<AppState> {
                 console.log(action);
                 break;
             default:
-                widget.actionGlobal(action, data);
+                widget.appAction(action, data);
         }
     }
 
 }
 
 
-function onActionGlobal(action: string, data: any, widget: AWidget<AppState>) {
+function appOnAction(action: string, data: any, widget: AWidget<AppState>) {
     console.log(action, data);
     switch (action) {
         case "xXx":
@@ -114,7 +114,7 @@ function onActionGlobal(action: string, data: any, widget: AWidget<AppState>) {
 }
 
 const app = new App()
-    .onActionGlobal(onActionGlobal)
+    .appOnAction(appOnAction)
     .mount(document.getElementById("app"));
 
 (self as any).app = app;
