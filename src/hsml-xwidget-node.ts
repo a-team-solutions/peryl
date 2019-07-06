@@ -13,7 +13,7 @@ export function xWidgetHtml<S>(wClass: Class<Widget<S>>,
 
 const widgets: Widgets = {
     mounted: {},
-    onActionGlobal: (action: string, data: any, widget: XWidget<any>): void => {
+    appOnAction: (action: string, data: any, widget: XWidget<any>): void => {
         console.log("action:", action, data, widget);
     }
 };
@@ -41,12 +41,12 @@ export function xWidget<S>(wClass: Class<Widget<S>>): XWidget<S> {
             this.onAction(action, data, this);
         }
 
-        actionGlobal = (action: string, data?: any): void => {
-            this.widgets.onActionGlobal(action, data, this);
+        appAction = (action: string, data?: any): void => {
+            this.widgets.appOnAction(action, data, this);
         }
 
-        onActionGlobal(onAction: OnAction<S>): this {
-            this.widgets.onActionGlobal = onAction;
+        appOnAction(onAction: OnAction<S>): this {
+            this.widgets.appOnAction = onAction;
             return this;
         }
 

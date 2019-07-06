@@ -23,8 +23,8 @@ export interface XWidget<S> extends HsmlHandlerCtx, Widget<S> {
     dom: Element;
     state: S;
     action: Action;
-    actionGlobal: Action;
-    onActionGlobal: (onAction: OnAction<S>) => this;
+    appAction: Action;
+    appOnAction: (onAction: OnAction<S>) => this;
     render: () => Hsmls;
     mount: (e: Element) => this;
     umount: () => this;
@@ -35,5 +35,5 @@ export interface XWidget<S> extends HsmlHandlerCtx, Widget<S> {
 
 export interface Widgets {
     readonly mounted: { [wid: string]: XWidget<any> };
-    onActionGlobal: OnAction<any>;
+    appOnAction: OnAction<any>;
 }

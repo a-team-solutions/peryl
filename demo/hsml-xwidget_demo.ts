@@ -48,7 +48,7 @@ class App implements Widget<AppState> {
     }
 
     onAction(action: string, data: any,
-             { state, update, action: actionLocal, actionGlobal }: XWidget<AppState>): void {
+             { state, update, action: actionLocal, appAction }: XWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
             case AppActions.title:
@@ -62,7 +62,7 @@ class App implements Widget<AppState> {
                 update({ count: state.count - data as number });
                 break;
             default:
-                actionGlobal(action, data);
+                appAction(action, data);
         }
     }
 }
@@ -89,21 +89,21 @@ class SubApp implements Widget<AppState> {
         ];
     }
 
-    onAction(action: string, data: any, { actionGlobal }: XWidget<AppState>): void {
+    onAction(action: string, data: any, { appAction }: XWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
             case SubAppActions.xXx:
                 console.log(SubAppActions.xXx);
                 break;
             default:
-                actionGlobal(action, data);
+                appAction(action, data);
         }
     }
 
 }
 
 
-function onActionGlobal(action: string, data: any, xWidget: XWidget<any>) {
+function appOnAction(action: string, data: any, xWidget: XWidget<any>) {
     console.log("action >", action, data, xWidget);
     switch (xWidget.type) {
         case "App":
@@ -120,7 +120,7 @@ function onAppAction(action: string, data: any, xWidget: XWidget<AppState>): voi
 }
 
 const app = xWidget<AppState>(App)
-    .onActionGlobal(onActionGlobal)
+    .appOnAction(appOnAction)
     .mount(document.getElementById("app"));
 
 
