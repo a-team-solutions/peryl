@@ -24,7 +24,7 @@ export class Sidebar extends AWidget<SidebarState> {
         ];
         const nbsp = "\u00a0 ";
         return [
-            ["div", [
+            ["div.w3-container", [
                 ["h2", [state.title, " ", this.id]],
                 ["div.w3-bar-block", {},
                     menu.map<Hsml>(m => (
@@ -50,7 +50,7 @@ export class Sidebar extends AWidget<SidebarState> {
                 widget.update({ title: data as string });
                 break;
             default:
-                widget.actionGlobal(action, data);
+                widget.appAction(action, data);
         }
     }
 }
@@ -83,7 +83,7 @@ export class Content extends AWidget<ContentState> {
                 widget.update({ title: data as string });
                 break;
             default:
-                widget.actionGlobal(action, data);
+                widget.appAction(action, data);
         }
     }
 }
@@ -236,14 +236,14 @@ export class AppShell extends AWidget<AppShellState> {
                 setTimeout(widget.update, 3e3, { snackbar: undefined });
                 break;
             default:
-                widget.actionGlobal(action, data);
+                widget.appAction(action, data);
         }
     }
 }
 
 
-function onActionGlobal(action: string, data: any, widget: AWidget<AppShellState>) {
-    console.log(action, data, widget);
+function appOnAction(action: string, data: any, widget: AWidget<AppShellState>) {
+    console.log("app action", widget.type, action, data);
     switch (action) {
         case "xXx":
             widget.update({ title: "xXx" });
@@ -252,7 +252,7 @@ function onActionGlobal(action: string, data: any, widget: AWidget<AppShellState
 }
 
 const app = new AppShell()
-    .onActionGlobal(onActionGlobal)
+    .appOnAction(appOnAction)
     .mount(document.getElementById("app"));
 
 setTimeout(() => {
@@ -272,11 +272,7 @@ new Hash<string>()
     .onChange(data => {
         console.log("hash: " + JSON.stringify(data));
         app.action(AppShellActions.menu, false);
-        if (data) {
-            app.action(AppShellActions.content, contents[data]);
-        } else {
-            app.action(AppShellActions.content, Content);
-        }
+        app.action(AppShellActions.content, contents[data] || Content);
     })
     .listen();
 

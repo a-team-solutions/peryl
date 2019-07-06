@@ -1,8 +1,8 @@
-import { svacHtml, svacHtmls } from "../src/hsml-svac";
-import { AppShellState, appShellState, appShellView, sidebar } from "./hsml-svac-appshell-components_demo";
+import { html, htmls } from "../src/hsml-sva";
+import { AppShellState, AppShell, Sidebar } from "./hsml-svac-appshell-components_demo";
 
-svacHtml<AppShellState>(appShellState, appShellView, (html: string) => console.log(html), true);
+html<AppShellState>(AppShell, AppShell.state, (html: string) => console.log(html), true);
 
-appShellState.content = sidebar;
-const h = svacHtmls<AppShellState>(appShellState, appShellView, true);
+AppShell.state.content = Sidebar;
+const h = htmls<AppShellState>(AppShell, AppShell.state, true);
 console.log(h);

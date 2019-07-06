@@ -6,19 +6,19 @@ import * as idom from "incremental-dom";
 
 export function xWidgetApp<S>(wClass: Class<Widget<S>>,
                               e: Element = document.body,
-                              onActionGlobal?: OnAction<S>): XWidget<S> {
-    onActionGlobal && (widgets.onActionGlobal = onActionGlobal);
+                              appOnAction?: OnAction<S>): XWidget<S> {
+    appOnAction && (widgets.appOnAction = appOnAction);
     return xWidget<S>(wClass).mount(e);
 }
 
 export interface Widgets {
     readonly mounted: { [wid: string]: XWidget<any> };
-    onActionGlobal: OnAction<any>;
+    appOnAction: OnAction<any>;
 }
 
 const widgets: Widgets = {
     mounted: {},
-    onActionGlobal: (action: string, data: any, widget: XWidget<any>): void => {
+    appOnAction: (action: string, data: any, widget: XWidget<any>): void => {
         console.log("action:", action, data, widget);
     }
 };
@@ -70,12 +70,12 @@ export function xWidget<S>(wClass: Class<Widget<S>>): XWidget<S> {
             this.onAction(action, data, this);
         }
 
-        actionGlobal = (action: string, data?: any): void => {
-            this.widgets.onActionGlobal(action, data, this);
+        appAction = (action: string, data?: any): void => {
+            this.widgets.appOnAction(action, data, this);
         }
 
-        onActionGlobal(onAction: OnAction<S>): this {
-            this.widgets.onActionGlobal = onAction;
+        appOnAction(onAction: OnAction<S>): this {
+            this.widgets.appOnAction = onAction;
             return this;
         }
 

@@ -46,7 +46,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
 
     static readonly mounted: { [wid: string]: AWidget<any> } = {};
 
-    static onActionGlobal: OnAction<any> = (action: string, data: any, widget: AWidget<any>): void => {
+    static appOnAction: OnAction<any> = (action: string, data: any, widget: AWidget<any>): void => {
         console.log("action:", action, data, widget);
     }
 
@@ -65,16 +65,16 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
         this.onAction(action, data, this);
     }
 
-    actionGlobal = (action: string, data?: any): void => {
-        AWidget.onActionGlobal(action, data, this);
+    appAction = (action: string, data?: any): void => {
+        AWidget.appOnAction(action, data, this);
     }
 
-    onActionGlobal(onAction: OnAction<S>): this {
-        AWidget.onActionGlobal = onAction;
+    appOnAction(onAction: OnAction<S>): this {
+        AWidget.appOnAction = onAction;
         return this;
     }
 
-    widgets(): AWidget<any>[] {
+    get widgets(): AWidget<any>[] {
         return Object.values(AWidget.mounted);
     }
 
@@ -209,7 +209,7 @@ const merge = <T extends { [k: string]: any }>(target: T, source: Partial<T>): T
                 }
                 merge(target[key], source[key]);
             } else {
-                (target as any) = source[key];
+                (target as any)[key] = source[key];
             }
         });
     } else {

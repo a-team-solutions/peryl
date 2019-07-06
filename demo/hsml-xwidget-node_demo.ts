@@ -49,7 +49,7 @@ class App implements Widget<AppState> {
     }
 
     onAction(action: string, data: any,
-             { state, update, action: actionLocal, actionGlobal }: XWidget<AppState>): void {
+             { state, update, action: actionLocal, appAction }: XWidget<AppState>): void {
         // console.log("action:", action, data);
         switch (action) {
             case Actions.title:
@@ -63,7 +63,7 @@ class App implements Widget<AppState> {
                 update({ count: state.count - data as number });
                 break;
             default:
-                actionGlobal(action, data);
+                appAction(action, data);
         }
     }
 }
@@ -93,7 +93,7 @@ class SubApp implements Widget<AppState> {
                 console.log(Actions.xXx);
                 break;
             default:
-                xWidget.actionGlobal(action, data);
+                xWidget.appAction(action, data);
         }
     }
 
