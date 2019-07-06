@@ -1,6 +1,6 @@
-import { Action, Manage, html, htmls } from "../src/hsml-svac";
+import { Action, Manage, html, htmls } from "../src/hsml-sva";
 import { Hsmls } from "../src/hsml";
-import { OnAction, Ctrl, Component } from "../src/hsml-svac-ctrl";
+import { OnAction, Ctrl, Component } from "../src/hsml-svac";
 
 interface AppState {
     title: string;

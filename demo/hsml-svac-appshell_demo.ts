@@ -1,4 +1,4 @@
-import { Component, Ctrl } from "../src/hsml-svac-ctrl";
+import { Component, Ctrl } from "../src/hsml-svac";
 import { AppShellState, AppShellActions, content, form, appShell } from "./hsml-svac-appshell-components_demo";
 import { Hash } from "../src/hash";
 

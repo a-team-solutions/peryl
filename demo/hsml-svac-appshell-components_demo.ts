@@ -1,6 +1,6 @@
-import { Action, Manage, View } from "../src/hsml-svac";
+import { Action, Manage, View } from "../src/hsml-sva";
 import { Hsmls, Hsml, join } from "../src/hsml";
-import { OnAction, Component, Ctrl } from "../src/hsml-svac-ctrl";
+import { OnAction, Component, Ctrl } from "../src/hsml-svac";
 
 export interface SidebarState {
     title: string;
