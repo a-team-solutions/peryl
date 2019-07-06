@@ -1,4 +1,4 @@
-import { Component, Ctrl } from "../src/hsml-svac";
+import { Component, App, Ctrl } from "../src/hsml-svac";
 import { AppShellState, AppShellActions, content, form, appShell } from "./hsml-svac-appshell-components_demo";
 import { Hash } from "../src/hash";
 
@@ -11,7 +11,7 @@ function appOnAction(action: string, data: any, ctrl: Ctrl<AppShellState>) {
     }
 }
 
-const app = new Ctrl<AppShellState>(appShell)
+const app = new App<AppShellState>(appShell)
     .appOnAction(appOnAction)
     .mount(document.getElementById("app"));
 

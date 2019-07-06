@@ -198,6 +198,8 @@ export class Ctrl<S> implements HsmlHandlerCtx {
 
 }
 
+export const App = Ctrl;
+
 (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
     nodes.forEach(node => {
         if (node.nodeType === 1 && "ctrl" in node) {
