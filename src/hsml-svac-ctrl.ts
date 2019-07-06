@@ -1,42 +1,38 @@
-import { Manage, Action } from "./hsml-svac";
+import { Manage, View } from "./hsml-svac";
 import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export interface View<S> {
-    (state: S, action: Action, manage: Manage): Hsmls;
-    svac_type?: string;
-    svac_state?: S;
-    svac_onAction?: OnAction<S>;
+export interface Component<S> {
+    type: string;
+    state: S;
+    view: View<S>;
+    onAction?: OnAction<S>;
 }
-
-export type Component<S> = [S, View<S>, OnAction<S>, string?];
 
 export type OnAction<S> = (action: string, data: any, ctrl: Ctrl<S>) => void;
 
-const manage: Manage = <S>(view: View<S>, state?: S): HsmlFnc | Hsmls => {
+const manage: Manage = <S>(component: Component<S>, state?: S): HsmlFnc | Hsmls => {
     return (e: Element) => {
-        const type = (view as any).svac_type;
-        const onAction = view.svac_onAction;
         if ((e as any).ctrl) {
             const c = (e as any).ctrl as Ctrl<S>;
-            if (c.view === view) {
+            if (c.view === component.view) {
                 if (state !== undefined) {
                     c.state = state;
                 }
                 c.update();
             } else {
                 c.umount();
-                const c1 = new Ctrl(state, view, onAction, type);
+                const c1 = new Ctrl(component);
                 if (state !== undefined) {
                     c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new Ctrl(state, view, onAction, type);
+            const c = new Ctrl(component);
             if (state !== undefined) {
-                c.state = (view as any).svac_state;
+                c.state = state;
             }
             c.mount(e);
         }
@@ -44,26 +40,13 @@ const manage: Manage = <S>(view: View<S>, state?: S): HsmlFnc | Hsmls => {
     };
 };
 
-export function svacApp<S>(view: View<S>, state?: S): Ctrl<S> {
-    return new Ctrl<S>(view.svac_state, view, view.svac_onAction, view.svac_type);
-}
-
-export function svacDef<S>(state: S,
-                           view: View<S>,
-                           onAction: OnAction<S>,
-                           type?: string): void {
-    view.svac_type = type || view.name;
-    view.svac_state = state;
-    view.svac_onAction = onAction;
-}
-
 export class Ctrl<S> implements HsmlHandlerCtx {
 
     private static __count = 0;
 
     static readonly mounted: { [ctrl: string]: Ctrl<any> } = {};
 
-    static onActionGlobal: OnAction<any> = (action: string, data: any, ctrl: Ctrl<any>): void => {
+    static appOnAction: OnAction<any> = (action: string, data: any, ctrl: Ctrl<any>): void => {
         console.log("action:", action, data, ctrl);
     }
 
@@ -78,28 +61,28 @@ export class Ctrl<S> implements HsmlHandlerCtx {
     view: View<S>;
     onAction: OnAction<S>;
 
-    constructor(state: S, view: View<S>, onAction: OnAction<S>, type?: string) {
-        this.state = state;
-        this.view = view;
-        this.onAction = onAction;
-        type && (this.type = type);
+    constructor(component: Component<S>) {
+        this.state = component.state;
+        this.view = component.view;
+        this.onAction = component.onAction;
+        component.type && (this.type = component.type);
+    }
+
+    appAction = (action: string, data?: any): void => {
+        Ctrl.appOnAction(action, data, this);
+    }
+
+    appOnAction(onAction: OnAction<S>): this {
+        Ctrl.appOnAction = onAction;
+        return this;
+    }
+
+    get appCtrls(): Ctrl<any>[] {
+        return Object.values(Ctrl.mounted);
     }
 
     action = (action: string, data?: any): void => {
         this.onAction(action, data, this);
-    }
-
-    actionGlobal = (action: string, data?: any): void => {
-        Ctrl.onActionGlobal(action, data, this);
-    }
-
-    onActionGlobal(onAction: OnAction<S>): this {
-        Ctrl.onActionGlobal = onAction;
-        return this;
-    }
-
-    ctrls(): Ctrl<any>[] {
-        return Object.values(Ctrl.mounted);
     }
 
     render = (): Hsmls => {

@@ -1,9 +1,9 @@
-import { svacApp, Component, Ctrl } from "../src/hsml-svac-ctrl";
-import { AppShellState, AppShellActions, content, form, appShellView } from "./hsml-svac-appshell-components_demo";
+import { Component, Ctrl } from "../src/hsml-svac-ctrl";
+import { AppShellState, AppShellActions, content, form, appShell } from "./hsml-svac-appshell-components_demo";
 import { Hash } from "../src/hash";
 
-function onActionGlobal(action: string, data: any, ctrl: Ctrl<AppShellState>) {
-    console.log(action, data, ctrl);
+function appOnAction(action: string, data: any, ctrl: Ctrl<AppShellState>) {
+    // console.log("app action", action, data, ctrl);
     switch (action) {
         case "xXx":
             ctrl.update({ title: "xXx" });
@@ -11,8 +11,8 @@ function onActionGlobal(action: string, data: any, ctrl: Ctrl<AppShellState>) {
     }
 }
 
-const app = svacApp<AppShellState>(appShellView)
-    .onActionGlobal(onActionGlobal)
+const app = new Ctrl<AppShellState>(appShell)
+    .appOnAction(appOnAction)
     .mount(document.getElementById("app"));
 
 setTimeout(() => {
@@ -20,8 +20,8 @@ setTimeout(() => {
 }, 1e3);
 
 const contents: { [k: string]: Component<any> } = {
-    Content: content,
-    Form: form
+    content: { ...content },
+    form: { ...form }
 };
 
 new Hash<string>()
@@ -32,11 +32,7 @@ new Hash<string>()
     .onChange(data => {
         console.log("hash: " + JSON.stringify(data));
         app.action(AppShellActions.menu, false);
-        if (data) {
-            app.action(AppShellActions.content, contents[data]);
-        } else {
-            app.action(AppShellActions.content, contents.Content);
-        }
+        app.action(AppShellActions.content, contents[data] || content);
     })
     .listen();
 

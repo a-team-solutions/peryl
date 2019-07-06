@@ -1,6 +1,6 @@
 import { Action, Manage, View } from "../src/hsml-svac";
 import { Hsmls, Hsml, join } from "../src/hsml";
-import { svacDef, OnAction, Component, Ctrl } from "../src/hsml-svac-ctrl";
+import { OnAction, Component, Ctrl } from "../src/hsml-svac-ctrl";
 
 export interface SidebarState {
     title: string;
@@ -17,8 +17,8 @@ export const sidebarState: SidebarState = {
 export const sidebarView: View<SidebarState> = (state: SidebarState, action: Action, manage: Manage): Hsmls => {
     const menu = [
         { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
-        { url: "#Content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
-        { url: "#Form", label: "Form", icon: "i.fas.fa-fw.fa-bell" }
+        { url: "#content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
+        { url: "#form", label: "Form", icon: "i.fas.fa-fw.fa-bell" }
     ];
     const nbsp = "\u00a0 ";
     return [
@@ -42,19 +42,22 @@ export const sidebarView: View<SidebarState> = (state: SidebarState, action: Act
 };
 
 export const sidebarOnAction: OnAction<SidebarState> = (action: string, data: any, ctrl: Ctrl<SidebarState>): void => {
-    console.log("action:", action, data);
+    // console.log("action:", action, data);
     switch (action) {
         case SidebarActions.title:
             ctrl.update({ title: data as string });
             break;
         default:
-            ctrl.actionGlobal(action, data);
+            ctrl.appAction(action, data);
     }
 };
 
-export const sidebar: Component<SidebarState> = [sidebarState, sidebarView, sidebarOnAction, "Sidebar"];
-
-svacDef(...sidebar);
+export const sidebar: Component<SidebarState> = {
+    type: "Sidebar",
+    state: sidebarState,
+    view: sidebarView,
+    onAction: sidebarOnAction
+};
 
 
 export interface ContentState {
@@ -77,19 +80,22 @@ export const contentView: View<ContentState> = (state: ContentState, action: Act
 };
 
 export const contentOnAction = (action: string, data: any, ctrl: Ctrl<ContentState>): void => {
-    console.log("action:", action, data);
+    // console.log("action:", action, data);
     switch (action) {
         case ContentActions.title:
             ctrl.update({ title: data as string });
             break;
         default:
-            ctrl.actionGlobal(action, data);
+            ctrl.appAction(action, data);
     }
 };
 
-export const content: Component<ContentState> = [contentState, contentView, contentOnAction, "Content"];
-
-svacDef(...content);
+export const content: Component<ContentState> = {
+    type: "Content",
+    state: contentState,
+    view: contentView,
+    onAction: contentOnAction
+};
 
 
 export interface FormModel {
@@ -235,7 +241,7 @@ function formDataCollect(e: Event, data: any): void {
 }
 
 export const formOnAction = (action: string, data: any, ctrl: Ctrl<FormState>): void => {
-    console.log("action:", action, data);
+    // console.log("action:", action, data);
     switch (action) {
         case FormActions.title:
             ctrl.update({ title: data as string });
@@ -248,16 +254,19 @@ export const formOnAction = (action: string, data: any, ctrl: Ctrl<FormState>): 
         case FormActions.formSubmit:
             data.preventDefault();
             console.dir(JSON.stringify(ctrl.state.model, null, 4));
-            ctrl.actionGlobal(action, ctrl.state.model);
+            ctrl.appAction(action, ctrl.state.model);
             break;
         default:
-            ctrl.actionGlobal(action, data);
+            ctrl.appAction(action, data);
     }
 };
 
-export const form: Component<FormState> = [formState, formView, formOnAction, "Form"];
-
-svacDef(...form);
+export const form: Component<FormState> = {
+    type: "Form",
+    state: formState,
+    view: formView,
+    onAction: formOnAction
+};
 
 
 export interface AppShellState {
@@ -283,7 +292,7 @@ export const appShellState: AppShellState = {
     subtitle: "Subtitle",
     menu: false,
     sidebar: sidebar,
-    content: content,
+    content: form,
     snackbar: ""
 };
 
@@ -357,7 +366,7 @@ export const appShellView: View<AppShellState> = (state: AppShellState, action: 
                     display: state.menu ? "block" : "none"
                 }
             },
-            manage<any>(state.sidebar[1], state.sidebar[0])
+            manage<any>(state.sidebar)
         ],
         // overlay
         ["div#overlay.w3-overlay.w3-hide-large.w3-animate-opacity~overlay",
@@ -373,7 +382,7 @@ export const appShellView: View<AppShellState> = (state: AppShellState, action: 
         // main
         ["div.w3-main", { style: "margin-left:300px;margin-top:43px;" }, [
             ["div.w3-container~content",
-                manage<any>(state.content[1], state.content[0])
+                manage<any>(state.content)
             ]
         ]],
         // snackbar
@@ -384,7 +393,7 @@ export const appShellView: View<AppShellState> = (state: AppShellState, action: 
 };
 
 export const appShellOnAction: OnAction<AppShellState> = (action: string, data: any, ctrl: Ctrl<AppShellState>): void => {
-    console.log("action:", action, data);
+    // console.log("action:", action, data);
     switch (action) {
         case AppShellActions.title:
             ctrl.update({ title: data as string });
@@ -400,16 +409,21 @@ export const appShellOnAction: OnAction<AppShellState> = (action: string, data: 
             break;
         case AppShellActions.content:
             ctrl.update({ content: data as any });
+            // ctrl.state.content = data;
+            // ctrl.update();
             break;
         case AppShellActions.snackbar:
             ctrl.update({ snackbar: data as string });
             setTimeout(ctrl.update, 3e3, { snackbar: undefined });
             break;
         default:
-            ctrl.actionGlobal(action, data);
+            ctrl.appAction(action, data);
     }
 };
 
-export const appShell: Component<AppShellState> = [appShellState, appShellView, appShellOnAction, "AppShell"];
-
-svacDef(...appShell);
+export const appShell: Component<AppShellState> = {
+    type: "AppShell",
+    state: appShellState,
+    view: appShellView,
+    onAction: appShellOnAction
+};
