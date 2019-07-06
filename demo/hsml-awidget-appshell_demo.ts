@@ -24,7 +24,7 @@ export class Sidebar extends AWidget<SidebarState> {
         ];
         const nbsp = "\u00a0 ";
         return [
-            ["div", [
+            ["div.w3-container", [
                 ["h2", [state.title, " ", this.id]],
                 ["div.w3-bar-block", {},
                     menu.map<Hsml>(m => (
@@ -243,7 +243,7 @@ export class AppShell extends AWidget<AppShellState> {
 
 
 function appOnAction(action: string, data: any, widget: AWidget<AppShellState>) {
-    console.log(action, data, widget);
+    console.log("app action", widget.type, action, data);
     switch (action) {
         case "xXx":
             widget.update({ title: "xXx" });

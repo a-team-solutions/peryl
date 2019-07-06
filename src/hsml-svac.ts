@@ -61,8 +61,8 @@ export class Ctrl<S> implements HsmlHandlerCtx {
     view: View<S>;
     onAction: OnAction<S>;
 
-    constructor(component: Component<S>) {
-        this.state = component.state;
+    constructor(component: Component<S>, state?: S) {
+        this.state = state || component.state;
         this.view = component.view;
         this.onAction = component.onAction;
         component.type && (this.type = component.type);

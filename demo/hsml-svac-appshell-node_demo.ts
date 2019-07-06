@@ -1,8 +1,8 @@
 import { html, htmls } from "../src/hsml-sva";
-import { AppShellState, appShell, sidebar } from "./hsml-svac-appshell-components_demo";
+import { AppShellState, AppShell, Sidebar } from "./hsml-svac-appshell-components_demo";
 
-html<AppShellState>(appShell, appShell.state, (html: string) => console.log(html), true);
+html<AppShellState>(AppShell, AppShell.state, (html: string) => console.log(html), true);
 
-appShell.state.content = sidebar;
-const h = htmls<AppShellState>(appShell, appShell.state, true);
+AppShell.state.content = Sidebar;
+const h = htmls<AppShellState>(AppShell, AppShell.state, true);
 console.log(h);
