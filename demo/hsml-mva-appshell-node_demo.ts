@@ -1,5 +1,5 @@
-import { html, htmls } from "../src/hsml-sva";
-import { AppShellModel, AppShell, Sidebar } from "./hsml-svac-appshell-components_demo";
+import { html, htmls } from "../src/hsml-mva-html";
+import { AppShellModel, AppShell, Sidebar } from "./hsml-mva-appshell-components_demo";
 
 html<AppShellModel>(AppShell, AppShell.model, (html: string) => console.log(html), true);
 

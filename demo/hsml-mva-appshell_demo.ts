@@ -1,5 +1,5 @@
-import { Widget, CWidget } from "../src/hsml-svac";
-import { AppShellModel, AppShellActions, Content, Form, AppShell } from "./hsml-svac-appshell-components_demo";
+import { Widget, CWidget } from "../src/hsml-mva-cwidget";
+import { AppShellModel, AppShellActions, Content, Form, AppShell } from "./hsml-mva-appshell-components_demo";
 import { Hash } from "../src/hash";
 
 const app = new CWidget<AppShellModel>(AppShell)

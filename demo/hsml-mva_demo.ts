@@ -1,6 +1,6 @@
-import { Action, Manage, html, htmls } from "../src/hsml-sva";
+import { Action, Manage } from "../src/hsml-mva";
 import { Hsmls } from "../src/hsml";
-import { OnAction, CWidget, Widget } from "../src/hsml-svac";
+import { OnAction, CWidget, Widget } from "../src/hsml-mva-cwidget";
 
 interface AppModel {
     title: string;
@@ -122,11 +122,3 @@ const app = new CWidget<AppModel>(App)
     .mount(document.getElementById("app"));
 
 (self as any).app = app;
-
-
-// Server side html rendering
-
-html<AppModel>(App, App.model, html => console.log(html), true);
-
-const h = htmls<AppModel>(App, App.model, true);
-console.log(h);

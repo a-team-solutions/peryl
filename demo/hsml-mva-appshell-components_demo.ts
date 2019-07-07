@@ -1,6 +1,6 @@
-import { Action, Manage } from "../src/hsml-sva";
+import { Action, Manage } from "../src/hsml-mva";
 import { Hsmls, Hsml, join } from "../src/hsml";
-import { Widget, CWidget } from "../src/hsml-svac";
+import { Widget, CWidget } from "../src/hsml-mva-cwidget";
 
 export interface SidebarModel {
     title: string;

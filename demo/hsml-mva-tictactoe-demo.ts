@@ -1,6 +1,6 @@
 import { Hsmls, Hsml } from "../src/hsml";
-import { Widget, CWidget } from "../src/hsml-svac";
-import { Manage, Action } from "../src/hsml-sva";
+import { Widget, CWidget } from "../src/hsml-mva-cwidget";
+import { Manage, Action } from "../src/hsml-mva";
 
 const NBSP = "\u00A0";
 const CIRC = "\u25EF";

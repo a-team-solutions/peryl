@@ -9,7 +9,7 @@ import * as hsmlHtml from "./hsml-html";
 import * as hsmlIDom from "./hsml-idom";
 import * as hsmlWidget from "./hsml-widget";
 import * as hsmlAWidget from "./hsml-awidget";
-import * as hsmlSvac from "./hsml-svac";
+import * as hsmlMva from "./hsml-mva-cwidget";
 import * as hsml from "./hsml";
 import * as http from "./http";
 import * as load from "./load";
@@ -32,7 +32,7 @@ export {
     hsmlIDom,
     hsmlWidget,
     hsmlAWidget,
-    hsmlSvac,
+    hsmlMva,
     hsml,
     http,
     load,
