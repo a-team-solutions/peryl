@@ -1,8 +1,8 @@
 import { Action, Manage } from "../src/hsml-sva";
 import { Hsmls, Hsml, join } from "../src/hsml";
-import { Component, Ctrl } from "../src/hsml-svac";
+import { Widget, CWidget } from "../src/hsml-svac";
 
-export interface SidebarState {
+export interface SidebarModel {
     title: string;
 }
 
@@ -10,15 +10,15 @@ export enum SidebarActions {
     title = "title",
 }
 
-export const Sidebar: Component<SidebarState> = {
+export const Sidebar: Widget<SidebarModel> = {
 
     type: "Sidebar",
 
-    state: {
+    model: {
         title: "Sidebar"
     },
 
-    view: (state: SidebarState, action: Action, manage: Manage): Hsmls => {
+    view: (model: SidebarModel, action: Action, manage: Manage): Hsmls => {
         const menu = [
             { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
             { url: "#content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
@@ -27,7 +27,7 @@ export const Sidebar: Component<SidebarState> = {
         const nbsp = "\u00a0 ";
         return [
             ["div.w3-container", [
-                ["h2", [state.title]],
+                ["h2", [model.title]],
                 ["div.w3-bar-block", {},
                     menu.map<Hsml>(m => (
                         ["a.w3-bar-item.w3-button.w3-padding",
@@ -45,21 +45,21 @@ export const Sidebar: Component<SidebarState> = {
         ];
     },
 
-    onAction: (action: string, data: any, ctrl: Ctrl<SidebarState>): void => {
+    onAction: (action: string, data: any, widget: CWidget<SidebarModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case SidebarActions.title:
-                ctrl.update({ title: data as string });
+                widget.update({ title: data as string });
                 break;
             default:
-                ctrl.appAction(action, data);
+                widget.appAction(action, data);
         }
     }
 
 };
 
 
-export interface ContentState {
+export interface ContentModel {
     title: string;
     text: string;
 }
@@ -68,37 +68,37 @@ export enum ContentActions {
     title = "title"
 }
 
-export const Content: Component<ContentState> = {
+export const Content: Widget<ContentModel> = {
 
     type: "Content",
 
-    state: {
+    model: {
         title: "Content",
         text: "text text text"
     },
 
-    view: (state: ContentState, action: Action, manage: Manage): Hsmls => {
+    view: (model: ContentModel, action: Action, manage: Manage): Hsmls => {
         return [
-            ["h1", [state.title]],
-            ["p", [state.text]]
+            ["h1", [model.title]],
+            ["p", [model.text]]
         ];
     },
 
-    onAction: (action: string, data: any, ctrl: Ctrl<ContentState>): void => {
+    onAction: (action: string, data: any, widget: CWidget<ContentModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case ContentActions.title:
-                ctrl.update({ title: data as string });
+                widget.update({ title: data as string });
                 break;
             default:
-                ctrl.appAction(action, data);
+                widget.appAction(action, data);
         }
     }
 
 };
 
 
-export interface FormModel {
+export interface FormData {
     name: string;
     age: number;
     married: boolean;
@@ -106,9 +106,9 @@ export interface FormModel {
     sport: string;
 }
 
-export interface FormState {
+export interface FormModel {
     title: string;
-    model: FormModel;
+    data: FormData;
 }
 
 export enum FormActions {
@@ -117,13 +117,13 @@ export enum FormActions {
     formSubmit = "form-submit"
 }
 
-export const Form: Component<FormState> = {
+export const Form: Widget<FormModel> = {
 
     type: "Form",
 
-    state: {
+    model: {
         title: "Form",
-        model: {
+        data: {
             name: "Ema",
             age: 33,
             married: false,
@@ -132,21 +132,21 @@ export const Form: Component<FormState> = {
         }
     },
 
-    view: (state: FormState, action: Action, manage: Manage): Hsmls => {
+    view: (model: FormModel, action: Action, manage: Manage): Hsmls => {
         const genders = [
             { label: "Male", value: "male" },
             { label: "Female", value: "female" }
         ];
         const sports = ["football", "gymnastics"];
         return [
-            ["h1", [state.title]],
+            ["h1", [model.title]],
             ["form.w3-container", [
                 ["p", [
                     ["label", ["Name",
                         ["input.w3-input", {
                             type: "text",
                             name: "name",
-                            value: state.model.name,
+                            value: model.data.name,
                             on: ["change", FormActions.formData]
                         }]
                     ]]
@@ -156,7 +156,7 @@ export const Form: Component<FormState> = {
                         ["input.w3-input", {
                             type: "number",
                             name: "age",
-                            value: state.model.age,
+                            value: model.data.age,
                             on: ["change", FormActions.formData]
                         }]
                     ]]
@@ -166,7 +166,7 @@ export const Form: Component<FormState> = {
                         ["input.w3-check", {
                             type: "checkbox",
                             name: "married",
-                            checked: state.model.married,
+                            checked: model.data.married,
                             on: ["change", FormActions.formData]
                         }],
                         " Married"
@@ -180,7 +180,7 @@ export const Form: Component<FormState> = {
                                     type: "radio",
                                     name: "gender",
                                     value: g.value,
-                                    checked: state.model.gender === g.value,
+                                    checked: model.data.gender === g.value,
                                     on: ["change", FormActions.formData]
                                 }],
                                 " ", g.label
@@ -200,7 +200,7 @@ export const Form: Component<FormState> = {
                         ],
                         ...sports.map<Hsml>(s => (
                             ["option",
-                                { value: s, selected: s === state.model.sport },
+                                { value: s, selected: s === model.data.sport },
                                 [s]
                             ])
                         )
@@ -214,24 +214,24 @@ export const Form: Component<FormState> = {
         ];
     },
 
-    onAction: (action: string, data: any, ctrl: Ctrl<FormState>): void => {
+    onAction: (action: string, data: any, widget: CWidget<FormModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case FormActions.title:
-                ctrl.update({ title: data as string });
+                widget.update({ title: data as string });
                 break;
             case FormActions.formData:
-                formDataCollect(data, ctrl.state.model);
-                // TODO: formDataValidate(ctrl.state.data);
-                console.log(ctrl.state.model);
+                formDataCollect(data, widget.model.data);
+                // TODO: formDataValidate(widget.model.data);
+                console.log(widget.model.data);
                 break;
             case FormActions.formSubmit:
                 data.preventDefault();
-                console.dir(JSON.stringify(ctrl.state.model, null, 4));
-                ctrl.appAction(action, ctrl.state.model);
+                console.dir(JSON.stringify(widget.model.data, null, 4));
+                widget.appAction(action, widget.model.data);
                 break;
             default:
-                ctrl.appAction(action, data);
+                widget.appAction(action, data);
         }
     }
 
@@ -268,12 +268,12 @@ function formDataCollect(e: Event, data: any): void {
 }
 
 
-export interface AppShellState {
+export interface AppShellModel {
     title: string;
     subtitle: string;
     menu: boolean;
-    sidebar: Component<any>;
-    content: Component<any>;
+    sidebar: Widget<any>;
+    content: Widget<any>;
     snackbar: string;
 }
 
@@ -286,11 +286,11 @@ export enum AppShellActions {
     snackbar = "snackbar"
 }
 
-export const AppShell: Component<AppShellState> = {
+export const AppShell: Widget<AppShellModel> = {
 
     type: "AppShell",
 
-    state: {
+    model: {
         title: "Title",
         subtitle: "Subtitle",
         menu: false,
@@ -299,7 +299,7 @@ export const AppShell: Component<AppShellState> = {
         snackbar: ""
     },
 
-    view: (state: AppShellState, action: Action, manage: Manage): Hsmls => {
+    view: (model: AppShellModel, action: Action, manage: Manage): Hsmls => {
         return [
             // header
             ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [
@@ -314,11 +314,11 @@ export const AppShell: Component<AppShellState> = {
                 ["span.w3-bar-item", [
                     ["strong.w3-hide-small", [
                         ["a", { href: "#", style: "text-decoration: none;" }, [
-                            state.title
+                            model.title
                         ]]
                     ]],
-                    ["span.w3-hide-small", [state.subtitle ? " - " : ""]],
-                    ["span", [state.subtitle ? state.subtitle : ""]],
+                    ["span.w3-hide-small", [model.subtitle ? " - " : ""]],
+                    ["span", [model.subtitle ? model.subtitle : ""]],
                 ]],
                 ["a.w3-bar-item.w3-right.w3-hover-light-grey",
                     {
@@ -336,17 +336,17 @@ export const AppShell: Component<AppShellState> = {
                     styles: {
                         zIndex: "3",
                         width: "300px",
-                        display: state.menu ? "block" : "none"
+                        display: model.menu ? "block" : "none"
                     }
                 },
-                manage<SidebarState>(state.sidebar)
+                manage<SidebarModel>(model.sidebar)
             ],
             // overlay
             ["div#overlay.w3-overlay.w3-hide-large.w3-animate-opacity~overlay",
                 {
                     styles: {
                         cursor: "pointer",
-                        display: state.menu ? "block" : "none"
+                        display: model.menu ? "block" : "none"
                     },
                     title: "close side menu",
                     on: ["click", AppShellActions.menu, null]
@@ -355,41 +355,41 @@ export const AppShell: Component<AppShellState> = {
             // main
             ["div.w3-main", { style: "margin-left:300px;margin-top:43px;" }, [
                 ["div.w3-container~content",
-                    manage<any>(state.content)
+                    manage<any>(model.content)
                 ]
             ]],
             // snackbar
-            ["div#snackbar~snackbar", { classes: [["show", !!state.snackbar]] },
-                [state.snackbar]
+            ["div#snackbar~snackbar", { classes: [["show", !!model.snackbar]] },
+                [model.snackbar]
             ]
         ];
     },
 
-    onAction: (action: string, data: any, ctrl: Ctrl<AppShellState>): void => {
+    onAction: (action: string, data: any, widget: CWidget<AppShellModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case AppShellActions.title:
-                ctrl.update({ title: data as string });
+                widget.update({ title: data as string });
                 break;
             case AppShellActions.subtitle:
-                ctrl.update({ subtitle: data as string });
+                widget.update({ subtitle: data as string });
                 break;
             case AppShellActions.menu:
-                ctrl.update({ menu: data === null ? !ctrl.state.menu : data });
+                widget.update({ menu: data === null ? !widget.model.menu : data });
                 break;
             case AppShellActions.sidebar:
-                ctrl.update({ sidebar: data as any });
+                widget.update({ sidebar: data as any });
                 break;
             case AppShellActions.content:
-                ctrl.state.content = data;
-                ctrl.update();
+                widget.model.content = data;
+                widget.update();
                 break;
             case AppShellActions.snackbar:
-                ctrl.update({ snackbar: data as string });
-                setTimeout(ctrl.update, 3e3, { snackbar: undefined });
+                widget.update({ snackbar: data as string });
+                setTimeout(widget.update, 3e3, { snackbar: undefined });
                 break;
             default:
-                ctrl.appAction(action, data);
+                widget.appAction(action, data);
         }
     }
 

@@ -1,19 +1,19 @@
 import { hsmls2idomPatch } from "../src/hsml-idom";
 import { Hsmls, Hsml } from "../src/hsml";
 
-type Component<State> = (state: State, dispatch: Dispatch) => Hsmls;
+type Component<Model> = (model: Model, dispatch: Dispatch) => Hsmls;
 
 type Dispatch = (event: string, data?: any) => void;
 
-function render<State>(element: HTMLElement,
-                       component: Component<State>,
-                       state: State,
+function render<Model>(element: HTMLElement,
+                       component: Component<Model>,
+                       model: Model,
                        dispatch: Dispatch): void {
     (render as any).scheduled || ((render as any).scheduled = null);
-    if (!state) return;
+    if (!model) return;
     if (!(render as any).scheduled) {
         (render as any).scheduled = setTimeout(() => {
-            const hsml = component(state, dispatch);
+            const hsml = component(model, dispatch);
             // console.log("render", hsml);
             hsmls2idomPatch(element, hsml);
             (render as any).scheduled = null;
@@ -23,18 +23,18 @@ function render<State>(element: HTMLElement,
 
 // ----------------------------------------------------------------------------
 
-const appState = {
+const appModel = {
     title: "Counter",
     count: 0
 };
 
-type AppState = typeof appState;
+type AppModel = typeof appModel;
 
-function app(state: AppState, dispatch: Dispatch): Hsmls {
+function app(model: AppModel, dispatch: Dispatch): Hsmls {
     return [
-        ["h2", [state.title]],
+        ["h2", [model.title]],
         ["p", [
-            ["em", ["Count"]], ": ", state.count.toString(),
+            ["em", ["Count"]], ": ", model.count.toString(),
             " ",
             button("-", () =>  dispatch("dec", 1)),
             button("+", () => dispatch("inc", 2)),
@@ -48,35 +48,35 @@ function button(label: string, cb: (e: Event) => void): Hsml {
     return ["button", { click: cb }, [label]];
 }
 
-function action(event: string, data: any, state: AppState, dispatch: Dispatch): AppState {
+function action(event: string, data: any, model: AppModel, dispatch: Dispatch): AppModel {
     // console.log("reduce", event, data);
     switch (event) {
         case "inc":
-            state.count += data;
+            model.count += data;
             break;
         case "dec":
-            state.count -= data;
+            model.count -= data;
             setTimeout(dispatch, 1e3, "dec_async", 1);
             break;
         case "dec_async":
-            state.count -= data;
+            model.count -= data;
             break;
         default:
             console.warn("unhandled event", event, data);
             return null;
     }
-    return state;
+    return model;
 }
 
 const appElement = document.getElementById("app");
 
 const dispatch = (event: string, data?: any): void => {
     // console.log("dispatch", event, data);
-    const state = action(event, data, appState, dispatch);
-    // console.log("state", state);
-    render(appElement, app, state, dispatch);
+    const model = action(event, data, appModel, dispatch);
+    // console.log("model", model);
+    render(appElement, app, model, dispatch);
 };
 
-render(appElement, app, appState, dispatch);
+render(appElement, app, appModel, dispatch);
 
 dispatch("event", {});

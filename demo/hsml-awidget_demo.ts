@@ -1,7 +1,7 @@
 import { AWidget, Action, Manage } from "../src/hsml-awidget";
 import { Hsmls } from "../src/hsml";
 
-interface AppState {
+interface AppModel {
     title: string;
     count: number;
 }
@@ -13,22 +13,22 @@ enum AppActions {
     xXx = "xXx"
 }
 
-class App extends AWidget<AppState> {
+class App extends AWidget<AppModel> {
 
-    state = {
+    model = {
         title: "Counter",
         count: 77
     };
 
-    view(state: AppState, action: Action, manage: Manage): Hsmls {
+    view(model: AppModel, action: Action, manage: Manage): Hsmls {
         return [
-            ["h2", [state.title]],
+            ["h2", [model.title]],
             ["p", [
                 "Title: ",
                 ["input",
                     {
                         type: "text",
-                        value: state.title,
+                        value: model.title,
                         // on: ["input", e => action(AppActions.title, (e.target as HTMLInputElement).value)],
                         // on: ["input", Actions.title, e => (e.target as HTMLInputElement).value]
                         on: ["input", AppActions.title]
@@ -36,17 +36,17 @@ class App extends AWidget<AppState> {
                 ],
             ]],
             ["p", [
-                ["em", ["Count"]], ": ", state.count,
+                ["em", ["Count"]], ": ", model.count,
                 " ",
                 ["button", { on: ["click", AppActions.dec, 1] }, ["-"]],
                 ["button", { on: ["click", AppActions.inc, 2] }, ["+"]],
                 ["button", { on: ["click", AppActions.xXx] }, ["xXx"]]
             ]],
-            ["p", state.title ? manage<AppState>(SubApp, state) : []]
+            ["p", model.title ? manage<AppModel>(SubApp, model) : []]
         ];
     }
 
-    onAction(action: string, data: any, widget: AWidget<AppState>): void {
+    onAction(action: string, data: any, widget: AWidget<AppModel>): void {
         // console.log("action:", action, data);
         switch (action) {
             case AppActions.title:
@@ -55,11 +55,11 @@ class App extends AWidget<AppState> {
                 widget.update({ title });
                 break;
             case AppActions.inc:
-                widget.update({ count: widget.state.count + data as number });
+                widget.update({ count: widget.model.count + data as number });
                 setTimeout(widget.action, 1e3, AppActions.dec, 1); // async call
                 break;
             case AppActions.dec:
-                widget.update({ count: widget.state.count - data as number });
+                widget.update({ count: widget.model.count - data as number });
                 break;
             default:
                 widget.appAction(action, data);
@@ -72,25 +72,25 @@ enum SubAppActions {
     xXx = "xXx"
 }
 
-class SubApp extends AWidget<AppState> {
+class SubApp extends AWidget<AppModel> {
 
-    state = {
+    model = {
         title: "Counter sec",
         count: 33
     };
 
-    view(state: AppState, action: Action, manage: Manage): Hsmls {
+    view(model: AppModel, action: Action, manage: Manage): Hsmls {
         return [
-            ["h3", [state.title]],
+            ["h3", [model.title]],
             ["p", [
-                ["em", ["Count"]], ": ", state.count,
+                ["em", ["Count"]], ": ", model.count,
                 " ",
                 ["button", { on: ["click", SubAppActions.xXx] }, [SubAppActions.xXx]]
             ]]
         ];
     }
 
-    onAction(action: string, data: any, widget: AWidget<AppState>): void {
+    onAction(action: string, data: any, widget: AWidget<AppModel>): void {
         // console.log("action:", action, data);
         switch (action) {
             case SubAppActions.xXx:
@@ -104,7 +104,7 @@ class SubApp extends AWidget<AppState> {
 }
 
 
-function appOnAction(action: string, data: any, widget: AWidget<AppState>) {
+function appOnAction(action: string, data: any, widget: AWidget<AppModel>) {
     console.log(action, data);
     switch (action) {
         case "xXx":

@@ -1,31 +1,31 @@
 import { Hsmls, HsmlFnc } from "./hsml";
 import { hsmls2htmls, hsmls2html } from "./hsml-html";
 
-export interface Component<S> {
+export interface Widget<Model> {
     type: string;
-    state: S;
-    view: View<S>;
+    model: Model;
+    view: View<Model>;
 }
 
-export type View<S> = (state: S, action: Action, manage: Manage) => Hsmls;
+export type View<Model> = (model: Model, action: Action, manage: Manage) => Hsmls;
 
 export type Action = (action: string, data?: any) => void;
 
-export type Manage = <S>(component: Component<S>, state?: S) => HsmlFnc | Hsmls;
+export type Manage = <Model>(widget: Widget<Model>, model?: Model) => HsmlFnc | Hsmls;
 
 
 // server
 
 const actionHtml: Action = (action: string, data: any) => { };
 
-const manageHtml: Manage = <S>(component: Component<S>, state?: S): HsmlFnc | Hsmls => {
-    return component.view(state || component.state, actionHtml, manageHtml);
+const manageHtml: Manage = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hsmls => {
+    return widget.view(model || widget.model, actionHtml, manageHtml);
 };
 
-export function html<S>(component: Component<S>, state: S, onHtml: (html: string) => void, pretty = false): void {
-    hsmls2html(component.view(state, actionHtml, manageHtml), onHtml, pretty);
+export function html<Model>(widget: Widget<Model>, model: Model, onHtml: (html: string) => void, pretty = false): void {
+    hsmls2html(widget.view(model, actionHtml, manageHtml), onHtml, pretty);
 }
 
-export function htmls<S>(component: Component<S>, state: S, pretty = false): string {
-    return hsmls2htmls(component.view(state, actionHtml, manageHtml), pretty).join("");
+export function htmls<Model>(widget: Widget<Model>, model: Model, pretty = false): string {
+    return hsmls2htmls(widget.view(model, actionHtml, manageHtml), pretty).join("");
 }

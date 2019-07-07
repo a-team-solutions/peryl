@@ -8,8 +8,8 @@ import * as hsmlDom from "./hsml-dom";
 import * as hsmlHtml from "./hsml-html";
 import * as hsmlIDom from "./hsml-idom";
 import * as hsmlWidget from "./hsml-widget";
-import * as hsmlXWidget from "./hsml-xwidget";
 import * as hsmlAWidget from "./hsml-awidget";
+import * as hsmlSvac from "./hsml-svac";
 import * as hsml from "./hsml";
 import * as http from "./http";
 import * as load from "./load";
@@ -31,8 +31,8 @@ export {
     hsmlHtml,
     hsmlIDom,
     hsmlWidget,
-    hsmlXWidget,
     hsmlAWidget,
+    hsmlSvac,
     hsml,
     http,
     load,

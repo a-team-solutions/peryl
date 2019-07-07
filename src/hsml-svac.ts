@@ -3,36 +3,36 @@ import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export interface Component<S> {
+export interface Widget<Model> {
     type: string;
-    state: S;
-    view: View<S>;
-    onAction?: OnAction<S>;
+    model: Model;
+    view: View<Model>;
+    onAction?: OnAction<Model>;
 }
 
-export type OnAction<S> = (action: string, data: any, ctrl: Ctrl<S>) => void;
+export type OnAction<Model> = (action: string, data: any, widget: CWidget<Model>) => void;
 
-const manage: Manage = <S>(component: Component<S>, state?: S): HsmlFnc | Hsmls => {
+const manage: Manage = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hsmls => {
     return (e: Element) => {
-        if ((e as any).ctrl) {
-            const c = (e as any).ctrl as Ctrl<S>;
-            if (c.view === component.view) {
-                if (state !== undefined) {
-                    c.state = state;
+        if ((e as any).widget) {
+            const c = (e as any).widget as CWidget<Model>;
+            if (c.view === widget.view) {
+                if (model !== undefined) {
+                    c.model = model;
                 }
                 c.update();
             } else {
                 c.umount();
-                const c1 = new Ctrl(component);
-                if (state !== undefined) {
-                    c1.state = state;
+                const c1 = new CWidget(widget);
+                if (model !== undefined) {
+                    c1.model = model;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new Ctrl(component);
-            if (state !== undefined) {
-                c.state = state;
+            const c = new CWidget(widget);
+            if (model !== undefined) {
+                c.model = model;
             }
             c.mount(e);
         }
@@ -40,45 +40,47 @@ const manage: Manage = <S>(component: Component<S>, state?: S): HsmlFnc | Hsmls 
     };
 };
 
-export class Ctrl<S> implements HsmlHandlerCtx {
+const wNodeAttr = "widget";
+
+export class CWidget<Model> implements HsmlHandlerCtx {
 
     private static __count = 0;
 
-    static readonly mounted: { [ctrl: string]: Ctrl<any> } = {};
+    static readonly mounted: { [widget: string]: CWidget<any> } = {};
 
-    static appOnAction: OnAction<any> = (action: string, data: any, ctrl: Ctrl<any>): void => {
-        console.log("action:", action, data, ctrl);
+    static appOnAction: OnAction<any> = (action: string, data: any, cw: CWidget<any>): void => {
+        console.log("action:", action, data, cw);
     }
 
-    readonly type: string = "Ctrl";
-    readonly id: string = this.type + "-" + Ctrl.__count++;
+    readonly type: string = "CWidget";
+    readonly id: string = this.type + "-" + CWidget.__count++;
     readonly dom: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
     private __updateSched: number;
 
-    state: S;
-    view: View<S>;
-    onAction: OnAction<S>;
+    model: Model;
+    view: View<Model>;
+    onAction: OnAction<Model>;
 
-    constructor(component: Component<S>, state?: S) {
-        this.state = state || component.state;
-        this.view = component.view;
-        this.onAction = component.onAction;
-        component.type && (this.type = component.type);
+    constructor(widget: Widget<Model>, model?: Model) {
+        this.model = model || widget.model;
+        this.view = widget.view;
+        this.onAction = widget.onAction;
+        widget.type && (this.type = widget.type);
     }
 
     appAction = (action: string, data?: any): void => {
-        Ctrl.appOnAction(action, data, this);
+        CWidget.appOnAction(action, data, this);
     }
 
-    appOnAction(onAction: OnAction<S>): this {
-        Ctrl.appOnAction = onAction;
+    appOnAction(onAction: OnAction<Model>): this {
+        CWidget.appOnAction = onAction;
         return this;
     }
 
-    get appCtrls(): Ctrl<any>[] {
-        return Object.values(Ctrl.mounted);
+    get appCtrls(): CWidget<any>[] {
+        return Object.values(CWidget.mounted);
     }
 
     action = (action: string, data?: any): void => {
@@ -86,7 +88,7 @@ export class Ctrl<S> implements HsmlHandlerCtx {
     }
 
     render = (): Hsmls => {
-        return this.view(this.state, this.action, manage);
+        return this.view(this.model, this.action, manage);
     }
 
     onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {
@@ -99,17 +101,17 @@ export class Ctrl<S> implements HsmlHandlerCtx {
     mount = (e: Element = document.body): this => {
         !e && console.warn("invalit element", e);
         if (e) {
-            if ("ctrl" in e) {
-                const c = (e as any).ctrl as Ctrl<S>;
+            if (wNodeAttr in e) {
+                const c = (e as any).widget as CWidget<Model>;
                 c && c.umount();
             }
             if (!this.dom) {
-                Ctrl.mounted[this.id] = this;
+                CWidget.mounted[this.id] = this;
                 (this as any).dom = e;
-                (e as any).ctrl = this;
+                (e as any).widget = this;
                 const hsmls = (this as any).render();
                 hsmls2idomPatch(e, hsmls, this);
-                e.setAttribute("ctrl", this.type);
+                e.setAttribute(wNodeAttr, this.type);
                 this.action("_mount", this.dom);
             }
         }
@@ -118,28 +120,28 @@ export class Ctrl<S> implements HsmlHandlerCtx {
 
     umount = (): this => {
         if (this.dom) {
-            delete Ctrl.mounted[this.id];
+            delete CWidget.mounted[this.id];
             this.action("_umount", this.dom);
-            if (this.dom.hasAttribute("ctrl")) {
-                this.dom.removeAttribute("ctrl");
+            if (this.dom.hasAttribute(wNodeAttr)) {
+                this.dom.removeAttribute(wNodeAttr);
             }
-            const cNodes = this.dom.querySelectorAll("[ctrl]");
+            const cNodes = this.dom.querySelectorAll(`[${wNodeAttr}]`);
             for (let i = 0; i < cNodes.length; i++) {
-                const c = (cNodes[i] as any).ctrl as Ctrl<S>;
+                const c = (cNodes[i] as any).widget as CWidget<Model>;
                 c && c.umount();
             }
             while (this.dom.firstChild /*.hasChildNodes()*/) {
                 this.dom.removeChild(this.dom.firstChild);
             }
-            delete (this.dom as any).ctrl;
+            delete (this.dom as any).widget;
             (this as any).dom = undefined;
         }
         return this;
     }
 
-    update = (state?: Partial<S>): this => {
-        if (state) {
-            this.state = merge(this.state, state);
+    update = (model?: Partial<Model>): this => {
+        if (model) {
+            this.model = merge(this.model, model);
         }
         if (this.dom && !this.__updateSched) {
             this.__updateSched = setTimeout(() => {
@@ -164,7 +166,7 @@ export class Ctrl<S> implements HsmlHandlerCtx {
                             _skip: true,
                             _id: this.id,
                             _key: this.id,
-                            ctrl: this.type
+                            widget: this.type
                         }
                     ]
                 );
@@ -175,8 +177,8 @@ export class Ctrl<S> implements HsmlHandlerCtx {
             (e: Element) => {
                 if (!this.dom) {
                     (this as any).dom = e;
-                    (e as any).ctrl = this;
-                    Ctrl.mounted[this.id] = this;
+                    (e as any).widget = this;
+                    CWidget.mounted[this.id] = this;
                     this.action("_mount", this.dom);
                 }
             });
@@ -185,7 +187,7 @@ export class Ctrl<S> implements HsmlHandlerCtx {
                 {
                     _id: this.id,
                     _key: this.id,
-                    ctrl: this.type
+                    widget: this.type
                 },
                 hsmls
             ]
@@ -198,12 +200,10 @@ export class Ctrl<S> implements HsmlHandlerCtx {
 
 }
 
-export const App = Ctrl;
-
 (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
     nodes.forEach(node => {
-        if (node.nodeType === 1 && "ctrl" in node) {
-            const c = (node as any).ctrl as Ctrl<any>;
+        if (node.nodeType === 1 && wNodeAttr in node) {
+            const c = (node as any).widget as CWidget<any>;
             c && c.umount();
         }
     });

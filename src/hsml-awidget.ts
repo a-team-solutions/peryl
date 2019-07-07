@@ -2,37 +2,37 @@ import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export type View<S> = (state: S, action: Action, manage: Manage) => Hsmls;
+export type View<Model> = (model: Model, action: Action, manage: Manage) => Hsmls;
 
 export type Action = (action: string, data?: any) => void;
 
-export type OnAction<S> = (action: string, data: any, widget: AWidget<S>) => void;
+export type OnAction<Model> = (action: string, data: any, widget: AWidget<Model>) => void;
 
 export type Class<T = object> = new (...args: any[]) => T;
 
-export type Manage = <S>(xwClass: Class<AWidget<S>>, state?: S) => HsmlFnc | Hsmls;
+export type Manage = <Model>(xwClass: Class<AWidget<Model>>, model?: Model) => HsmlFnc | Hsmls;
 
-const manage: Manage = <S>(wClass: Class<AWidget<S>>, state?: S): HsmlFnc | Hsmls => {
+const manage: Manage = <Model>(wClass: Class<AWidget<Model>>, model?: Model): HsmlFnc | Hsmls => {
     return (e: Element) => {
         if ((e as any).widget) {
-            const w = (e as any).widget as AWidget<S>;
+            const w = (e as any).widget as AWidget<Model>;
             if (w.type === wClass.name) {
-                if (state !== undefined) {
-                    w.state = state;
+                if (model !== undefined) {
+                    w.model = model;
                 }
                 w.update();
             } else {
                 w.umount();
                 const w1 = new wClass();
-                if (state !== undefined) {
-                    w1.state = state;
+                if (model !== undefined) {
+                    w1.model = model;
                 }
                 w1.mount(e);
             }
         } else {
             const w = new wClass();
-            if (state !== undefined) {
-                w.state = state;
+            if (model !== undefined) {
+                w.model = model;
             }
             w.mount(e);
         }
@@ -57,8 +57,8 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
 
     private __updateSched: number;
 
-    abstract state: S;
-    abstract view(state: S, action: Action, manage: Manage): Hsmls;
+    abstract model: S;
+    abstract view(model: S, action: Action, manage: Manage): Hsmls;
     abstract onAction(action: string, data: any, widget: AWidget<S>): void;
 
     action = (action: string, data?: any): void => {
@@ -79,7 +79,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
     }
 
     render = (): Hsmls => {
-        return this.view(this.state, this.action, manage);
+        return this.view(this.model, this.action, manage);
     }
 
     onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {
@@ -130,9 +130,9 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
         return this;
     }
 
-    update = (state?: Partial<S>): this => {
-        if (state) {
-            this.state = merge(this.state, state);
+    update = (model?: Partial<S>): this => {
+        if (model) {
+            this.model = merge(this.model, model);
         }
         if (this.dom && !this.__updateSched) {
             this.__updateSched = setTimeout(() => {
