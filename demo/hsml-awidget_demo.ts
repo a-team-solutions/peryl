@@ -46,7 +46,7 @@ class App extends AWidget<AppModel> {
         ];
     }
 
-    onAction(action: string, data: any, widget: AWidget<AppModel>): void {
+    actions(action: string, data: any, widget: AWidget<AppModel>): void {
         // console.log("action:", action, data);
         switch (action) {
             case AppActions.title:
@@ -90,7 +90,7 @@ class SubApp extends AWidget<AppModel> {
         ];
     }
 
-    onAction(action: string, data: any, widget: AWidget<AppModel>): void {
+    actions(action: string, data: any, widget: AWidget<AppModel>): void {
         // console.log("action:", action, data);
         switch (action) {
             case SubAppActions.xXx:
@@ -104,7 +104,7 @@ class SubApp extends AWidget<AppModel> {
 }
 
 
-function appOnAction(action: string, data: any, widget: AWidget<AppModel>) {
+function appActions(action: string, data: any, widget: AWidget<AppModel>) {
     console.log(action, data);
     switch (action) {
         case "xXx":
@@ -114,7 +114,7 @@ function appOnAction(action: string, data: any, widget: AWidget<AppModel>) {
 }
 
 const app = new App()
-    .appOnAction(appOnAction)
+    .appActions(appActions)
     .mount(document.getElementById("app"));
 
 (self as any).app = app;

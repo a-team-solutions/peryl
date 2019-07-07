@@ -1,6 +1,6 @@
 import { Action, Manage } from "../src/hsml-mva";
 import { Hsmls } from "../src/hsml";
-import { OnAction, CWidget, Widget } from "../src/hsml-mva-cwidget";
+import { Actions, CWidget, Widget } from "../src/hsml-mva-cwidget";
 
 interface AppModel {
     title: string;
@@ -49,7 +49,7 @@ const App: Widget<AppModel> = {
         ];
     },
 
-    onAction: (action: string, data: any, widget: CWidget<AppModel>): void => {
+    actions: (action: string, data: any, widget: CWidget<AppModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case AppActions.title:
@@ -92,7 +92,7 @@ const Sub: Widget<AppModel> = {
         ];
     },
 
-    onAction: (action: string, data: any, widget: CWidget<AppModel>): void => {
+    actions: (action: string, data: any, widget: CWidget<AppModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case SubAppActions.xXx:
@@ -108,7 +108,7 @@ const Sub: Widget<AppModel> = {
 
 // Client side app rendering
 
-const appOnAction: OnAction<AppModel> = (action: string, data: any, widget: CWidget<AppModel>) => {
+const appActions: Actions<AppModel> = (action: string, data: any, widget: CWidget<AppModel>) => {
     console.log(action, data);
     switch (action) {
         case "xXx":
@@ -118,7 +118,7 @@ const appOnAction: OnAction<AppModel> = (action: string, data: any, widget: CWid
 };
 
 const app = new CWidget<AppModel>(App)
-    .appOnAction(appOnAction)
+    .appActions(appActions)
     .mount(document.getElementById("app"));
 
 (self as any).app = app;

@@ -6,7 +6,7 @@ export interface IWidget {
     render(): Hsmls;
     onMount(): void;
     onUmount(): void;
-    onAction(action: string, data?: HsmlAttrOnData): void;
+    actions(action: string, data?: HsmlAttrOnData): void;
 }
 
 export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
@@ -38,12 +38,12 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
         console.log("umount");
     }
 
-    onAction(action: string, data: any): void {
+    actions(action: string, data: any): void {
         console.log(action, data);
     }
 
     action(action: string, data?: any): void {
-        this.onAction(action, data);
+        this.actions(action, data);
     }
 
     onHsml(action: string, data: HsmlAttrOnData, e: Event) {

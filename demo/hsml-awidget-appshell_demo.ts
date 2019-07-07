@@ -43,7 +43,7 @@ export class Sidebar extends AWidget<SidebarModel> {
         ];
     }
 
-    onAction(action: string, data: any, widget: AWidget<SidebarModel>): void {
+    actions(action: string, data: any, widget: AWidget<SidebarModel>): void {
         console.log("action:", action, data);
         switch (action) {
             case SidebarActions.title:
@@ -76,7 +76,7 @@ export class Content extends AWidget<ContentModel> {
         ];
     }
 
-    onAction(action: string, data: any, widget: AWidget<ContentModel>): void {
+    actions(action: string, data: any, widget: AWidget<ContentModel>): void {
         console.log("action:", action, data);
         switch (action) {
             case ContentActions.title:
@@ -213,7 +213,7 @@ export class AppShell extends AWidget<AppShellModel> {
         ];
     }
 
-    onAction(action: string, data: any, widget: AWidget<AppShellModel>): void {
+    actions(action: string, data: any, widget: AWidget<AppShellModel>): void {
         console.log("action:", action, data);
         switch (action) {
             case AppShellActions.title:
@@ -242,7 +242,7 @@ export class AppShell extends AWidget<AppShellModel> {
 }
 
 
-function appOnAction(action: string, data: any, widget: AWidget<AppShellModel>) {
+function appActions(action: string, data: any, widget: AWidget<AppShellModel>) {
     console.log("app action", widget.type, action, data);
     switch (action) {
         case "xXx":
@@ -252,7 +252,7 @@ function appOnAction(action: string, data: any, widget: AWidget<AppShellModel>) 
 }
 
 const app = new AppShell()
-    .appOnAction(appOnAction)
+    .appActions(appActions)
     .mount(document.getElementById("app"));
 
 setTimeout(() => {

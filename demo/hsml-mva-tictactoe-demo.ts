@@ -11,7 +11,7 @@ interface TicTacToeModel {
     turn: number;
 }
 
-enum Actions {
+enum TicTacToeActions {
     mark = "mark"
 }
 
@@ -43,7 +43,7 @@ const TicTacToe: Widget<TicTacToeModel> = {
                             display: "inline-block",
                             width: "2em", height: "2em"
                         },
-                        on: ["click", Actions.mark, { x, y, turn: model.turn }]
+                        on: ["click", TicTacToeActions.mark, { x, y, turn: model.turn }]
                     },
                     [
                         col === NBSP ? NBSP : col
@@ -53,10 +53,10 @@ const TicTacToe: Widget<TicTacToeModel> = {
         ]
     ]),
 
-    onAction: (action: string, data: any, widget: CWidget<TicTacToeModel>): void => {
+    actions: (action: string, data: any, widget: CWidget<TicTacToeModel>): void => {
         console.log("action", action, data);
         switch (action) {
-            case Actions.mark:
+            case TicTacToeActions.mark:
                 widget.model.board[data.y][data.x] = data.turn ? CROS : CIRC;
                 widget.model.turn = data.turn ? 0 : 1;
                 widget.update();

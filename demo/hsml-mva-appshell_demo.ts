@@ -3,7 +3,7 @@ import { AppShellModel, AppShellActions, Content, Form, AppShell } from "./hsml-
 import { Hash } from "../src/hash";
 
 const app = new CWidget<AppShellModel>(AppShell)
-    .appOnAction((action: string, data: any, widget: CWidget<AppShellModel>) => {
+    .appActions((action: string, data: any, widget: CWidget<AppShellModel>) => {
         // console.log("app action", widget.type, action, data);
         switch (action) {
             case "xXx":

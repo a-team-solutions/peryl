@@ -7,10 +7,10 @@ export interface Widget<Model> {
     type: string;
     model: Model;
     view: View<Model>;
-    onAction?: OnAction<Model>;
+    actions?: Actions<Model>;
 }
 
-export type OnAction<Model> = (action: string, data: any, widget: CWidget<Model>) => void;
+export type Actions<Model> = (action: string, data: any, widget: CWidget<Model>) => void;
 
 const manage: Manage = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hsmls => {
     return (e: Element) => {
@@ -48,7 +48,7 @@ export class CWidget<Model> implements HsmlHandlerCtx {
 
     static readonly mounted: { [widget: string]: CWidget<any> } = {};
 
-    static appOnAction: OnAction<any> = (action: string, data: any, cw: CWidget<any>): void => {
+    static appActions: Actions<any> = (action: string, data: any, cw: CWidget<any>): void => {
         console.log("action:", action, data, cw);
     }
 
@@ -61,21 +61,21 @@ export class CWidget<Model> implements HsmlHandlerCtx {
 
     model: Model;
     view: View<Model>;
-    onAction: OnAction<Model>;
+    actions: Actions<Model>;
 
     constructor(widget: Widget<Model>, model?: Model) {
         this.model = model || widget.model;
         this.view = widget.view;
-        this.onAction = widget.onAction;
+        this.actions = widget.actions;
         widget.type && (this.type = widget.type);
     }
 
     appAction = (action: string, data?: any): void => {
-        CWidget.appOnAction(action, data, this);
+        CWidget.appActions(action, data, this);
     }
 
-    appOnAction(onAction: OnAction<Model>): this {
-        CWidget.appOnAction = onAction;
+    appActions(actions: Actions<Model>): this {
+        CWidget.appActions = actions;
         return this;
     }
 
@@ -84,7 +84,7 @@ export class CWidget<Model> implements HsmlHandlerCtx {
     }
 
     action = (action: string, data?: any): void => {
-        this.onAction(action, data, this);
+        this.actions(action, data, this);
     }
 
     render = (): Hsmls => {

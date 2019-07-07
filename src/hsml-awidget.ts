@@ -6,7 +6,7 @@ export type View<Model> = (model: Model, action: Action, manage: Manage) => Hsml
 
 export type Action = (action: string, data?: any) => void;
 
-export type OnAction<Model> = (action: string, data: any, widget: AWidget<Model>) => void;
+export type Actions<Model> = (action: string, data: any, widget: AWidget<Model>) => void;
 
 export type Class<T = object> = new (...args: any[]) => T;
 
@@ -46,7 +46,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
 
     static readonly mounted: { [wid: string]: AWidget<any> } = {};
 
-    static appOnAction: OnAction<any> = (action: string, data: any, widget: AWidget<any>): void => {
+    static appActions: Actions<any> = (action: string, data: any, widget: AWidget<any>): void => {
         console.log("action:", action, data, widget);
     }
 
@@ -59,18 +59,18 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
 
     abstract model: S;
     abstract view(model: S, action: Action, manage: Manage): Hsmls;
-    abstract onAction(action: string, data: any, widget: AWidget<S>): void;
+    abstract actions(action: string, data: any, widget: AWidget<S>): void;
 
     action = (action: string, data?: any): void => {
-        this.onAction(action, data, this);
+        this.actions(action, data, this);
     }
 
     appAction = (action: string, data?: any): void => {
-        AWidget.appOnAction(action, data, this);
+        AWidget.appActions(action, data, this);
     }
 
-    appOnAction(onAction: OnAction<S>): this {
-        AWidget.appOnAction = onAction;
+    appActions(actions: Actions<S>): this {
+        AWidget.appActions = actions;
         return this;
     }
 

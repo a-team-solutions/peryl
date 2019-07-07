@@ -45,7 +45,7 @@ export const Sidebar: Widget<SidebarModel> = {
         ];
     },
 
-    onAction: (action: string, data: any, widget: CWidget<SidebarModel>): void => {
+    actions: (action: string, data: any, widget: CWidget<SidebarModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case SidebarActions.title:
@@ -84,7 +84,7 @@ export const Content: Widget<ContentModel> = {
         ];
     },
 
-    onAction: (action: string, data: any, widget: CWidget<ContentModel>): void => {
+    actions: (action: string, data: any, widget: CWidget<ContentModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case ContentActions.title:
@@ -214,7 +214,7 @@ export const Form: Widget<FormModel> = {
         ];
     },
 
-    onAction: (action: string, data: any, widget: CWidget<FormModel>): void => {
+    actions: (action: string, data: any, widget: CWidget<FormModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case FormActions.title:
@@ -365,7 +365,7 @@ export const AppShell: Widget<AppShellModel> = {
         ];
     },
 
-    onAction: (action: string, data: any, widget: CWidget<AppShellModel>): void => {
+    actions: (action: string, data: any, widget: CWidget<AppShellModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case AppShellActions.title:
