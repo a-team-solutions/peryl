@@ -1,13 +1,13 @@
 import { Widget, CWidget } from "../src/hsml-mva-cwidget";
-import { AppShellModel, AppShellActions, Content, Form, AppShell } from "./hsml-mva-appshell-components_demo";
+import { AppShellModel, AppShellActions, Content, Form, AppShell, FormActions } from "./hsml-mva-appshell-components_demo";
 import { Hash } from "../src/hash";
 
 const app = new CWidget<AppShellModel>(AppShell)
     .appActions((action: string, data: any, widget: CWidget<AppShellModel>) => {
-        // console.log("app action", widget.type, action, data);
+        console.log("app action", widget.type, action, data);
         switch (action) {
-            case "xXx":
-                widget.update({ title: "xXx" });
+            case FormActions.formSubmit:
+                alert(`Form submit: \n${JSON.stringify(data, null, 4)}`);
                 break;
         }
     })
