@@ -6,6 +6,8 @@ const requiredMsg = "required";
 const notInRangeMsg = "not_in_range";
 const invalidFormatMsg = "invalid_format";
 const invalidOptionMsg = "invalid_option";
+const invalidValueMsg = "invalid_value";
+
 const localeDefault = "en";
 const dateFormatFefault = "L";
 const numFormatDefault = "0,0.[00]";
@@ -83,7 +85,7 @@ export class SelectValidator extends Validator<string, SelectValidatorOpts, Sele
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
-                                options: opts.options && opts.options.join(", ")
+                                options: ("options" in opts) ? opts.options.join(", ") : ""
                             })
                         : requiredMsg
                 };
@@ -101,7 +103,7 @@ export class SelectValidator extends Validator<string, SelectValidatorOpts, Sele
                     ? tpl(msgs.invalid_option,
                         {
                             option: obj,
-                            options: opts.options && opts.options.join(", ")
+                            options: ("options" in opts) ? opts.options.join(", ") : ""
                         })
                     : invalidOptionMsg;
             }
@@ -143,9 +145,9 @@ export class StringValidator extends Validator<string, StringValidatorOpts, Stri
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
-                                min: opts.min && ("" + opts.min),
-                                max: opts.max && ("" + opts.max),
-                                regexp: opts.regexp && ("" + opts.regexp)
+                                min: ("min" in opts) ? ("" + opts.min) : "",
+                                max: ("max" in opts) ? ("" + opts.max) : "",
+                                regexp: ("regexp" in opts) ? ("" + opts.regexp) : ""
                             })
                         : requiredMsg
                 };
@@ -157,10 +159,10 @@ export class StringValidator extends Validator<string, StringValidatorOpts, Stri
                     err: msgs.invalid_format
                         ? tpl(msgs.invalid_format,
                             {
-                                regexp: opts.regexp && ("" + opts.regexp)
+                                regexp: ("regexp" in opts) ? ("" + opts.regexp) : ""
                             })
                         : invalidFormatMsg
-                    };
+                };
             }
         }
         return { obj: str };
@@ -169,7 +171,7 @@ export class StringValidator extends Validator<string, StringValidatorOpts, Stri
     protected objCheck(obj: string): string {
         const opts = this.opts;
         const msgs = this.msgs;
-        let err: boolean;
+        let err: boolean = false;
         if ("max" in opts) {
             if (obj.length > opts.max) {
                 err = true;
@@ -180,7 +182,7 @@ export class StringValidator extends Validator<string, StringValidatorOpts, Stri
                 err = true;
             }
         }
-        if ("min" in opts && "max" in opts) {
+        if (("min" in opts) && ("max" in opts)) {
             if (obj.length > opts.max && obj.length < opts.min) {
                 err = true;
             }
@@ -189,9 +191,9 @@ export class StringValidator extends Validator<string, StringValidatorOpts, Stri
             return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
-                        min: opts.min && ("" + opts.min),
-                        max: opts.max && ("" + opts.max)
-                    })
+                        min: ("min" in opts) ? ("" + opts.min) : "",
+                        max: ("max" in opts) ? ("" + opts.max) : "",
+            })
                 : notInRangeMsg;
         }
         return "";
@@ -235,10 +237,10 @@ export class NumeralValidator extends Validator<Numeral, NumeralValidatorOpts, N
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
-                                min: opts.min && ("" + opts.min),
-                                max: opts.max && ("" + opts.max),
-                                locale: opts.locale || localeDefault,
-                                format: opts.format || numFormatDefault
+                                min: ("min" in opts) ? ("" + opts.min) : "",
+                                max: ("max" in opts) ? ("" + opts.max) : "",
+                                locale: ("locale" in opts) ? opts.locale : localeDefault,
+                                format: ("format" in opts) ? opts.format : numFormatDefault
                             })
                         : requiredMsg
                 };
@@ -246,12 +248,14 @@ export class NumeralValidator extends Validator<Numeral, NumeralValidatorOpts, N
         }
         numeral.locale(opts.locale || localeDefault);
         const n = numeral(str);
-        let err: boolean;
+        let err: boolean = false;
         if (n.value() === null) {
             err = true;
         }
-        if (opts.strict && (str !== this.objToStr(n).str)) {
-            err = true;
+        if ("strict" in opts) {
+            if (opts.strict && (str !== this.objToStr(n).str)) {
+                err = true;
+            }
         }
         if (err) {
             const num = (n.value() !== null) ? n : numeral(1234.45);
@@ -261,11 +265,11 @@ export class NumeralValidator extends Validator<Numeral, NumeralValidatorOpts, N
                     ? tpl(msgs.invalid_format,
                         {
                             num: this.objToStr(num).str,
-                            locale: opts.locale || localeDefault,
-                            format: opts.format || numFormatDefault
+                            locale: ("locale" in opts) ? opts.locale : localeDefault,
+                            format: ("format" in opts) ? opts.format : numFormatDefault
                         })
                     : invalidFormatMsg
-                };
+            };
         }
         return { obj: n };
     }
@@ -276,7 +280,7 @@ export class NumeralValidator extends Validator<Numeral, NumeralValidatorOpts, N
         }
         const opts = this.opts;
         const msgs = this.msgs;
-        let err: boolean;
+        let err: boolean = false;
         if ("max" in opts) {
             if (obj.value() > opts.max) {
                 err = true;
@@ -291,10 +295,10 @@ export class NumeralValidator extends Validator<Numeral, NumeralValidatorOpts, N
             return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
-                        min: opts.min && ("" + opts.min),
-                        max: opts.max && ("" + opts.max),
-                        locale: opts.locale || localeDefault,
-                        format: opts.format || numFormatDefault
+                        min: ("min" in opts) ? ("" + opts.min) : "",
+                        max: ("max" in opts) ? ("" + opts.max) : "",
+                        locale: ("locale" in opts) ? opts.locale : localeDefault,
+                        format: ("format" in opts) ? opts.format : numFormatDefault
                     })
                 : notInRangeMsg;
         }
@@ -345,10 +349,10 @@ export class MomentValidator extends Validator<Moment, MomentValidatorOpts, Mome
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
-                                min: opts.min && ("" + opts.min),
-                                max: opts.max && ("" + opts.max),
-                                locale: opts.locale || localeDefault,
-                                format: opts.format && opts.format
+                                min: ("min" in opts) ? ("" + opts.min) : "",
+                                max: ("max" in opts) ? ("" + opts.max) : "",
+                                locale: ("locale" in opts) ? opts.locale : localeDefault,
+                                format: ("format" in opts) ? opts.format : numFormatDefault
                             })
                         : requiredMsg
                 };
@@ -358,7 +362,7 @@ export class MomentValidator extends Validator<Moment, MomentValidatorOpts, Mome
             opts.format || dateFormatFefault,
             opts.locale || localeDefault,
             opts.strict || false);
-        let err: boolean;
+        let err: boolean = false;
         if (!d.isValid()) {
             err = true;
         }
@@ -373,11 +377,11 @@ export class MomentValidator extends Validator<Moment, MomentValidatorOpts, Mome
                     ? tpl(msgs.invalid_format,
                         {
                             date: this.objToStr(date).str,
-                            locale: opts.locale || localeDefault,
-                            format: opts.format && opts.format
+                            locale: ("locale" in opts) ? opts.locale : localeDefault,
+                            format: ("format" in opts) ? opts.format : numFormatDefault
                         })
                     : invalidFormatMsg
-                };
+            };
         }
         return { obj: d };
     }
@@ -388,7 +392,7 @@ export class MomentValidator extends Validator<Moment, MomentValidatorOpts, Mome
         }
         const opts = this.opts;
         const msgs = this.msgs;
-        let err: boolean;
+        let err: boolean = false;
         if ("max" in opts) {
             if (obj.isAfter(opts.max)) {
                 err = true;
@@ -403,10 +407,10 @@ export class MomentValidator extends Validator<Moment, MomentValidatorOpts, Mome
             return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
-                        min: opts.min && ("" + opts.min),
-                        max: opts.max && ("" + opts.max),
-                        locale: opts.locale && opts.locale,
-                        format: opts.format && opts.format
+                        min: ("min" in opts) ? ("" + opts.min) : "",
+                        max: ("max" in opts) ? ("" + opts.max) : "",
+                        locale: ("locale" in opts) ? opts.locale : localeDefault,
+                        format: ("format" in opts) ? opts.format : numFormatDefault
                     })
                 : notInRangeMsg;
         }
@@ -455,15 +459,15 @@ export class NumberValidator extends Validator<number, NumberValidatorOpts, Numb
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
-                                min: opts.min && ("" + opts.min),
-                                max: opts.max && ("" + opts.max)
+                                min: ("min" in opts) ? ("" + opts.min) : "",
+                                max: ("max" in opts) ? ("" + opts.max) : "",
                             })
                         : requiredMsg
                 };
             }
         }
         const n = Number(str);
-        let err: boolean;
+        let err: boolean = false;
         if (str !== this.objToStr(n).str) {
             err = true;
         }
@@ -477,7 +481,7 @@ export class NumberValidator extends Validator<number, NumberValidatorOpts, Numb
                             num: this.objToStr(num).str
                         })
                     : invalidFormatMsg
-                };
+            };
         }
         return { obj: n };
     }
@@ -485,7 +489,7 @@ export class NumberValidator extends Validator<number, NumberValidatorOpts, Numb
     protected objCheck(obj: number): string {
         const opts = this.opts;
         const msgs = this.msgs;
-        let err: boolean;
+        let err: boolean = false;
         if ("max" in opts) {
             if (obj > opts.max) {
                 err = true;
@@ -500,8 +504,8 @@ export class NumberValidator extends Validator<number, NumberValidatorOpts, Numb
             return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
-                        min: opts.min && ("" + opts.min),
-                        max: opts.max && ("" + opts.max)
+                        min: ("min" in opts) ? ("" + opts.min) : "",
+                        max: ("max" in opts) ? ("" + opts.max) : "",
                     })
                 : notInRangeMsg;
         }
@@ -518,10 +522,12 @@ export class NumberValidator extends Validator<number, NumberValidatorOpts, Numb
 
 export interface BooleanValidatorOpts {
     required?: boolean;
+    value?: boolean;
 }
 
 export interface BooleanValidatorMsgs {
     required?: string;
+    invalid_value?: string;
 }
 
 export class BooleanValidator extends Validator<boolean, BooleanValidatorOpts, BooleanValidatorMsgs> {
@@ -547,6 +553,22 @@ export class BooleanValidator extends Validator<boolean, BooleanValidatorOpts, B
     }
 
     protected objCheck(obj: boolean): string {
+        const opts = this.opts;
+        const msgs = this.msgs;
+        let err = false;
+        if ("value" in opts) {
+            if (obj !== opts.value) {
+                err = true;
+            }
+        }
+        if (err) {
+            return msgs.invalid_value
+                ? tpl(msgs.invalid_value,
+                    {
+                        value: ("value" in opts) ? ("" + opts.value) : "",
+                    })
+                : invalidValueMsg;
+        }
         return "";
     }
 
@@ -629,16 +651,21 @@ type StrDict<O, Optional extends (true | false) = false> = {
             ? 2
             : never];
 
+type ObjectValidators<T> = {
+    [key in keyof T]?: Validator<any, any, any> |
+    ObjectValidator<any> |
+    ArrayValidator<any> };
+
 export class ObjectValidator<T = any> {
 
-    readonly validators: { [key in keyof T]?: Validator<any, any, any> | ObjectValidator<any> | ArrayValidator<any>} = {} as any;
+    readonly validators: ObjectValidators<T> = {} as any;
 
     readonly str: StrDict<T>;
     readonly obj: { [key in keyof T]: any };
     readonly err: StrDict<T>;
     readonly valid: boolean;
 
-    constructor(validators?: { [key in keyof T]?: Validator<any, any, any> | ObjectValidator<any> | ArrayValidator<any>}) {
+    constructor(validators?: ObjectValidators<T>) {
         if (validators) {
             this.validators = validators;
         }
@@ -710,7 +737,8 @@ export class ObjectValidator<T = any> {
 function tpl(tmpl: string, data: { [k: string]: string }): string {
     return Object.keys(data)
         .map(k => [k, data[k]])
-        .reduce((t, d) => t.replace(new RegExp(`\\$\\{${d[0]}\\}`, "g"), d[1]), tmpl);
+        .reduce((t, d) =>
+            t.replace(new RegExp(`\\$\\{${d[0]}\\}`, "g"), d[1]), tmpl);
 }
 
 export class FormValidator<T = any> {
@@ -882,7 +910,7 @@ export class FormValidator<T = any> {
 //     .addValidator("date", dv)
 //     .validate(data);
 
-// // console.log(ov);
+// console.log(ov);
 
 // ov.format(ov.obj);
 // console.log(ov);
