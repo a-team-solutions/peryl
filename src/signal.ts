@@ -22,8 +22,8 @@ export class Signal<T> implements Sig<T> {
     private _slots: Slot<T>[] = [];
     private _emit: boolean = true;
 
-    private _onConnect: (connNo: number) => void;
-    private _onDisconnect: (connNo: number) => void;
+    private _onConnect?: ((connNo: number) => void);
+    private _onDisconnect?: ((connNo: number) => void);
 
     constructor() {
     }

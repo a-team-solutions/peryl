@@ -1,7 +1,7 @@
 
 export class Hash<T> {
 
-    private _cb: (data: T) => void;
+    private _cb?: (data: T) => void;
     private _iId: any;
 
     private _encode = (data: T) => encodeURIComponent(JSON.stringify(data));
@@ -35,7 +35,7 @@ export class Hash<T> {
     }
 
     listen(): this {
-        this._cb(this.read());
+        this._cb && this._cb(this.read());
         return this;
     }
 

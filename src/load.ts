@@ -6,7 +6,7 @@ export function scriptLib(url: string,
         const lib = (window as any)[namespace];
         (window as any)[namespace] = {};
         delete (window as any)[namespace];
-        callback(lib);
+        callback && callback(lib);
     });
 }
 
@@ -45,12 +45,12 @@ export function scripts(urls: string[], callback?: () => void): void {
         callbackTmp = (function (url, callbackTmp) {
             return () => {
                 script(url, () => {
-                    callbackTmp();
+                    callbackTmp && callbackTmp();
                 });
             };
         })(url, callbackTmp);
     }
-    callbackTmp();
+    callbackTmp && callbackTmp();
 }
 
 export function image(url: string, callback?: () => void): void {

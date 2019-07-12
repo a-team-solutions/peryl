@@ -54,7 +54,7 @@ class HelloWidget extends Widget {
 
 class TimerWidget extends Widget {
 
-    private _interval: number;
+    private _interval?: number;
 
     constructor() {
         super("TimerWidget");
@@ -104,8 +104,8 @@ class TimerWidget extends Widget {
 
 
 interface FormData {
-    name: string;
-    age: number;
+    name?: string;
+    age?: number;
 }
 
 interface FormErrors {

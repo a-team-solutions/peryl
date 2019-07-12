@@ -16,16 +16,10 @@ export interface Notif {
 
 export class NotifWidget implements Widget {
 
-    readonly name: string;
+    private _element?: HTMLElement;
+    private _notif?: Notif;
 
-    private _element: HTMLElement;
-    private _notif: Notif;
-
-    constructor(name?: string) {
-        this.name = name;
-    }
-
-    getNotif(): Notif {
+    getNotif(): Notif | undefined {
         return this._notif;
     }
 
@@ -36,7 +30,7 @@ export class NotifWidget implements Widget {
 
     element(): HTMLElement {
         if (!this._element) {
-            const notification = this._notif;
+            const notification = this._notif!;
             this._element = html(`
                     <div class="alert alert-dismissible alert-${notification.type}"
                          role="${notification.type}">
@@ -57,7 +51,9 @@ export class NotifWidget implements Widget {
     }
 
     umount(): this {
-        this._element.parentElement.removeChild(this._element);
+        this._element &&
+            this._element.parentElement &&
+                this._element.parentElement.removeChild(this._element);
         return this;
     }
 
@@ -66,14 +62,8 @@ export class NotifWidget implements Widget {
 
 export class NotifsWidget implements Widget {
 
-    readonly name: string;
-
-    private _element: HTMLElement;
+    private _element?: HTMLElement;
     private _notifWidgets: NotifWidget[] = [];
-
-    constructor(name?: string) {
-        this.name = name;
-    }
 
     getNotifWidgets(): NotifWidget[] {
         return this._notifWidgets;
@@ -82,24 +72,26 @@ export class NotifsWidget implements Widget {
     addNotif(notif: Notif): this {
         const n = new NotifWidget().setNotif(notif);
         this._notifWidgets.push(n);
-        this._element.appendChild(n.element());
+        this._element && this._element.appendChild(n.element());
         return this;
     }
 
     empty(): void {
-        this._element.innerHTML = "";
+        this._element && (this._element.innerHTML = "");
         this._notifWidgets = [];
     }
 
-    mount(element: HTMLElement): this {
+    mount(element?: HTMLElement | null): this {
         const e = html(`<div class="notifications"></div>`);
         this._element = e;
-        element.appendChild(e);
+        element && element.appendChild(e);
         return this;
     }
 
     umount(): this {
-        this._element.parentElement.removeChild(this._element);
+        this._element &&
+            this._element.parentElement &&
+                this._element.parentElement.removeChild(this._element);
         return this;
     }
 

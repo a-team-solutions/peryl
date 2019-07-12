@@ -21,7 +21,7 @@ s.emit("emit");
 console.log("-------------------------------------");
 
 class X {
-    slotMethod(data: string): void {
+    slotMethod(data?: string): void {
         console.log("method data: " + data, this);
     }
 }
@@ -54,12 +54,12 @@ class A {
 class B {
     private a = "B.a";
 
-    slot = (data: number) => {
+    slot = (data?: number) => {
         console.log("B.slot() data: '" + this.a + "' " + " " + data);
     }
 }
 
-function slot(data: number) {
+function slot(data?: number) {
     console.log("slot() data: " + data);
     // console.log("slot() data: '" + this.a + "' " + " " + data);
 }

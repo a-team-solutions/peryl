@@ -5,10 +5,10 @@ export class Sidebar implements Widget {
 
     readonly name: string;
 
-    private _element: HTMLElement;
+    private _element?: HTMLElement;
 
-    private _title: string;
-    private _content: Widget;
+    private _title?: string;
+    private _content?: Widget;
 
     private cancelOnClickOut = false;
     private cancelOnEsc = false;
@@ -30,7 +30,7 @@ export class Sidebar implements Widget {
         return this;
     }
 
-    getContent(): Widget {
+    getContent(): Widget | undefined {
         return this._content;
     }
 
@@ -50,17 +50,17 @@ export class Sidebar implements Widget {
         return this;
     }
 
-    onSigOpen(callback: (modalDialog: Sidebar) => void): Sidebar {
+    onSigOpen(callback: (modalDialog?: Sidebar) => void): Sidebar {
         this.sigOpen.connect(callback);
         return this;
     }
 
-    onSigClose(callback: (modalDialog: Sidebar) => void): Sidebar {
+    onSigClose(callback: (modalDialog?: Sidebar) => void): Sidebar {
         this.sigClose.connect(callback);
         return this;
     }
 
-    onSigCancel(callback: (modalDialog: Sidebar) => void): Sidebar {
+    onSigCancel(callback: (modalDialog?: Sidebar) => void): Sidebar {
         this.sigCancel.connect(callback);
         return this;
     }
@@ -85,13 +85,15 @@ export class Sidebar implements Widget {
         this.sigCancel.emit(this);
     }
 
-    mount(element: HTMLElement): this {
-        element.appendChild(this.element());
+    mount(element: HTMLElement | null): this {
+        element && element.appendChild(this.element());
         return this;
     }
 
     umount(): this {
-        this._element.parentElement.removeChild(this._element);
+        this._element &&
+            this._element.parentElement &&
+                this._element.parentElement.removeChild(this._element);
         return this;
     }
 
@@ -107,10 +109,10 @@ export class Sidebar implements Widget {
                     </div>`);
             this._element = e;
             const b = select(".sidebar-cancel", e);
-            b.addEventListener("click", () => {
+            b && (b.addEventListener("click", () => {
                 this.close();
                 this.sigCancel.emit(this);
-            });
+            }));
             this._element.addEventListener("click", (e) => {
                 if (this.cancelOnClickOut && this._element === e.target) {
                     this.close();

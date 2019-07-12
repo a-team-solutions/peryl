@@ -13,7 +13,7 @@ export function tmpl<T = any>(template: string): (data: { [key in keyof T]: any 
     const stringify = JSON.stringify;
     const re = /\$\{([\S\s]*?)\}/g;
     const strings: string[] = [];
-    let m: RegExpExecArray;
+    let m: RegExpExecArray | null;
     let i = 0;
     let str: string;
     while ((m = re.exec(template))) {

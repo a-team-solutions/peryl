@@ -11,16 +11,16 @@ export interface IWidget {
 
 export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
 
-    private static __count = 0;
+    private static _count = 0;
 
     static readonly mounted: { [wid: string]: Widget } = {};
 
     readonly type: string = this.constructor.name; // "Widget"
-    readonly id: string = this.type + "-" + Widget.__count++;
-    readonly dom: Element;
+    readonly id: string = this.type + "-" + Widget._count++;
+    readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
-    private __updateSched: number;
+    private _updateSched?: number;
 
     constructor(type?: string) {
         if (type) {
@@ -53,22 +53,25 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
         this.action(action, data);
     }
 
-    mount(e: Element = document.body): this {
-        !e && console.warn("invalit element", e);
-        if ("widget" in e) {
-            const w = (e as any).widget as Widget;
-            w && w.umount();
-        }
-        if (!this.dom) {
-            Widget.mounted[this.id] = this;
-            (this as any).dom = e;
-            (e as any).widget = this;
-            const hsmls = this.render();
-            hsmls2idomPatch(e, hsmls, this);
-            e.setAttribute("widget", this.type);
-            if ((this as any).onMount) {
-                (this as any).onMount();
+    mount(e: Element | null = document.body): this {
+        if (e) {
+            if ("widget" in e) {
+                const w = (e as any).widget as Widget;
+                w && w.umount();
             }
+            if (!this.dom) {
+                Widget.mounted[this.id] = this;
+                (this as any).dom = e;
+                (e as any).widget = this;
+                const hsmls = this.render();
+                hsmls2idomPatch(e, hsmls, this);
+                e.setAttribute("widget", this.type);
+                if ((this as any).onMount) {
+                    (this as any).onMount();
+                }
+            }
+        } else {
+            console.warn("invalit element", e);
         }
         return this;
     }
@@ -97,12 +100,12 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
     }
 
     update(): this {
-        if (this.dom && !this.__updateSched) {
-            this.__updateSched = setTimeout(() => {
+        if (this.dom && !this._updateSched) {
+            this._updateSched = setTimeout(() => {
                 if (this.dom) {
                     hsmls2idomPatch(this.dom, this.render(), this);
                 }
-                this.__updateSched = null;
+                this._updateSched = undefined;
             }, 0);
         }
         return this;
@@ -110,9 +113,9 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
 
     toHsml(): Hsml {
         if (this.dom) {
-            if (this.__updateSched) {
-                clearTimeout(this.__updateSched);
-                this.__updateSched = undefined;
+            if (this._updateSched) {
+                clearTimeout(this._updateSched);
+                this._updateSched = undefined;
             } else {
                 return (
                     ["div",

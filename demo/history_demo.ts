@@ -36,8 +36,8 @@ function displayPage(state: any) {
     // Check to make sure that this state object is not null.
     if (state) {
         document.title = state.title;
-        titleElement.innerHTML = state.title;
-        contentElement.innerHTML = state.content;
+        titleElement && (titleElement.innerHTML = state.title);
+        contentElement && (contentElement.innerHTML = state.content);
     }
 }
 

@@ -9,9 +9,9 @@ export function selectAll(selector: string, element?: HTMLElement): HTMLElement[
     return a;
 }
 
-export function select(selector: string, element?: HTMLElement): HTMLElement {
+export function select(selector: string, element?: HTMLElement): HTMLElement | null {
     const e = element || document;
-    return e.querySelector(selector) as HTMLElement;
+    return e.querySelector(selector);
 }
 
 export function append(element: HTMLElement, ...elements: HTMLElement[]): void {
@@ -19,11 +19,12 @@ export function append(element: HTMLElement, ...elements: HTMLElement[]): void {
 }
 
 export function replace(oldElement: HTMLElement, newElement: HTMLElement): void {
-    oldElement.parentElement.replaceChild(newElement, oldElement);
+    oldElement.parentElement &&
+        oldElement.parentElement.replaceChild(newElement, oldElement);
 }
 
 export function remove(element: HTMLElement): void {
-    element.parentElement.removeChild(element);
+    element.parentElement && element.parentElement.removeChild(element);
 }
 
 export function empty(element: HTMLElement) {

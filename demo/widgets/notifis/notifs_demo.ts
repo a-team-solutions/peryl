@@ -4,14 +4,14 @@ import { select } from "../../../src/dom";
 const notifsWidget = new notifs.NotifsWidget()
     .mount(select("#notifs"));
 
-select("#add").onclick = function () {
+select("#add")!.onclick = function () {
     notifsWidget.addNotif({
         type: notifs.TYPE_INFO,
         title: "title",
         text: "text text"
     });
 };
-select("#empty").onclick = function () {
+select("#empty")!.onclick = function () {
     notifsWidget.empty();
 };
 

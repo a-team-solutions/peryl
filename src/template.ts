@@ -59,15 +59,16 @@ String.prototype["template"] = function (fn, object) {
  * @returns {(data: Object) => string | string}
  */
 export function tmpl(templateOrId: string, data?: Object) {
-    const template = !/[^a-zA-Z0-9_-]+/.test(templateOrId) ?
-        document.getElementById(templateOrId).innerHTML : templateOrId;
+    const template = !/[^a-zA-Z0-9_-]+/.test(templateOrId)
+        ? document.getElementById(templateOrId)!.innerHTML
+        : templateOrId;
     let
         stringify = JSON.stringify,
         re = /\$\{([\S\s]*?)\}/g,
         strings: any[] = [],
         i = 0,
         str: string,
-        m: RegExpExecArray;
+        m: RegExpExecArray | null;
     while ((m = re.exec(template))) {
         str = template.slice(i, m.index);
         strings.push(stringify(str), "(" + m[1] + ")");
@@ -97,7 +98,7 @@ export function template(templateOrId: string, data?: any) {
     // var fn = !/\W/.test(str) ?
     const fn: Function = !/[^a-zA-Z0-9_-]+/.test(templateOrId) ?
         template_cache[templateOrId] = template_cache[templateOrId] ||
-            template(document.getElementById(templateOrId).innerHTML) :
+            template(document.getElementById(templateOrId)!.innerHTML) :
         // Generate a reusable function that will serve as a template
         // generator (and which will be cached).
         new Function("obj",

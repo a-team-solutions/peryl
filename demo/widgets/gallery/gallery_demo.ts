@@ -19,4 +19,4 @@ new gallery.GalleryWidget()
         const selected = select("#selected") as HTMLSpanElement;
         selected.innerHTML = JSON.stringify(item);
     })
-    .mount(select("#gallery"));
+    .mount(select("#gallery")!);

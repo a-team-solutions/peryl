@@ -54,14 +54,14 @@ export class CWidget<Model> implements HsmlHandlerCtx {
 
     readonly type: string = "CWidget";
     readonly id: string = this.type + "-" + CWidget._count++;
-    readonly dom: Element;
+    readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
-    private _updateSched: number;
+    private _updateSched?: number;
 
     model: Model;
     view: View<Model>;
-    actions: Actions<Model>;
+    actions?: Actions<Model>;
 
     constructor(widget: Widget<Model>, model?: Model) {
         this.model = model || widget.model;
@@ -84,7 +84,7 @@ export class CWidget<Model> implements HsmlHandlerCtx {
     }
 
     action = (action: string, data?: any): void => {
-        this.actions(action, data, this);
+        this.actions && this.actions(action, data, this);
     }
 
     render = (): Hsmls => {
@@ -98,10 +98,9 @@ export class CWidget<Model> implements HsmlHandlerCtx {
         this.action(action, data);
     }
 
-    mount = (e: Element = document.body): this => {
-        !e && console.warn("invalit element", e);
+    mount = (e: Element | null = document.body): this => {
         if (e) {
-            if (wNodeAttr in e) {
+            if ((e as any).widget) {
                 const c = (e as any).widget as CWidget<Model>;
                 c && c.umount();
             }
@@ -114,6 +113,8 @@ export class CWidget<Model> implements HsmlHandlerCtx {
                 e.setAttribute(wNodeAttr, this.type);
                 this.action("_mount", this.dom);
             }
+        } else {
+            console.warn("invalit element", e);
         }
         return this;
     }
@@ -148,7 +149,7 @@ export class CWidget<Model> implements HsmlHandlerCtx {
                 if (this.dom) {
                     hsmls2idomPatch(this.dom, this.render(), this);
                 }
-                this._updateSched = null;
+                this._updateSched = undefined;
             }, 0);
         }
         return this;
@@ -202,7 +203,7 @@ export class CWidget<Model> implements HsmlHandlerCtx {
 
 (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
     nodes.forEach(node => {
-        if (node.nodeType === 1 && wNodeAttr in node) {
+        if (node.nodeType === 1 && (node as any).widget) {
             const c = (node as any).widget as CWidget<any>;
             c && c.umount();
         }
@@ -212,11 +213,11 @@ export class CWidget<Model> implements HsmlHandlerCtx {
 const merge = <T extends { [k: string]: any }>(target: T, source: Partial<T>): T => {
     if (isMergeble(target) && isMergeble(source)) {
         Object.keys(source).forEach(key => {
-            if (isMergeble(source[key])) {
+            if (isMergeble(source[key] as object)) {
                 if (!target[key]) {
                     (target as any)[key] = {};
                 }
-                merge(target[key], source[key]);
+                merge(target[key], source[key] as Partial<T>);
             } else {
                 (target as any)[key] = source[key];
             }

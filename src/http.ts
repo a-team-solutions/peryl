@@ -62,7 +62,7 @@ export class HttpResponse {
         return this._xhr.getAllResponseHeaders();
     }
 
-    getHeader(header: string): string {
+    getHeader(header: string): string | null {
         return this._xhr.getResponseHeader(header);
     }
 
@@ -74,7 +74,7 @@ export class HttpResponse {
         return this._xhr.responseType;
     }
 
-    getContentType(): string {
+    getContentType(): string | null {
         return this.getHeader("Content-Type");
     }
 
@@ -86,7 +86,7 @@ export class HttpResponse {
         return JSON.parse(this._xhr.responseText);
     }
 
-    getXml(): Document {
+    getXml(): Document | null {
         return this._xhr.responseXML;
     }
 
@@ -95,7 +95,7 @@ export class HttpResponse {
 
 export interface HttpProgress {
     loaded: number;
-    total: number;
+    total?: number;
 }
 
 export type HttpMethod =
@@ -118,18 +118,18 @@ export type HttpResponseType =
 
 export class HttpRequest {
 
-    private _url: string;
-    private _query: Object;
+    private _url?: string;
+    private _query?: Object;
     private _method: HttpMethod = "GET";
     private _headers: { [key: string]: string } = {};
-    private _timeout: number;
-    private _responseType: HttpResponseType;
+    private _timeout?: number;
+    private _responseType?: HttpResponseType;
 
-    private _onProgress: (progress: HttpProgress) => void;
-    private _onResponse: (response: HttpResponse) => void;
-    private _onError: (e: Event) => void;
+    private _onProgress?: (progress: HttpProgress) => void;
+    private _onResponse?: (response: HttpResponse) => void;
+    private _onError?: (e?: Event) => void;
 
-    private _xhr: XMLHttpRequest;
+    private _xhr?: XMLHttpRequest;
     private _async: boolean = true;
     private _noCache: boolean = false;
 
@@ -208,7 +208,7 @@ export class HttpRequest {
         return this;
     }
 
-    onError(onError: (e: Event) => void): this {
+    onError(onError: (e?: Event) => void): this {
         this._onError = onError;
         return this;
     }
@@ -242,7 +242,7 @@ export class HttpRequest {
         const xhr = new XMLHttpRequest();
         this._xhr = xhr;
 
-        let url = this._url;
+        let url = this._url || "";
         if (this._query) {
             const query = encodeUrlQuery(this._query);
             url = query ? `${url}?${query}` : url;
@@ -259,7 +259,7 @@ export class HttpRequest {
         if ("onprogress" in xhr) {
             if (this._onProgress) {
                 const onprogress = (e: ProgressEvent) => {
-                    this._onProgress({
+                    this._onProgress!({
                         loaded: e.loaded,
                         total: e.lengthComputable ? e.total : undefined
                     });
@@ -284,7 +284,7 @@ export class HttpRequest {
         if ("ontimeout" in xhr) {
             if (this._onError) {
                 xhr.ontimeout = (e: ProgressEvent) => {
-                    this._onError(e);
+                    this._onError!(e);
                 };
             }
         }
@@ -292,14 +292,14 @@ export class HttpRequest {
         if ("onabort" in xhr) {
             if (this._onError) {
                 xhr.onabort = (e: ProgressEvent) => {
-                    this._onError(undefined);
+                    this._onError!();
                 };
             }
         }
 
         if (this._onError) {
             xhr.onerror = (e: ProgressEvent) => {
-                this._onError(e);
+                this._onError!(e);
             };
         }
 

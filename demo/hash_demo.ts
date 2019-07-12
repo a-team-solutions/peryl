@@ -3,7 +3,7 @@ import * as hash from "../src/hash";
 import { select } from "../src/dom";
 
 const out = select("#output");
-out.innerHTML = "test";
+out && (out.innerHTML = "test");
 
 const h = new hash.Hash<any>()
     // .coders(
@@ -20,11 +20,10 @@ const h = new hash.Hash<any>()
     // )
     .onChange(data => {
         console.log("hash: " + JSON.stringify(data));
-        out.innerHTML += "<br/>" + "hash: " + JSON.stringify(data);
+        out && (out.innerHTML += "<br/>" + "hash: " + JSON.stringify(data));
     })
     .listen()
     .write({ message: "hello" });
 
-select("#hash").onclick = (e: MouseEvent) => {
-    h.write({ time: new Date().getTime() });
-};
+const el = select("#hash");
+el && (el.onclick = (e: MouseEvent) => h.write({ time: new Date().getTime() }));

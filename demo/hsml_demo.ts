@@ -63,7 +63,6 @@ function action(event: string, data: any, model: AppModel, dispatch: Dispatch): 
             break;
         default:
             console.warn("unhandled event", event, data);
-            return null;
     }
     return model;
 }
@@ -74,9 +73,9 @@ const dispatch = (event: string, data?: any): void => {
     // console.log("dispatch", event, data);
     const model = action(event, data, appModel, dispatch);
     // console.log("model", model);
-    render(appElement, app, model, dispatch);
+    render(appElement!, app, model, dispatch);
 };
 
-render(appElement, app, appModel, dispatch);
+render(appElement!, app, appModel, dispatch);
 
 dispatch("event", {});

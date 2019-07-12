@@ -34,7 +34,7 @@ import { html, select } from "../../../src/dom";
 //     .send();
 
 const ol = html(`<ol></ol>`);
-select("#obce").appendChild(ol);
+select("#obce")!.appendChild(ol);
 
 new HttpRequest()
     .get("https://data.gov.sk/api/action/datastore_search", {

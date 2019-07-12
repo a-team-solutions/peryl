@@ -1,7 +1,7 @@
 
 export interface Entry {
     getName(): string;
-    getValue(): string;
+    getValue(): string | undefined;
     setValue(value: string): this;
     validate(locale?: string): string;
     setValidator(validator: (entry: Entry, locale?: string) => string): this;
@@ -12,8 +12,8 @@ export interface Entry {
 export class TextAreaEntry implements Entry {
 
     private _element: HTMLTextAreaElement;
-    private _validator: (entry: Entry, locale: string) => string;
-    private _onChange: (entry: Entry, final: boolean) => void;
+    private _validator?: (entry: Entry, locale: string) => string;
+    private _onChange?: (entry: Entry, final: boolean) => void;
 
     constructor(element: HTMLTextAreaElement | string) {
         if (typeof element === "string") {
@@ -37,7 +37,7 @@ export class TextAreaEntry implements Entry {
         return this._element.name;
     }
 
-    getValue(): string {
+    getValue(): string | undefined {
         return this._element.value;
     }
 
@@ -46,7 +46,7 @@ export class TextAreaEntry implements Entry {
         return this;
     }
 
-    validate(locale?: string): string {
+    validate(locale: string = ""): string {
         if (this._validator) {
             return this._validator(this, locale);
         }
@@ -69,8 +69,8 @@ export class TextAreaEntry implements Entry {
 export class TextInputEntry implements Entry {
 
     private _element: HTMLInputElement;
-    private _validator: (entry: Entry, locale: string) => string;
-    private _onChange: (entry: Entry, final: boolean) => void;
+    private _validator?: (entry: Entry, locale: string) => string;
+    private _onChange?: (entry: Entry, final: boolean) => void;
 
     constructor(element: HTMLInputElement|string) {
         if (typeof element === "string") {
@@ -94,7 +94,7 @@ export class TextInputEntry implements Entry {
         return this._element.name;
     }
 
-    getValue(): string {
+    getValue(): string | undefined {
         return this._element.value;
     }
 
@@ -103,7 +103,7 @@ export class TextInputEntry implements Entry {
         return this;
     }
 
-    validate(locale?: string): string {
+    validate(locale: string = ""): string {
         if (this._validator) {
             return this._validator(this, locale);
         }
@@ -129,8 +129,8 @@ export class NumberInputEntry implements Entry {
 
     private _decimals: number = 0;
     private _dragSensitivity: number = 1.0;
-    private _validator: (entry: Entry, locale: string) => string;
-    private _onChange: (entry: Entry, final: boolean) => void;
+    private _validator?: (entry: Entry, locale: string) => string;
+    private _onChange?: (entry: Entry, final: boolean) => void;
 
     constructor(element: HTMLInputElement | string) {
         if (typeof element === "string") {
@@ -150,7 +150,7 @@ export class NumberInputEntry implements Entry {
         return this._element.name;
     }
 
-    getValue(): string {
+    getValue(): string | undefined {
         return this._element.value;
     }
 
@@ -202,7 +202,7 @@ export class NumberInputEntry implements Entry {
                 setTimeout(() => {
                     // const value = Number(this._element.value);
                     // this.setValue(value.toFixed(this._decimals));
-                    this._onChange(this, false);
+                    this._onChange && this._onChange(this, false);
                 }, 0);
             }
         };
@@ -236,7 +236,7 @@ export class NumberInputEntry implements Entry {
                 } else {
                     this.setValue(newValue.toFixed(this._decimals));
                 }
-                this._onChange(this, false);
+                this._onChange && this._onChange(this, false);
             };
 
             const onMouseUp = () => {
@@ -244,7 +244,7 @@ export class NumberInputEntry implements Entry {
                 this._element.style.cursor = "";
                 document.removeEventListener("mousemove", onMouseMove);
                 document.removeEventListener("mouseup", onMouseUp);
-                this._onChange(this, true);
+                this._onChange && this._onChange(this, true);
             };
 
             document.addEventListener("mousemove", onMouseMove);
@@ -253,7 +253,7 @@ export class NumberInputEntry implements Entry {
         return this;
     }
 
-    validate(locale?: string): string {
+    validate(locale: string = ""): string {
         if (this._validator) {
             return this._validator(this, locale);
         }
@@ -276,8 +276,8 @@ export class NumberInputEntry implements Entry {
 export class CheckboxEntry implements Entry {
 
     private _element: HTMLInputElement;
-    private _validator: (entry: Entry, locale: string) => string;
-    private _onChange: (entry: Entry) => void;
+    private _validator?: (entry: Entry, locale: string) => string;
+    private _onChange?: (entry: Entry) => void;
 
     constructor(element: HTMLInputElement | string) {
         if (typeof element === "string") {
@@ -296,7 +296,7 @@ export class CheckboxEntry implements Entry {
         return this._element.name;
     }
 
-    getValue(): string {
+    getValue(): string | undefined {
         return "" + this._element.checked;
     }
 
@@ -305,7 +305,7 @@ export class CheckboxEntry implements Entry {
         return this;
     }
 
-    validate(locale?: string): string {
+    validate(locale: string = ""): string {
         if (this._validator) {
             return this._validator(this, locale);
         }
@@ -328,8 +328,8 @@ export class CheckboxEntry implements Entry {
 export class SelectEntry implements Entry {
 
     private _element: HTMLSelectElement;
-    private _validator: (entry: Entry, locale: string) => string;
-    private _onChange: (entry: Entry) => void;
+    private _validator?: (entry: Entry, locale: string) => string;
+    private _onChange?: (entry: Entry) => void;
 
     constructor(element: HTMLSelectElement | string) {
         if (typeof element === "string") {
@@ -348,7 +348,7 @@ export class SelectEntry implements Entry {
         return this._element.name;
     }
 
-    getValue(): string {
+    getValue(): string | undefined {
         return this._element.value;
 
         // const idx = this._element.selectedIndex;
@@ -383,7 +383,7 @@ export class SelectEntry implements Entry {
         return this;
     }
 
-    validate(locale?: string): string {
+    validate(locale: string = ""): string {
         if (this._validator) {
             return this._validator(this, locale);
         }
@@ -406,8 +406,9 @@ export class SelectEntry implements Entry {
 export class RadioEntry implements Entry {
 
     private _elements: HTMLInputElement[] = [];
-    private _validator: (entry: Entry, locale: string) => string;
-    private _onChange: (entry: Entry) => void;
+
+    private _validator?: (entry: Entry, locale: string) => string;
+    private _onChange?: (entry: Entry) => void;
 
     constructor(elements: HTMLInputElement[] | string[]) {
         (elements as any).forEach((e: HTMLInputElement | string) => {
@@ -430,13 +431,13 @@ export class RadioEntry implements Entry {
         return this._elements[0].name;
     }
 
-    getValue(): string {
+    getValue(): string | undefined {
         for (let e of this._elements) {
             if (e.checked) {
                 return e.value;
             }
         }
-        return null;
+        return;
     }
 
     setValue(value: string): this {
@@ -448,7 +449,7 @@ export class RadioEntry implements Entry {
         return this;
     }
 
-    validate(locale?: string): string {
+    validate(locale: string = ""): string {
         if (this._validator) {
             return this._validator(this, locale);
         }
@@ -490,8 +491,8 @@ export class RadioEntry implements Entry {
 export class FileEntry implements Entry {
 
     private _element: HTMLInputElement;
-    private _validator: (entry: Entry, locale: string) => string;
-    private _onChange: (entry: Entry) => void;
+    private _validator?: (entry: Entry, locale: string) => string;
+    private _onChange?: (entry: Entry) => void;
 
     constructor(element: HTMLInputElement | string) {
         if (typeof element === "string") {
@@ -510,17 +511,19 @@ export class FileEntry implements Entry {
         return this._element.name;
     }
 
-    getValue(): string {
+    getValue(): string | undefined {
         const f = this._element.files;
-        if (f.length) {
+        if (f && f.length) {
             return f[0].name + " (" + f[0].type + ", " + f[0].size + ")";
         } else {
-            return "";
+            return;
         }
     }
 
-    getFile(): File {
-        return this._element.files.length ? this._element.files[0] : null;
+    getFile(): File | null {
+        return (this._element.files && this._element.files.length)
+            ? this._element.files[0]
+            : null;
     }
 
     setValue(value: string): this {
@@ -528,7 +531,7 @@ export class FileEntry implements Entry {
         return this;
     }
 
-    validate(locale?: string): string {
+    validate(locale: string = ""): string {
         if (this._validator) {
             return this._validator(this, locale);
         }
@@ -552,7 +555,7 @@ export class Form {
 
     private _element: HTMLFormElement;
     private _formEntries: Entry[] = [];
-    private _onSubmit: (form: Form) => void;
+    private _onSubmit?: (form: Form) => void;
 
     constructor(element: HTMLFormElement | string) {
         if (typeof element === "string") {
@@ -583,13 +586,13 @@ export class Form {
         return this._formEntries;
     }
 
-    getEntry(name: string): Entry {
+    getEntry(name: string): Entry | undefined {
         for (let entry of this._formEntries) {
             if (entry.getName() === name) {
                 return entry;
             }
         }
-        return null;
+        return;
     }
 
     validate(locale?: string): any {

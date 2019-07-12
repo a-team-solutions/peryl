@@ -39,10 +39,11 @@ export interface HsmlAttrs {
         // | HsmlAttrData
         | HsmlAttrOn
         | EventListener
-        | HsmlObj;
+        | HsmlObj
+        | undefined;
 }
 
-export type HsmlFnc = (e?: Element) => boolean | void;
+export type HsmlFnc = (e: Element) => boolean | void;
 
 export interface HsmlObj {
     toHsml?(): Hsml;
@@ -143,8 +144,8 @@ export function hsml<C extends HsmlHandlerCtx>(hml: Hsml, handler: HsmlHandler<C
         const childIdx = hasAttrs ? 2 : 1;
 
         let children: Hsmls = [];
-        let hsmlFnc: HsmlFnc;
-        let hsmlObj: HsmlObj;
+        let hsmlFnc: HsmlFnc | undefined;
+        let hsmlObj: HsmlObj | undefined;
 
         const htc = hmlTag[childIdx];
         switch (htc && htc.constructor) {

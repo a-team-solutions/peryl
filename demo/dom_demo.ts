@@ -9,16 +9,10 @@ class Item {
 
 class MyWidget implements Widget {
 
-    readonly name: string;
-
     private _items: Item[] = [];
-    private _onSelect: (item: Item) => void;
+    private _onSelect?: (item: Item) => void;
 
-    private _element: HTMLElement;
-
-    constructor(name?: string) {
-        this.name = name;
-    }
+    private _element?: HTMLElement;
 
     setItems(items: Item[]): this {
         this._items = items;
@@ -47,25 +41,29 @@ class MyWidget implements Widget {
         return this;
     }
 
-    mount(el: HTMLElement): this {
-        this._element = html(`<ol class="Widget"></ol>`);
-        el.appendChild(this._element);
-        this._updateItems();
-        // event delegation
-        // addEventListener(el, "li, li *", "click",
-        //     (target: HTMLElement, e: Event) => {
-        //         if (target.hasAttribute("data-id")) {
-        //             const id = target.getAttribute("data-id");
-        //             if (this._onSelect) {
-        //                 this._onSelect(this._items[+id]);
-        //             }
-        //         }
-        //     });
+    mount(e: HTMLElement | null): this {
+        if (e) {
+            this._element = html(`<ol class="Widget"></ol>`);
+            e.appendChild(this._element);
+            this._updateItems();
+            // event delegation
+            // addEventListener(el, "li, li *", "click",
+            //     (target: HTMLElement, e: Event) => {
+            //         if (target.hasAttribute("data-id")) {
+            //             const id = target.getAttribute("data-id");
+            //             if (this._onSelect) {
+            //                 this._onSelect(this._items[+id]);
+            //             }
+            //         }
+            //     });
+        } else {
+            console.warn("invalit element", e);
+        }
         return this;
     }
 
     umount(): this {
-        remove(this._element);
+        this._element && remove(this._element);
         return this;
     }
 
@@ -84,7 +82,7 @@ class MyWidget implements Widget {
                         this._onSelect(item);
                     }
                 });
-                this._element.appendChild(li);
+                this._element && this._element.appendChild(li);
             });
             // event delegation
             // this._element.innerHTML = this._items.map((item, i) => {

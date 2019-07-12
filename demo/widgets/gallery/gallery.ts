@@ -11,15 +11,9 @@ export class Item {
 
 export class GalleryWidget implements Widget {
 
-    readonly name: string;
-
-    private _element: HTMLDivElement;
+    private _element?: HTMLDivElement;
     private _items: Item[] = [];
-    private _onSelect: (item: Item) => void;
-
-    constructor(name?: string) {
-        this.name = name;
-    }
+    private _onSelect?: (item: Item) => void;
 
     setItems(items: Item[]): this {
         this._items = items;
@@ -66,7 +60,8 @@ export class GalleryWidget implements Widget {
                     const i = select(".gallery-image img") as HTMLImageElement;
                     i.alt = a.title;
                     i.src = a.href;
-                    this._onSelect && this._onSelect(this._items[+i.getAttribute("data-i")]);
+                    const data = i.getAttribute("data-i") || "";
+                    this._onSelect && this._onSelect(this._items[+data]);
                 }
                 return false;
             };
@@ -86,7 +81,7 @@ export class GalleryWidget implements Widget {
     }
 
     umount(): this {
-        remove(this._element);
+        this._element && remove(this._element);
         return this;
     }
 
@@ -94,12 +89,12 @@ export class GalleryWidget implements Widget {
         if (this._items.length > 0) {
             const item = this._items[0];
             const e = select(".gallery-image", this._element);
-            e.innerHTML = `<img src="${item.url}" alt="${item.title}">`;
+            e && (e.innerHTML = `<img src="${item.url}" alt="${item.title}">`);
         }
         const t = select(".gallery-thumbs", this._element);
-        t.innerHTML = this._items.map((item, i) => {
+        t && (t.innerHTML = this._items.map((item, i) => {
             return `<a href="${item.url}" title="${item.title}" data-i="${i}"><img src="${item.thumb}"></a>`;
-        }).join(" ");
+        }).join(" "));
     }
 
 }

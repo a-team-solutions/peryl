@@ -42,7 +42,7 @@ const manage: Manage = <Model>(wClass: Class<AWidget<Model>>, model?: Model): Hs
 
 export abstract class AWidget<S> implements HsmlHandlerCtx {
 
-    private static __count = 0;
+    private static _count = 0;
 
     static readonly mounted: { [wid: string]: AWidget<any> } = {};
 
@@ -51,11 +51,11 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
     }
 
     readonly type: string = this.constructor.name; // "XWidget"
-    readonly id: string = this.type + "-" + AWidget.__count++;
-    readonly dom: Element;
+    readonly id: string = this.type + "-" + AWidget._count++;
+    readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
-    private __updateSched: number;
+    private _updateSched?: number;
 
     abstract model: S;
     abstract view(model: S, action: Action, manage: Manage): Hsmls;
@@ -89,8 +89,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
         this.action(action, data);
     }
 
-    mount = (e: Element = document.body): this => {
-        !e && console.warn("invalit element", e);
+    mount = (e: Element | null = document.body): this => {
         if (e) {
             if ("widget" in e) {
                 const w = (e as any).widget as AWidget<S>;
@@ -105,6 +104,8 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
                 e.setAttribute("widget", this.type);
                 this.action("_mount", this.dom);
             }
+        } else {
+            console.warn("invalit element", e);
         }
         return this;
     }
@@ -134,12 +135,12 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
         if (model) {
             this.model = merge(this.model, model);
         }
-        if (this.dom && !this.__updateSched) {
-            this.__updateSched = setTimeout(() => {
+        if (this.dom && !this._updateSched) {
+            this._updateSched = setTimeout(() => {
                 if (this.dom) {
                     hsmls2idomPatch(this.dom, this.render(), this);
                 }
-                this.__updateSched = null;
+                this._updateSched = undefined;
             }, 0);
         }
         return this;
@@ -147,9 +148,9 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
 
     toHsml = (): Hsml => {
         if (this.dom) {
-            if (this.__updateSched) {
-                clearTimeout(this.__updateSched);
-                this.__updateSched = undefined;
+            if (this._updateSched) {
+                clearTimeout(this._updateSched);
+                this._updateSched = undefined;
             } else {
                 return (
                     ["div",
@@ -203,11 +204,11 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
 const merge = <T extends { [k: string]: any }>(target: T, source: Partial<T>): T => {
     if (isMergeble(target) && isMergeble(source)) {
         Object.keys(source).forEach(key => {
-            if (isMergeble(source[key])) {
+            if (isMergeble(source[key] as object)) {
                 if (!target[key]) {
                     (target as any)[key] = {};
                 }
-                merge(target[key], source[key]);
+                merge(target[key], source[key] as Partial<T>);
             } else {
                 (target as any)[key] = source[key];
             }

@@ -117,7 +117,7 @@ const ov = new ObjectValidator<typeof data>()
 
 // console.log(ov);
 
-ov.format(ov.obj);
+ov.format(ov.obj!);
 console.log(ov);
 
 console.log();

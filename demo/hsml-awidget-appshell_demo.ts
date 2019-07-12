@@ -125,7 +125,7 @@ export class AppShell extends AWidget<AppShellModel> {
                     {
                         accesskey: "m",
                         "aria-label": "Menu",
-                        on: ["click", AppShellActions.menu, null]
+                        on: ["click", AppShellActions.menu]
                     },
                     [["i.fas.fa-bars"]],
                 ],
@@ -197,7 +197,7 @@ export class AppShell extends AWidget<AppShellModel> {
                         display: model.menu ? "block" : "none"
                     },
                     title: "close side menu",
-                    on: ["click", AppShellActions.menu, null]
+                    on: ["click", AppShellActions.menu]
                 }
             ],
             // main

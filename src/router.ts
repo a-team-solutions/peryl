@@ -49,6 +49,33 @@ export class Emitter {
 
 export class Route {
 
+    private _regex!: RegExp;
+    private _params: any = {};
+
+    readonly path: string;
+    readonly keys: Keys = [];
+
+    constructor(path: string) {
+        this.path = path;
+        this._pathParse(path, false, false);
+    }
+
+    match(path: string, params: string[]) {
+        const m = this._regex.exec(path);
+        if (!m) {
+            return false;
+        }
+        for (let i = 1; i < m.length; ++i) {
+            const key = this.keys[i - 1];
+            const val = "string" === typeof m[i] ? decodeURIComponent(m[i]) : m[i];
+            if (key) {
+                this._params[key.name] = val;
+            }
+            params.push(val);
+        }
+        return true;
+    }
+
     private _pathParse(path: Path, sensitive: boolean, strict: boolean): void {
         if (path instanceof RegExp) {
             this._regex = path;
@@ -89,33 +116,6 @@ export class Route {
             .replace(/__plus__/g, "(.+)")
             .replace(/\*/g, "(.*)");
         this._regex = new RegExp("^" + path + "$", sensitive ? "" : "i");
-    }
-
-    private _regex: RegExp;
-    private _params: any = {};
-
-    readonly path: string;
-    readonly keys: Keys = [];
-
-    constructor(path: string) {
-        this.path = path;
-        this._pathParse(path, false, false);
-    }
-
-    match(path: string, params: string[]) {
-        const m = this._regex.exec(path);
-        if (!m) {
-            return false;
-        }
-        for (let i = 1; i < m.length; ++i) {
-            const key = this.keys[i - 1];
-            const val = "string" === typeof m[i] ? decodeURIComponent(m[i]) : m[i];
-            if (key) {
-                this._params[key.name] = val;
-            }
-            params.push(val);
-        }
-        return true;
     }
 
 }

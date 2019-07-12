@@ -2,7 +2,6 @@ import * as sidebar from "./sidebar";
 import { html, select, Widget } from "../../../src/dom";
 
 class Content implements Widget {
-    name: string;
     mount(el: HTMLElement): this {
         el.appendChild(html(`<p>content text</p>`));
         return this;
@@ -29,7 +28,7 @@ const s = new sidebar.Sidebar()
     .mount(select("#sidebar"));
 
 
-select("#btn").addEventListener("click", () => {
+select("#btn")!.addEventListener("click", () => {
     s.open();
     // setTimeout(() => s.cancel(), 3000);
 });
