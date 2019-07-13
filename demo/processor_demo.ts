@@ -135,7 +135,7 @@ class Viewer extends Procesor<State> {
 
     select(states: State[]): State[] {
         console.log(JSON.stringify(this.name));
-        print(states.map(s => JSON.stringify(s)).join("\n"));
+        log(states.map(s => JSON.stringify(s)).join("\n"));
         return states;
     }
 
@@ -147,7 +147,7 @@ class Viewer extends Procesor<State> {
 
 const out = document.getElementById("out");
 
-function print(...msgs: any[]) {
+function log(...msgs: any[]) {
     console.log(...msgs);
     out!.textContent = msgs.join(" ");
 }
