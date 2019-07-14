@@ -2,7 +2,7 @@ import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export type View<Model> = (model: Model, action: Action, manage: Manage) => Hsmls;
+export type View<Model> = (model: Model, action: Action, mount: Mount) => Hsmls;
 
 export type Action = (action: string, data?: any) => void;
 
@@ -10,9 +10,9 @@ export type Actions<Model> = (action: string, data: any, widget: AWidget<Model>)
 
 export type Class<T = object> = new (...args: any[]) => T;
 
-export type Manage = <Model>(xwClass: Class<AWidget<Model>>, model?: Model) => HsmlFnc | Hsmls;
+export type Mount = <Model>(xwClass: Class<AWidget<Model>>, model?: Model) => HsmlFnc | Hsmls;
 
-const manage: Manage = <Model>(wClass: Class<AWidget<Model>>, model?: Model): HsmlFnc | Hsmls => {
+const mount: Mount = <Model>(wClass: Class<AWidget<Model>>, model?: Model): HsmlFnc | Hsmls => {
     return (e: Element) => {
         if ((e as any).widget) {
             const w = (e as any).widget as AWidget<Model>;
@@ -58,7 +58,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
     private _updateSched?: number;
 
     abstract model: S;
-    abstract view(model: S, action: Action, manage: Manage): Hsmls;
+    abstract view(model: S, action: Action, mount: Mount): Hsmls;
     abstract actions(action: string, data: any, widget: AWidget<S>): void;
 
     action = (action: string, data?: any): void => {
@@ -79,7 +79,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
     }
 
     render = (): Hsmls => {
-        return this.view(this.model, this.action, manage);
+        return this.view(this.model, this.action, mount);
     }
 
     onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {

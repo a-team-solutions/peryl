@@ -298,7 +298,7 @@ class AppWidget extends Widget {
             ]],
             ["fieldset", [
                 ["legend", ["Mount element"]],
-                ["div#wid.wclass", { _widget: new HelloWidget("hello mount") }]
+                ["div#wid.wclass", { _hsmlObj: new HelloWidget("hello mount") }]
             ]]
         ];
     }

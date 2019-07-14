@@ -1,4 +1,4 @@
-import { Action, Manage } from "../src/hsml-mva";
+import { Action, Mount } from "../src/hsml-mva";
 import { Hsmls, Hsml, join } from "../src/hsml";
 import { Widget, CWidget } from "../src/hsml-mva-cwidget";
 
@@ -18,7 +18,7 @@ export const Sidebar: Widget<SidebarModel> = {
         title: "Sidebar"
     },
 
-    view: (model: SidebarModel, action: Action, manage: Manage): Hsmls => {
+    view: (model: SidebarModel, action: Action, mount: Mount): Hsmls => {
         const menu = [
             { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
             { url: "#content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
@@ -77,7 +77,7 @@ export const Content: Widget<ContentModel> = {
         text: "text text text"
     },
 
-    view: (model: ContentModel, action: Action, manage: Manage): Hsmls => {
+    view: (model: ContentModel, action: Action, mount: Mount): Hsmls => {
         return [
             ["h1", [model.title]],
             ["p", [model.text]]
@@ -132,7 +132,7 @@ export const Form: Widget<FormModel> = {
         }
     },
 
-    view: (model: FormModel, action: Action, manage: Manage): Hsmls => {
+    view: (model: FormModel, action: Action, mount: Mount): Hsmls => {
         const genders = [
             { label: "Male", value: "male" },
             { label: "Female", value: "female" }
@@ -299,7 +299,7 @@ export const AppShell: Widget<AppShellModel> = {
         snackbar: ""
     },
 
-    view: (model: AppShellModel, action: Action, manage: Manage): Hsmls => {
+    view: (model: AppShellModel, action: Action, mount: Mount): Hsmls => {
         return [
             // header
             ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [
@@ -339,7 +339,7 @@ export const AppShell: Widget<AppShellModel> = {
                         display: model.menu ? "block" : "none"
                     }
                 },
-                manage<SidebarModel>(model.sidebar)
+                mount<SidebarModel>(model.sidebar)
             ],
             // overlay
             ["div#overlay.w3-overlay.w3-hide-large.w3-animate-opacity~overlay",
@@ -355,7 +355,7 @@ export const AppShell: Widget<AppShellModel> = {
             // main
             ["div.w3-main", { style: "margin-left:300px;margin-top:43px;" }, [
                 ["div.w3-container~content",
-                    manage<any>(model.content)
+                    mount<any>(model.content)
                 ]
             ]],
             // snackbar

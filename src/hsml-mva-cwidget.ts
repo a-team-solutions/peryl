@@ -1,4 +1,4 @@
-import { Manage, View } from "./hsml-mva";
+import { Mount, View } from "./hsml-mva";
 import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
@@ -12,7 +12,7 @@ export interface Widget<Model> {
 
 export type Actions<Model> = (action: string, data: any, widget: CWidget<Model>) => void;
 
-const manage: Manage = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hsmls => {
+const mount: Mount = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hsmls => {
     return (e: Element) => {
         if ((e as any).widget) {
             const c = (e as any).widget as CWidget<Model>;
@@ -88,7 +88,7 @@ export class CWidget<Model> implements HsmlHandlerCtx {
     }
 
     render = (): Hsmls => {
-        return this.view(this.model, this.action, manage);
+        return this.view(this.model, this.action, mount);
     }
 
     onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {

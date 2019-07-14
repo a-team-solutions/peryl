@@ -1,6 +1,6 @@
 import { Hsmls, Hsml } from "../src/hsml";
 import { Widget, CWidget } from "../src/hsml-mva-cwidget";
-import { Manage, Action } from "../src/hsml-mva";
+import { Mount, Action } from "../src/hsml-mva";
 
 const NBSP = "\u00A0";
 const CIRC = "\u25EF";
@@ -28,7 +28,7 @@ const TicTacToe: Widget<TicTacToeModel> = {
         turn: 0
     },
 
-    view: (model: TicTacToeModel, action: Action, manage: Manage): Hsmls => ([
+    view: (model: TicTacToeModel, action: Action, mount: Mount): Hsmls => ([
         ["h1", ["Tic-Tac-Toe Demo"]],
         ["p", [
             "Player: ", model.turn ? CROS : CIRC

@@ -1,4 +1,4 @@
-import { Action, Manage } from "../src/hsml-mva";
+import { Action, Mount } from "../src/hsml-mva";
 import { Hsmls } from "../src/hsml";
 import { Actions, CWidget, Widget } from "../src/hsml-mva-cwidget";
 
@@ -23,7 +23,7 @@ const App: Widget<AppModel> = {
         count: 77
     },
 
-    view: (model: AppModel, action: Action, manage: Manage): Hsmls => {
+    view: (model: AppModel, action: Action, mount: Mount): Hsmls => {
         return [
             ["h2", [model.title]],
             ["p", [
@@ -45,7 +45,7 @@ const App: Widget<AppModel> = {
                 ["button", { on: ["click", AppActions.inc, 2] }, ["+"]],
                 ["button", { on: ["click", AppActions.xXx] }, ["xXx"]]
             ]],
-            ["p", model.title ? manage<AppModel>(Sub, model) : []]
+            ["p", model.title ? mount<AppModel>(Sub, model) : []]
         ];
     },
 
@@ -81,7 +81,7 @@ const Sub: Widget<AppModel> = {
 
     model: App.model,
 
-    view: (model: AppModel, action: Action, manage: Manage): Hsmls => {
+    view: (model: AppModel, action: Action, mount: Mount): Hsmls => {
         return [
             ["h3", [model.title]],
             ["p", [
@@ -104,9 +104,6 @@ const Sub: Widget<AppModel> = {
     }
 
 };
-
-
-// Client side app rendering
 
 const appActions: Actions<AppModel> = (action: string, data: any, widget: CWidget<AppModel>) => {
     console.log(action, data);

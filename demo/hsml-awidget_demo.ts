@@ -1,4 +1,4 @@
-import { AWidget, Action, Manage } from "../src/hsml-awidget";
+import { AWidget, Action, Mount } from "../src/hsml-awidget";
 import { Hsmls } from "../src/hsml";
 
 interface AppModel {
@@ -20,7 +20,7 @@ class App extends AWidget<AppModel> {
         count: 77
     };
 
-    view(model: AppModel, action: Action, manage: Manage): Hsmls {
+    view(model: AppModel, action: Action, mount: Mount): Hsmls {
         return [
             ["h2", [model.title]],
             ["p", [
@@ -42,7 +42,7 @@ class App extends AWidget<AppModel> {
                 ["button", { on: ["click", AppActions.inc, 2] }, ["+"]],
                 ["button", { on: ["click", AppActions.xXx] }, ["xXx"]]
             ]],
-            ["p", model.title ? manage<AppModel>(SubApp, model) : []]
+            ["p", model.title ? mount<AppModel>(SubApp, model) : []]
         ];
     }
 
@@ -79,7 +79,7 @@ class SubApp extends AWidget<AppModel> {
         count: 33
     };
 
-    view(model: AppModel, action: Action, manage: Manage): Hsmls {
+    view(model: AppModel, action: Action, mount: Mount): Hsmls {
         return [
             ["h3", [model.title]],
             ["p", [

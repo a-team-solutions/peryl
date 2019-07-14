@@ -40,7 +40,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         const props: any[] = [];
         let id = attrs._id;
         let classes: string[] = attrs._classes ? attrs._classes : [];
-        let widget: any = attrs._widget;
+        let hsmlObj: any = attrs._hsmlObj;
         for (const a in attrs) {
             if (attrs.hasOwnProperty(a)) {
                 switch (a) {
@@ -49,7 +49,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
                     case "_ref":
                     case "_key":
                     case "_skip":
-                    case "_widget":
+                    case "_hsmlObj":
                         break;
                     case "id":
                         id = attrs[a] as string;
@@ -112,8 +112,8 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         if (id) {
             props.unshift(["id", id]);
         }
-        if (widget && "type" in widget) {
-            props.unshift(["widget", widget.type]);
+        if (hsmlObj && "type" in hsmlObj) {
+            props.unshift(["hsmlObj", hsmlObj.type]);
         }
         const args = props.map(p => `${p[0]}="${p[1]}"`).join(" ");
         let html = "";
@@ -127,8 +127,8 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
             html += "\n";
         }
         this._onHtml(html);
-        if (widget && "render" in widget && widget.render.constructor === Function) {
-            const hsmls = widget.render() as Hsmls;
+        if (hsmlObj && "render" in hsmlObj && hsmlObj.render.constructor === Function) {
+            const hsmls = hsmlObj.render() as Hsmls;
             for (const jml of hsmls) {
                 if (jml.constructor === String) {
                     this._onHtml(jml + (this._pretty ? "\n" : ""));

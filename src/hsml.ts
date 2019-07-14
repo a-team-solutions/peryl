@@ -25,6 +25,7 @@ export interface HsmlAttrs {
     readonly _ref?: string;
     readonly _key?: string;
     readonly _skip?: boolean;
+    readonly _hsmlObj?: HsmlObj;
     readonly classes?: HsmlAttrClasses;
     readonly styles?: HsmlAttrStyles;
     readonly data?: HsmlAttrData;
@@ -191,7 +192,7 @@ export function hsml<C extends HsmlHandlerCtx>(hml: Hsml, handler: HsmlHandler<C
             (attrs as any)._ref = ref;
         }
         if (hsmlObj) {
-            (attrs as any)._widget = hsmlObj;
+            (attrs as any)._hsmlObj = hsmlObj;
         }
 
         const skip = handler.open(tag, attrs, children, ctx);

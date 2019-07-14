@@ -26,7 +26,7 @@ class HsmlDomHandler implements HsmlHandler<HsmlHandlerCtx> {
         let id = attrs._id;
         let classes: string[] = attrs._classes ? attrs._classes : [];
         let ref = attrs._ref;
-        let widget: any = attrs._widget;
+        let hsmlObj: any = attrs._hsmlObj;
         for (const a in attrs) {
             if (attrs.hasOwnProperty(a)) {
                 switch (a) {
@@ -35,7 +35,7 @@ class HsmlDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                     case "_ref":
                     case "_key":
                     case "_skip":
-                    case "_widget":
+                    case "_hsmlObj":
                         break;
                     case "id":
                         id = attrs[a] as string;
@@ -115,8 +115,8 @@ class HsmlDomHandler implements HsmlHandler<HsmlHandlerCtx> {
         if (ctx && ref) {
             ctx.refs[ref] = this._current;
         }
-        if (widget && widget.mount && widget.mount.constructor === Function) {
-            widget.mount(e);
+        if (hsmlObj && hsmlObj.mount && hsmlObj.mount.constructor === Function) {
+            hsmlObj.mount(e);
         }
         return attrs._skip ? true : false;
     }

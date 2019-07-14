@@ -1,4 +1,4 @@
-import { AWidget, Action, Manage, Class } from "../src/hsml-awidget";
+import { AWidget, Action, Mount, Class } from "../src/hsml-awidget";
 import { Hsmls, Hsml } from "../src/hsml";
 import { Hash } from "../src/hash";
 
@@ -16,7 +16,7 @@ export class Sidebar extends AWidget<SidebarModel> {
         title: "Sidebar"
     };
 
-    view(model: SidebarModel, action: Action, manage: Manage): Hsmls {
+    view(model: SidebarModel, action: Action, mount: Mount): Hsmls {
         const menu = [
             { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
             { url: "#Content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
@@ -69,7 +69,7 @@ export class Content extends AWidget<ContentModel> {
         title: "Content"
     };
 
-    view(model: ContentModel, action: Action, manage: Manage): Hsmls {
+    view(model: ContentModel, action: Action, mount: Mount): Hsmls {
         return [
             ["h1", [model.title, ": ", this.id]],
             ["p", ["text text text"]]
@@ -117,7 +117,7 @@ export class AppShell extends AWidget<AppShellModel> {
         snackbar: ""
     };
 
-    view(model: AppShellModel, action: Action, manage: Manage): Hsmls {
+    view(model: AppShellModel, action: Action, mount: Mount): Hsmls {
         return [
             // header
             ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [
@@ -187,7 +187,7 @@ export class AppShell extends AWidget<AppShellModel> {
                         display: model.menu ? "block" : "none"
                     }
                 },
-                manage<any>(model.sidebar)
+                mount<any>(model.sidebar)
             ],
             // overlay
             ["div#overlay.w3-overlay.w3-hide-large.w3-animate-opacity~overlay",
@@ -203,7 +203,7 @@ export class AppShell extends AWidget<AppShellModel> {
             // main
             ["div.w3-main", { style: "margin-left:300px;margin-top:43px;" }, [
                 ["div.w3-container~content",
-                    manage<any>(model.content)
+                    mount<any>(model.content)
                 ]
             ]],
             // snackbar

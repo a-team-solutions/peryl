@@ -6,8 +6,8 @@ export interface Widget<Model> {
     view: View<Model>;
 }
 
-export type View<Model> = (model: Model, action: Action, manage: Manage) => Hsmls;
+export type View<Model> = (model: Model, action: Action, mount: Mount) => Hsmls;
 
 export type Action = (action: string, data?: any) => void;
 
-export type Manage = <Model>(widget: Widget<Model>, model?: Model) => HsmlFnc | Hsmls;
+export type Mount = <Model>(widget: Widget<Model>, model?: Model) => HsmlFnc | Hsmls;
