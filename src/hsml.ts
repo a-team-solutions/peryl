@@ -55,10 +55,10 @@ export interface Hsmls extends Array<Hsml> { }
 export type HsmlChildren = Hsmls | HsmlFnc | HsmlObj;
 // export type HsmlChildren = Hsmls | HsmlFnc | HsmlObj | string | boolean | number | Date;
 
-export type HsmlTagAttrN = [HsmlHead, HsmlChildren?];
-export type HsmlTagAttrY = [HsmlHead, HsmlAttrs, HsmlChildren?];
+export type HsmlTagNoAttr = [HsmlHead, HsmlChildren?];
+export type HsmlTagAttr = [HsmlHead, HsmlAttrs, HsmlChildren?];
 
-export type HsmlTag = HsmlTagAttrN | HsmlTagAttrY;
+export type HsmlTag = HsmlTagNoAttr | HsmlTagAttr;
 // export type HsmlTag = [HsmlTagHead, (HsmlTagAttrs | HsmlTagChildren)?, HsmlTagChildren?];
 
 export type Hsml = string | boolean | number | Date | HsmlFnc | HsmlObj | HsmlTag;
