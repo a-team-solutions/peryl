@@ -596,7 +596,17 @@ export class BooleanValidator
                 };
             }
         }
-        const b = Boolean(str);
+        let b;
+        switch (str) {
+            case "true":
+            case "1":
+            case "on":
+            case "yes":
+                b = true;
+                break;
+            default:
+                b = false;
+        }
         return { obj: b };
     }
 
