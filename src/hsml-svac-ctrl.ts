@@ -1,4 +1,4 @@
-import { Mount, View } from "./hsml-sva";
+import { Mount, View } from "./hsml-svac";
 import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";

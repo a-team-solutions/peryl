@@ -1,6 +1,6 @@
-import { Action, Mount } from "../src/hsml-sva";
+import { Action, Mount } from "../src/hsml-svac";
 import { Hsmls, Hsml, join } from "../src/hsml";
-import { Widget, WidgetCtrl } from "../src/hsml-sva-ctrl";
+import { Widget, WidgetCtrl } from "../src/hsml-svac-ctrl";
 
 export interface SidebarState {
     title: string;

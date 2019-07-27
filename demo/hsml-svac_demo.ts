@@ -1,6 +1,6 @@
-import { Action, Mount } from "../src/hsml-sva";
+import { Action, Mount } from "../src/hsml-svac";
 import { Hsmls } from "../src/hsml";
-import { Actions, WidgetCtrl, Widget } from "../src/hsml-sva-ctrl";
+import { Actions, WidgetCtrl, Widget } from "../src/hsml-svac-ctrl";
 
 interface AppState {
     title: string;

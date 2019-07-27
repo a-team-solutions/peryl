@@ -1,5 +1,5 @@
-import { Widget, WidgetCtrl } from "../src/hsml-sva-ctrl";
-import { AppShellState, AppShellActions, Content, Form, AppShell, FormActions } from "./hsml-sva-appshell-components_demo";
+import { Widget, WidgetCtrl } from "../src/hsml-svac-ctrl";
+import { AppShellState, AppShellActions, Content, Form, AppShell, FormActions } from "./hsml-svac-appshell-components_demo";
 import { Hash } from "../src/hash";
 
 const app = new WidgetCtrl<AppShellState>(AppShell)

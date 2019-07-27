@@ -1,6 +1,6 @@
 import { Hsmls, Hsml } from "../src/hsml";
-import { Widget, WidgetCtrl } from "../src/hsml-sva-ctrl";
-import { Mount, Action } from "../src/hsml-sva";
+import { Widget, WidgetCtrl } from "../src/hsml-svac-ctrl";
+import { Mount, Action } from "../src/hsml-svac";
 
 const NBSP = "\u00A0";
 const CIRC = "\u25EF";

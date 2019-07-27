@@ -1,6 +1,6 @@
 import { Hsmls, HsmlFnc } from "./hsml";
 import { hsmls2htmls, hsmls2html } from "./hsml-html";
-import { Action, Mount, Widget } from "./hsml-sva";
+import { Action, Mount, Widget } from "./hsml-svac";
 
 const actionHtml: Action = (action: string, data: any) => { };
 
