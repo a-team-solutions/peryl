@@ -1,38 +1,38 @@
-import { Mount, View } from "./hsml-mva";
+import { Mount, View } from "./hsml-sva";
 import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export interface Widget<Model> {
+export interface Widget<State> {
     type: string;
-    model: Model;
-    view: View<Model>;
-    actions?: Actions<Model>;
+    state: State;
+    view: View<State>;
+    actions?: Actions<State>;
 }
 
-export type Actions<Model> = (action: string, data: any, widget: WidgetCtrl<Model>) => void;
+export type Actions<State> = (action: string, data: any, widget: WidgetCtrl<State>) => void;
 
-const mount: Mount = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hsmls => {
+const mount: Mount = <State>(widget: Widget<State>, state?: State): HsmlFnc | Hsmls => {
     return (e: Element) => {
         if ((e as any).widget) {
-            const c = (e as any).widget as WidgetCtrl<Model>;
+            const c = (e as any).widget as WidgetCtrl<State>;
             if (c.view === widget.view) {
-                if (model !== undefined) {
-                    c.model = model;
+                if (state !== undefined) {
+                    c.state = state;
                 }
                 c.update();
             } else {
                 c.umount();
                 const c1 = new WidgetCtrl(widget);
-                if (model !== undefined) {
-                    c1.model = model;
+                if (state !== undefined) {
+                    c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
             const c = new WidgetCtrl(widget);
-            if (model !== undefined) {
-                c.model = model;
+            if (state !== undefined) {
+                c.state = state;
             }
             c.mount(e);
         }
@@ -42,7 +42,7 @@ const mount: Mount = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hs
 
 const wNodeAttr = "widget";
 
-export class WidgetCtrl<Model> implements HsmlHandlerCtx {
+export class WidgetCtrl<State> implements HsmlHandlerCtx {
 
     private static _count = 0;
 
@@ -59,12 +59,12 @@ export class WidgetCtrl<Model> implements HsmlHandlerCtx {
 
     private _updateSched?: number;
 
-    model: Model;
-    view: View<Model>;
-    actions?: Actions<Model>;
+    state: State;
+    view: View<State>;
+    actions?: Actions<State>;
 
-    constructor(widget: Widget<Model>, model?: Model) {
-        this.model = model || widget.model;
+    constructor(widget: Widget<State>, state?: State) {
+        this.state = state || widget.state;
         this.view = widget.view;
         this.actions = widget.actions;
         widget.type && (this.type = widget.type);
@@ -74,7 +74,7 @@ export class WidgetCtrl<Model> implements HsmlHandlerCtx {
         WidgetCtrl.appActions(action, data, this);
     }
 
-    appActions(actions: Actions<Model>): this {
+    appActions(actions: Actions<State>): this {
         WidgetCtrl.appActions = actions;
         return this;
     }
@@ -88,7 +88,7 @@ export class WidgetCtrl<Model> implements HsmlHandlerCtx {
     }
 
     render = (): Hsmls => {
-        return this.view(this.model, this.action, mount);
+        return this.view(this.state, this.action, mount);
     }
 
     onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {
@@ -101,7 +101,7 @@ export class WidgetCtrl<Model> implements HsmlHandlerCtx {
     mount = (e: Element | null = document.body): this => {
         if (e) {
             if ((e as any).widget) {
-                const c = (e as any).widget as WidgetCtrl<Model>;
+                const c = (e as any).widget as WidgetCtrl<State>;
                 c && c.umount();
             }
             if (!this.dom) {
@@ -128,7 +128,7 @@ export class WidgetCtrl<Model> implements HsmlHandlerCtx {
             }
             const cNodes = this.dom.querySelectorAll(`[${wNodeAttr}]`);
             for (let i = 0; i < cNodes.length; i++) {
-                const c = (cNodes[i] as any).widget as WidgetCtrl<Model>;
+                const c = (cNodes[i] as any).widget as WidgetCtrl<State>;
                 c && c.umount();
             }
             while (this.dom.firstChild) {
@@ -140,9 +140,9 @@ export class WidgetCtrl<Model> implements HsmlHandlerCtx {
         return this;
     }
 
-    update = (model?: Partial<Model>): this => {
-        if (model) {
-            this.model = merge(this.model, model);
+    update = (state?: Partial<State>): this => {
+        if (state) {
+            this.state = merge(this.state, state);
         }
         if (this.dom && !this._updateSched) {
             this._updateSched = setTimeout(() => {

@@ -2,7 +2,7 @@ import { AWidget, Action, Mount, Class } from "../src/hsml-awidget";
 import { Hsmls, Hsml } from "../src/hsml";
 import { Hash } from "../src/hash";
 
-export interface SidebarModel {
+export interface SidebarState {
     title: string;
 }
 
@@ -10,13 +10,13 @@ export enum SidebarActions {
     title = "title",
 }
 
-export class Sidebar extends AWidget<SidebarModel> {
+export class Sidebar extends AWidget<SidebarState> {
 
-    model = {
+    state = {
         title: "Sidebar"
     };
 
-    view(model: SidebarModel, action: Action, mount: Mount): Hsmls {
+    view(state: SidebarState, action: Action, mount: Mount): Hsmls {
         const menu = [
             { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
             { url: "#Content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
@@ -25,7 +25,7 @@ export class Sidebar extends AWidget<SidebarModel> {
         const nbsp = "\u00a0 ";
         return [
             ["div.w3-container", [
-                ["h2", [model.title, " ", this.id]],
+                ["h2", [state.title, " ", this.id]],
                 ["div.w3-bar-block", {},
                     menu.map<Hsml>(m => (
                         ["a.w3-bar-item.w3-button.w3-padding",
@@ -43,7 +43,7 @@ export class Sidebar extends AWidget<SidebarModel> {
         ];
     }
 
-    actions(action: string, data: any, widget: AWidget<SidebarModel>): void {
+    actions(action: string, data: any, widget: AWidget<SidebarState>): void {
         console.log("action:", action, data);
         switch (action) {
             case SidebarActions.title:
@@ -55,7 +55,7 @@ export class Sidebar extends AWidget<SidebarModel> {
     }
 }
 
-export interface ContentModel {
+export interface ContentState {
     title: string;
 }
 
@@ -63,20 +63,20 @@ export enum ContentActions {
     title = "title",
 }
 
-export class Content extends AWidget<ContentModel> {
+export class Content extends AWidget<ContentState> {
 
-    model = {
+    state = {
         title: "Content"
     };
 
-    view(model: ContentModel, action: Action, mount: Mount): Hsmls {
+    view(state: ContentState, action: Action, mount: Mount): Hsmls {
         return [
-            ["h1", [model.title, ": ", this.id]],
+            ["h1", [state.title, ": ", this.id]],
             ["p", ["text text text"]]
         ];
     }
 
-    actions(action: string, data: any, widget: AWidget<ContentModel>): void {
+    actions(action: string, data: any, widget: AWidget<ContentState>): void {
         console.log("action:", action, data);
         switch (action) {
             case ContentActions.title:
@@ -88,7 +88,7 @@ export class Content extends AWidget<ContentModel> {
     }
 }
 
-export interface AppShellModel {
+export interface AppShellState {
     title: string;
     subtitle: string;
     menu: boolean;
@@ -106,9 +106,9 @@ export enum AppShellActions {
     snackbar = "snackbar"
 }
 
-export class AppShell extends AWidget<AppShellModel> {
+export class AppShell extends AWidget<AppShellState> {
 
-    model = {
+    state = {
         title: "Title",
         subtitle: "Subtitle",
         menu: false,
@@ -117,7 +117,7 @@ export class AppShell extends AWidget<AppShellModel> {
         snackbar: ""
     };
 
-    view(model: AppShellModel, action: Action, mount: Mount): Hsmls {
+    view(state: AppShellState, action: Action, mount: Mount): Hsmls {
         return [
             // header
             ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [
@@ -132,11 +132,11 @@ export class AppShell extends AWidget<AppShellModel> {
                 ["span.w3-bar-item", [
                     ["strong.w3-hide-small", [
                         ["a", { href: "#", style: "text-decoration: none;" }, [
-                            model.title
+                            state.title
                         ]]
                     ]],
-                    ["span.w3-hide-small", [model.subtitle ? " - " : ""]],
-                    ["span", [model.subtitle ? model.subtitle : ""]],
+                    ["span.w3-hide-small", [state.subtitle ? " - " : ""]],
+                    ["span", [state.subtitle ? state.subtitle : ""]],
                 ]],
                 ["a.w3-bar-item.w3-right.w3-hover-light-grey",
                     {
@@ -149,7 +149,7 @@ export class AppShell extends AWidget<AppShellModel> {
                 ],
                 ["a.w3-bar-item.w3-right.w3-hover-light-grey",
                     {
-                        href: `http://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(location.href)}&title=${encodeURIComponent(model.title)}&source=${encodeURIComponent(location.href)}`,
+                        href: `http://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(location.href)}&title=${encodeURIComponent(state.title)}&source=${encodeURIComponent(location.href)}`,
                         title: "Share on LinkedIn",
                         style: "padding-right: 3px; padding-left: 3px;",
                         target: "_blank",
@@ -159,7 +159,7 @@ export class AppShell extends AWidget<AppShellModel> {
                 ],
                 ["a.w3-bar-item.w3-right.w3-hover-light-grey",
                     {
-                        href: `https://twitter.com/intent/tweet?source=${encodeURIComponent(location.href)}&text=${encodeURIComponent(model.title)}:%20${encodeURIComponent(location.href)}`,
+                        href: `https://twitter.com/intent/tweet?source=${encodeURIComponent(location.href)}&text=${encodeURIComponent(state.title)}:%20${encodeURIComponent(location.href)}`,
                         title: "Tweet",
                         style: "padding-right: 3px; padding-left: 3px;",
                         target: "_blank",
@@ -169,7 +169,7 @@ export class AppShell extends AWidget<AppShellModel> {
                 ],
                 ["a.w3-bar-item.w3-right.w3-hover-light-grey",
                     {
-                        href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent(model.title)}`,
+                        href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent(state.title)}`,
                         title: "Share on Facebook",
                         style: "padding-right: 3px; padding-left: 3px;",
                         target: "_blank",
@@ -184,17 +184,17 @@ export class AppShell extends AWidget<AppShellModel> {
                     styles: {
                         zIndex: "3",
                         width: "300px",
-                        display: model.menu ? "block" : "none"
+                        display: state.menu ? "block" : "none"
                     }
                 },
-                mount<any>(model.sidebar)
+                mount<any>(state.sidebar)
             ],
             // overlay
             ["div#overlay.w3-overlay.w3-hide-large.w3-animate-opacity~overlay",
                 {
                     styles: {
                         cursor: "pointer",
-                        display: model.menu ? "block" : "none"
+                        display: state.menu ? "block" : "none"
                     },
                     title: "close side menu",
                     on: ["click", AppShellActions.menu]
@@ -203,17 +203,17 @@ export class AppShell extends AWidget<AppShellModel> {
             // main
             ["div.w3-main", { style: "margin-left:300px;margin-top:43px;" }, [
                 ["div.w3-container~content",
-                    mount<any>(model.content)
+                    mount<any>(state.content)
                 ]
             ]],
             // snackbar
-            ["div#snackbar~snackbar", { classes: [["show", !!model.snackbar]] },
-                [model.snackbar]
+            ["div#snackbar~snackbar", { classes: [["show", !!state.snackbar]] },
+                [state.snackbar]
             ]
         ];
     }
 
-    actions(action: string, data: any, widget: AWidget<AppShellModel>): void {
+    actions(action: string, data: any, widget: AWidget<AppShellState>): void {
         console.log("action:", action, data);
         switch (action) {
             case AppShellActions.title:
@@ -223,7 +223,7 @@ export class AppShell extends AWidget<AppShellModel> {
                 widget.update({ subtitle: data as string });
                 break;
             case AppShellActions.menu:
-                widget.update({ menu: data === null ? !widget.model.menu : data });
+                widget.update({ menu: data === null ? !widget.state.menu : data });
                 break;
             case AppShellActions.sidebar:
                 widget.update({ sidebar: data as any });
@@ -242,7 +242,7 @@ export class AppShell extends AWidget<AppShellModel> {
 }
 
 
-function appActions(action: string, data: any, widget: AWidget<AppShellModel>) {
+function appActions(action: string, data: any, widget: AWidget<AppShellState>) {
     console.log("app action", widget.type, action, data);
     switch (action) {
         case "xXx":

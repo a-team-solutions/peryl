@@ -2,37 +2,37 @@ import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export type View<Model> = (model: Model, action: Action, mount: Mount) => Hsmls;
+export type View<State> = (state: State, action: Action, mount: Mount) => Hsmls;
 
 export type Action = (action: string, data?: any) => void;
 
-export type Actions<Model> = (action: string, data: any, widget: AWidget<Model>) => void;
+export type Actions<State> = (action: string, data: any, widget: AWidget<State>) => void;
 
 export type Class<T = object> = new (...args: any[]) => T;
 
-export type Mount = <Model>(xwClass: Class<AWidget<Model>>, model?: Model) => HsmlFnc | Hsmls;
+export type Mount = <State>(xwClass: Class<AWidget<State>>, state?: State) => HsmlFnc | Hsmls;
 
-const mount: Mount = <Model>(wClass: Class<AWidget<Model>>, model?: Model): HsmlFnc | Hsmls => {
+const mount: Mount = <State>(wClass: Class<AWidget<State>>, state?: State): HsmlFnc | Hsmls => {
     return (e: Element) => {
         if ((e as any).widget) {
-            const w = (e as any).widget as AWidget<Model>;
+            const w = (e as any).widget as AWidget<State>;
             if (w.type === wClass.name) {
-                if (model !== undefined) {
-                    w.model = model;
+                if (state !== undefined) {
+                    w.state = state;
                 }
                 w.update();
             } else {
                 w.umount();
                 const w1 = new wClass();
-                if (model !== undefined) {
-                    w1.model = model;
+                if (state !== undefined) {
+                    w1.state = state;
                 }
                 w1.mount(e);
             }
         } else {
             const w = new wClass();
-            if (model !== undefined) {
-                w.model = model;
+            if (state !== undefined) {
+                w.state = state;
             }
             w.mount(e);
         }
@@ -40,7 +40,7 @@ const mount: Mount = <Model>(wClass: Class<AWidget<Model>>, model?: Model): Hsml
     };
 };
 
-export abstract class AWidget<S> implements HsmlHandlerCtx {
+export abstract class AWidget<State> implements HsmlHandlerCtx {
 
     private static _count = 0;
 
@@ -57,9 +57,9 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
 
     private _updateSched?: number;
 
-    abstract model: S;
-    abstract view(model: S, action: Action, mount: Mount): Hsmls;
-    abstract actions(action: string, data: any, widget: AWidget<S>): void;
+    abstract state: State;
+    abstract view(state: State, action: Action, mount: Mount): Hsmls;
+    abstract actions(action: string, data: any, widget: AWidget<State>): void;
 
     action = (action: string, data?: any): void => {
         this.actions(action, data, this);
@@ -69,7 +69,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
         AWidget.appActions(action, data, this);
     }
 
-    appActions(actions: Actions<S>): this {
+    appActions(actions: Actions<State>): this {
         AWidget.appActions = actions;
         return this;
     }
@@ -79,7 +79,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
     }
 
     render = (): Hsmls => {
-        return this.view(this.model, this.action, mount);
+        return this.view(this.state, this.action, mount);
     }
 
     onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {
@@ -92,7 +92,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
     mount = (e: Element | null = document.body): this => {
         if (e) {
             if ("widget" in e) {
-                const w = (e as any).widget as AWidget<S>;
+                const w = (e as any).widget as AWidget<State>;
                 w && w.umount();
             }
             if (!this.dom) {
@@ -119,7 +119,7 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
             }
             const wNodes = this.dom.querySelectorAll("[widget]");
             for (let i = 0; i < wNodes.length; i++) {
-                const w = (wNodes[i] as any).widget as AWidget<S>;
+                const w = (wNodes[i] as any).widget as AWidget<State>;
                 w && w.umount();
             }
             while (this.dom.firstChild /*.hasChildNodes()*/) {
@@ -131,9 +131,9 @@ export abstract class AWidget<S> implements HsmlHandlerCtx {
         return this;
     }
 
-    update = (model?: Partial<S>): this => {
-        if (model) {
-            this.model = merge(this.model, model);
+    update = (state?: Partial<State>): this => {
+        if (state) {
+            this.state = merge(this.state, state);
         }
         if (this.dom && !this._updateSched) {
             this._updateSched = setTimeout(() => {

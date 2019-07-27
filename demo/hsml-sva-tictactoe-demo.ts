@@ -1,12 +1,12 @@
 import { Hsmls, Hsml } from "../src/hsml";
-import { Widget, WidgetCtrl } from "../src/hsml-mva-ctrl";
-import { Mount, Action } from "../src/hsml-mva";
+import { Widget, WidgetCtrl } from "../src/hsml-sva-ctrl";
+import { Mount, Action } from "../src/hsml-sva";
 
 const NBSP = "\u00A0";
 const CIRC = "\u25EF";
 const CROS = "\u2A2F";
 
-interface TicTacToeModel {
+interface TicTacToeState {
     board: string[][];
     turn: number;
 }
@@ -15,11 +15,11 @@ enum TicTacToeActions {
     mark = "mark"
 }
 
-const TicTacToe: Widget<TicTacToeModel> = {
+const TicTacToe: Widget<TicTacToeState> = {
 
     type: "TicTacToe",
 
-    model: {
+    state: {
         board: [
             [NBSP, NBSP, NBSP],
             [NBSP, NBSP, NBSP],
@@ -28,12 +28,12 @@ const TicTacToe: Widget<TicTacToeModel> = {
         turn: 0
     },
 
-    view: (model: TicTacToeModel, action: Action, mount: Mount): Hsmls => ([
+    view: (state: TicTacToeState, action: Action, mount: Mount): Hsmls => ([
         ["h1", ["Tic-Tac-Toe Demo"]],
         ["p", [
-            "Player: ", model.turn ? CROS : CIRC
+            "Player: ", state.turn ? CROS : CIRC
         ]],
-        ["div", model.board.map<Hsml>((row, y) =>
+        ["div", state.board.map<Hsml>((row, y) =>
             ["div", row.map<Hsml>((col, x) =>
                 ["button",
                     {
@@ -43,7 +43,7 @@ const TicTacToe: Widget<TicTacToeModel> = {
                             display: "inline-block",
                             width: "2em", height: "2em"
                         },
-                        on: ["click", TicTacToeActions.mark, { x, y, turn: model.turn }]
+                        on: ["click", TicTacToeActions.mark, { x, y, turn: state.turn }]
                     },
                     [
                         col === NBSP ? NBSP : col
@@ -53,12 +53,12 @@ const TicTacToe: Widget<TicTacToeModel> = {
         ]
     ]),
 
-    actions: (action: string, data: any, widget: WidgetCtrl<TicTacToeModel>): void => {
+    actions: (action: string, data: any, widget: WidgetCtrl<TicTacToeState>): void => {
         console.log("action", action, data);
         switch (action) {
             case TicTacToeActions.mark:
-                widget.model.board[data.y][data.x] = data.turn ? CROS : CIRC;
-                widget.model.turn = data.turn ? 0 : 1;
+                widget.state.board[data.y][data.x] = data.turn ? CROS : CIRC;
+                widget.state.turn = data.turn ? 0 : 1;
                 widget.update();
                 break;
             case "_mount":
@@ -72,7 +72,7 @@ const TicTacToe: Widget<TicTacToeModel> = {
 };
 
 
-const app = new WidgetCtrl<TicTacToeModel>(TicTacToe)
+const app = new WidgetCtrl<TicTacToeState>(TicTacToe)
     .mount(document.getElementById("app"));
 
 (self as any).app = app;
