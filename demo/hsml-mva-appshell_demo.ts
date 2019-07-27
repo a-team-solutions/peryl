@@ -1,9 +1,9 @@
-import { Widget, CWidget } from "../src/hsml-mva-cwidget";
+import { Widget, WidgetCtrl } from "../src/hsml-mva-ctrl";
 import { AppShellModel, AppShellActions, Content, Form, AppShell, FormActions } from "./hsml-mva-appshell-components_demo";
 import { Hash } from "../src/hash";
 
-const app = new CWidget<AppShellModel>(AppShell)
-    .appActions((action: string, data: any, widget: CWidget<AppShellModel>) => {
+const app = new WidgetCtrl<AppShellModel>(AppShell)
+    .appActions((action: string, data: any, widget: WidgetCtrl<AppShellModel>) => {
         console.log("app action", widget.type, action, data);
         switch (action) {
             case FormActions.formSubmit:

@@ -10,12 +10,12 @@ export interface Widget<Model> {
     actions?: Actions<Model>;
 }
 
-export type Actions<Model> = (action: string, data: any, widget: CWidget<Model>) => void;
+export type Actions<Model> = (action: string, data: any, widget: WidgetCtrl<Model>) => void;
 
 const mount: Mount = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hsmls => {
     return (e: Element) => {
         if ((e as any).widget) {
-            const c = (e as any).widget as CWidget<Model>;
+            const c = (e as any).widget as WidgetCtrl<Model>;
             if (c.view === widget.view) {
                 if (model !== undefined) {
                     c.model = model;
@@ -23,14 +23,14 @@ const mount: Mount = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hs
                 c.update();
             } else {
                 c.umount();
-                const c1 = new CWidget(widget);
+                const c1 = new WidgetCtrl(widget);
                 if (model !== undefined) {
                     c1.model = model;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new CWidget(widget);
+            const c = new WidgetCtrl(widget);
             if (model !== undefined) {
                 c.model = model;
             }
@@ -42,18 +42,18 @@ const mount: Mount = <Model>(widget: Widget<Model>, model?: Model): HsmlFnc | Hs
 
 const wNodeAttr = "widget";
 
-export class CWidget<Model> implements HsmlHandlerCtx {
+export class WidgetCtrl<Model> implements HsmlHandlerCtx {
 
     private static _count = 0;
 
-    private static _widgets: { [widget: string]: CWidget<any> } = {};
+    private static _widgets: { [ctrl: string]: WidgetCtrl<any> } = {};
 
-    static appActions: Actions<any> = (action: string, data: any, cw: CWidget<any>): void => {
+    static appActions: Actions<any> = (action: string, data: any, cw: WidgetCtrl<any>): void => {
         console.log("action:", action, data, cw);
     }
 
-    readonly type: string = "CWidget";
-    readonly id: string = this.type + "-" + CWidget._count++;
+    readonly type: string = "Widget";
+    readonly id: string = this.type + "-" + WidgetCtrl._count++;
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
@@ -71,16 +71,16 @@ export class CWidget<Model> implements HsmlHandlerCtx {
     }
 
     appAction = (action: string, data?: any): void => {
-        CWidget.appActions(action, data, this);
+        WidgetCtrl.appActions(action, data, this);
     }
 
     appActions(actions: Actions<Model>): this {
-        CWidget.appActions = actions;
+        WidgetCtrl.appActions = actions;
         return this;
     }
 
-    get appWidgets(): CWidget<any>[] {
-        return Object.values(CWidget._widgets);
+    get appWidgets(): WidgetCtrl<any>[] {
+        return Object.values(WidgetCtrl._widgets);
     }
 
     action = (action: string, data?: any): void => {
@@ -101,11 +101,11 @@ export class CWidget<Model> implements HsmlHandlerCtx {
     mount = (e: Element | null = document.body): this => {
         if (e) {
             if ((e as any).widget) {
-                const c = (e as any).widget as CWidget<Model>;
+                const c = (e as any).widget as WidgetCtrl<Model>;
                 c && c.umount();
             }
             if (!this.dom) {
-                CWidget._widgets[this.id] = this;
+                WidgetCtrl._widgets[this.id] = this;
                 (this as any).dom = e;
                 (e as any).widget = this;
                 const hsmls = (this as any).render();
@@ -121,14 +121,14 @@ export class CWidget<Model> implements HsmlHandlerCtx {
 
     umount = (): this => {
         if (this.dom) {
-            delete CWidget._widgets[this.id];
+            delete WidgetCtrl._widgets[this.id];
             this.action("_umount", this.dom);
             if (this.dom.hasAttribute(wNodeAttr)) {
                 this.dom.removeAttribute(wNodeAttr);
             }
             const cNodes = this.dom.querySelectorAll(`[${wNodeAttr}]`);
             for (let i = 0; i < cNodes.length; i++) {
-                const c = (cNodes[i] as any).widget as CWidget<Model>;
+                const c = (cNodes[i] as any).widget as WidgetCtrl<Model>;
                 c && c.umount();
             }
             while (this.dom.firstChild) {
@@ -179,7 +179,7 @@ export class CWidget<Model> implements HsmlHandlerCtx {
                 if (!this.dom) {
                     (this as any).dom = e;
                     (e as any).widget = this;
-                    CWidget._widgets[this.id] = this;
+                    WidgetCtrl._widgets[this.id] = this;
                     this.action("_mount", this.dom);
                 }
             });
@@ -204,7 +204,7 @@ export class CWidget<Model> implements HsmlHandlerCtx {
 (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
     nodes.forEach(node => {
         if (node.nodeType === 1 && (node as any).widget) {
-            const c = (node as any).widget as CWidget<any>;
+            const c = (node as any).widget as WidgetCtrl<any>;
             c && c.umount();
         }
     });

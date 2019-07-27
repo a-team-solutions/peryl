@@ -1,6 +1,6 @@
 import { Action, Mount } from "../src/hsml-mva";
 import { Hsmls, Hsml, join } from "../src/hsml";
-import { Widget, CWidget } from "../src/hsml-mva-cwidget";
+import { Widget, WidgetCtrl } from "../src/hsml-mva-ctrl";
 
 export interface SidebarModel {
     title: string;
@@ -45,7 +45,7 @@ export const Sidebar: Widget<SidebarModel> = {
         ];
     },
 
-    actions: (action: string, data: any, widget: CWidget<SidebarModel>): void => {
+    actions: (action: string, data: any, widget: WidgetCtrl<SidebarModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case SidebarActions.title:
@@ -84,7 +84,7 @@ export const Content: Widget<ContentModel> = {
         ];
     },
 
-    actions: (action: string, data: any, widget: CWidget<ContentModel>): void => {
+    actions: (action: string, data: any, widget: WidgetCtrl<ContentModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case ContentActions.title:
@@ -214,7 +214,7 @@ export const Form: Widget<FormModel> = {
         ];
     },
 
-    actions: (action: string, data: any, widget: CWidget<FormModel>): void => {
+    actions: (action: string, data: any, widget: WidgetCtrl<FormModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case FormActions.title:
@@ -365,7 +365,7 @@ export const AppShell: Widget<AppShellModel> = {
         ];
     },
 
-    actions: (action: string, data: any, widget: CWidget<AppShellModel>): void => {
+    actions: (action: string, data: any, widget: WidgetCtrl<AppShellModel>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case AppShellActions.title:

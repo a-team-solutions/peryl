@@ -1,5 +1,5 @@
 import { Hsmls, Hsml } from "../src/hsml";
-import { Widget, CWidget } from "../src/hsml-mva-cwidget";
+import { Widget, WidgetCtrl } from "../src/hsml-mva-ctrl";
 import { Mount, Action } from "../src/hsml-mva";
 
 const NBSP = "\u00A0";
@@ -53,7 +53,7 @@ const TicTacToe: Widget<TicTacToeModel> = {
         ]
     ]),
 
-    actions: (action: string, data: any, widget: CWidget<TicTacToeModel>): void => {
+    actions: (action: string, data: any, widget: WidgetCtrl<TicTacToeModel>): void => {
         console.log("action", action, data);
         switch (action) {
             case TicTacToeActions.mark:
@@ -72,7 +72,7 @@ const TicTacToe: Widget<TicTacToeModel> = {
 };
 
 
-const app = new CWidget<TicTacToeModel>(TicTacToe)
+const app = new WidgetCtrl<TicTacToeModel>(TicTacToe)
     .mount(document.getElementById("app"));
 
 (self as any).app = app;
