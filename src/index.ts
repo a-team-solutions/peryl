@@ -11,6 +11,7 @@ import * as hsmlWidget from "./hsml-widget";
 import * as hsmlAWidget from "./hsml-awidget";
 import * as hsmlSvac from "./hsml-svac-ctrl";
 import * as hsml from "./hsml";
+import * as hyperscript from "./hyperscript";
 import * as http from "./http";
 import * as load from "./load";
 import * as objpaths from "./objpaths";
@@ -34,6 +35,7 @@ export {
     hsmlAWidget,
     hsmlSvac,
     hsml,
+    hyperscript,
     http,
     load,
     objpaths,
