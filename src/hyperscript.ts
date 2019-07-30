@@ -15,7 +15,7 @@ function h(tag: string, second?: Hsml[], third?: Hsml | Hsml[], fourth?: Hsml[])
             // additional tags
             result[0] += second;
         } else if (Array.isArray(second) && (second.length === 1) && (typeof second[0] === "string")) {
-            result.push(second[0]);
+            result.push([second[0]]);
         } else {
             // attr or hsmls
             result.push(second);
@@ -24,7 +24,7 @@ function h(tag: string, second?: Hsml[], third?: Hsml | Hsml[], fourth?: Hsml[])
     if (third) {
         if (Array.isArray(third) && (third.length === 1) && (typeof third[0] === "string")) {
             // hsmls with text only
-            result.push(third[0]);
+            result.push([third[0]]);
         } else {
             // attr of hsmls
             result.push(third);
@@ -32,7 +32,7 @@ function h(tag: string, second?: Hsml[], third?: Hsml | Hsml[], fourth?: Hsml[])
     }
     if (fourth) {
         if (Array.isArray(fourth) && (fourth.length === 1) && (typeof fourth[0] === "string")) {
-            result.push(fourth[0]);
+            result.push([fourth[0]]);
         } else {
             result.push(fourth);
         }

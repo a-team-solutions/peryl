@@ -1,11 +1,55 @@
 import "jasmine";
-import { div, a, ul, li, input, h2, button } from "../src/hyperscript";
+import { div, span, a, ul, li, h2, input, button } from "../src/hyperscript";
 
 const todo = (text: string) => li([
     a({ href: "#" }, [text])
 ]);
 
 describe("hypescript", () => {
+
+    it("basic elements", () => {
+        expect(div("")).toEqual(["div"]);
+        expect(span("#app.body")).toEqual(["span#app.body"]);
+    });
+
+    it("element with props", () => {
+        expect(div({ click: "special" })).toEqual(["div", { click: "special" }]);
+        expect(div(".app", { onInput: "z" })).toEqual(["div.app", { onInput: "z" }]);
+    });
+
+    it("nested elements", () => {
+        expect(ul([
+            li(["1. line"]),
+            li(["2. line"]),
+            li(["3. line"])
+        ])).toEqual(["ul", [
+            ["li", ["1. line"]],
+            ["li", ["2. line"]],
+            ["li", ["3. line"]]
+        ]]);
+    });
+
+    it("deeply nested", () => {
+        expect(
+            div("#app", [
+                span(["body"]),
+                ul([
+                    li(["1. line"]),
+                    li(["2. line"]),
+                    li(["3. line"])
+                ])
+            ])
+        ).toEqual(
+            ["div#app", [
+                ["span", ["body"]],
+                ["ul", [
+                    ["li", ["1. line"]],
+                    ["li", ["2. line"]],
+                    ["li", ["3. line"]]
+                ]]
+            ]]
+        );
+    });
 
     it("should be equal with hsml", () => {
         expect(
