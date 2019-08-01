@@ -4,14 +4,14 @@ import * as encode from "./encode";
 import * as form from "./form";
 import * as hash from "./hash";
 import * as history from "./history";
+import * as hsml from "./hsml";
 import * as hsmlDom from "./hsml-dom";
 import * as hsmlHtml from "./hsml-html";
 import * as hsmlIDom from "./hsml-idom";
 import * as hsmlWidget from "./hsml-widget";
 import * as hsmlAWidget from "./hsml-awidget";
 import * as hsmlSvac from "./hsml-svac-ctrl";
-import * as hsml from "./hsml";
-import * as hyperscript from "./hyperscript";
+import * as hsmlHyperscript from "./hsml-hyperscript";
 import * as http from "./http";
 import * as load from "./load";
 import * as objpaths from "./objpaths";
@@ -28,14 +28,14 @@ export {
     form,
     hash,
     history,
+    hsml,
     hsmlDom,
     hsmlHtml,
     hsmlIDom,
     hsmlWidget,
     hsmlAWidget,
     hsmlSvac,
-    hsml,
-    hyperscript,
+    hsmlHyperscript,
     http,
     load,
     objpaths,

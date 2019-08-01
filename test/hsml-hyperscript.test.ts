@@ -1,5 +1,5 @@
 import "jasmine";
-import { div, span, a, ul, li, h2, input, button } from "../src/hyperscript";
+import { div, span, a, ul, li, h2, input, button } from "../src/hsml-hyperscript";
 import { Hsml } from "../src/hsml";
 
 describe("hypescript", () => {
@@ -72,7 +72,7 @@ describe("hypescript", () => {
     });
 
     it("should be equal with hsml", () => {
-        const items = ["first", "second", "third"];
+        const todos = ["first", "second", "third"];
         expect(
             div("#todo-app", [
                 h2(["Todo App"]),
@@ -80,9 +80,9 @@ describe("hypescript", () => {
                     input(".input-text", { type: "checkbox" }, ["placeholder"]),
                     button({ onclick: ["click"] }),
                     ul(".todos",
-                        items.map<Hsml>(text =>
+                        todos.map<Hsml>(todo =>
                             li([
-                                a({ href: "#" }, [text])
+                                a({ href: "#" }, [todo])
                             ])
                         )
                     )
@@ -96,9 +96,9 @@ describe("hypescript", () => {
                     ["input.input-text", { type: "checkbox" }, ["placeholder"]],
                     ["button", { onclick: ["click"] }],
                     ["ul.todos",
-                        items.map<Hsml>(text =>
+                        todos.map<Hsml>(todo =>
                             ["li", [
-                                ["a", { href: "#" }, [text]]
+                                ["a", { href: "#" }, [todo]]
                             ]]
                         )
                     ]
