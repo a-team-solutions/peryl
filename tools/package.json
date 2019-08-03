@@ -8,7 +8,6 @@
     "build": "tsc",
     "clean": "rm -rf build",
     "clean:all": "npm run clean; rm -rf node_modules;",
-    "html2jsonml": "node ./build/html2jsonml-cli.js",
     "html2hsml": "node ./build/html2hsml-cli.js"
   },
   "bin": {
@@ -21,8 +20,8 @@
     "ts-node": "^3.3.0"
   },
   "devDependencies": {
-    "@types/sax": "^1.0.0",
-    "tslint": "^5.8.0",
+    "@types/sax": "^1.2.0",
+    "tslint": "^5.18.0",
     "typescript": "^3.5.2"
   }
 }
