@@ -1,5 +1,5 @@
 import "jasmine";
-import { div, span, a, ul, li, h2, input, button } from "../src/hsml-hyperscript";
+import { div, span, a, ul, li, h2, input, button } from "../src/hsml-h";
 import { Hsml } from "../src/hsml";
 
 describe("hypescript", () => {
