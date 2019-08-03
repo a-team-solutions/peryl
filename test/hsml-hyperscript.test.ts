@@ -26,10 +26,10 @@ describe("hypescript", () => {
         .toEqual(
             ["div", { click: "special" }]);
         expect(
-            div(".app", { onInput: "z" })
+            div(".app", { title: "z" })
         )
         .toEqual(
-            ["div.app", { onInput: "z" }]
+            ["div.app", { title: "z" }]
         );
     });
 
