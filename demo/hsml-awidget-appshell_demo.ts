@@ -4,6 +4,11 @@ import { Hash } from "../src/hash";
 
 export interface SidebarState {
     title: string;
+    menu: {
+        url: string;
+        label: string;
+        icon: string;
+    }[];
 }
 
 export enum SidebarActions {
@@ -13,21 +18,21 @@ export enum SidebarActions {
 export class Sidebar extends AWidget<SidebarState> {
 
     state = {
-        title: "Sidebar"
-    };
-
-    view(state: SidebarState, action: Action, mount: Mount): Hsmls {
-        const menu = [
+        title: "Sidebar",
+        menu: [
             { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
             { url: "#Content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
             { url: "#Sidebar", label: "Sidebar", icon: "i.fas.fa-fw.fa-bell" }
-        ];
+        ]
+    };
+
+    view(state: SidebarState, action: Action, mount: Mount): Hsmls {
         const nbsp = "\u00a0 ";
         return [
             ["div.w3-container", [
                 ["h2", [state.title, " ", this.id]],
                 ["div.w3-bar-block", {},
-                    menu.map<Hsml>(m => (
+                    state.menu.map<Hsml>(m => (
                         ["a.w3-bar-item.w3-button.w3-padding",
                             {
                                 href: m.url,

@@ -85,7 +85,10 @@ class SubApp extends AWidget<AppState> {
             ["p", [
                 ["em", ["Count"]], ": ", state.count,
                 " ",
-                ["button", { on: ["click", SubAppActions.xXx] }, [SubAppActions.xXx]]
+                ["button",
+                    { on: ["click", SubAppActions.xXx] },
+                    [SubAppActions.xXx]
+                ]
             ]]
         ];
     }
@@ -119,5 +122,5 @@ const app = new App()
 
 (self as any).app = app;
 
-const h = app.toHtml();
-console.log(h);
+const html = app.toHtml();
+console.log(html);
