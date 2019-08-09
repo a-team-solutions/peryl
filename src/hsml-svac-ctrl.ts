@@ -1,36 +1,36 @@
-import { Mount, View } from "./hsml-svac";
+import { Mount, Action } from "./hsml-svac";
 import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export interface Widget<State> {
+export interface View<State>  {
+    (state: State, action: Action, mount: Mount): Hsmls;
     type: string;
     state: State;
-    view: View<State>;
     actions?: Actions<State>;
 }
 
-export type Actions<State> = (action: string, data: any, widget: WidgetCtrl<State>) => void;
+export type Actions<State> = (action: string, data: any, ctrl: Ctrl<State>) => void;
 
-const mount: Mount = <State>(widget: Widget<State>, state?: State): HsmlFnc | Hsmls => {
+const mount: Mount = <State>(view: View<State>, state?: State): HsmlFnc | Hsmls => {
     return (e: Element) => {
-        if ((e as any).widget) {
-            const c = (e as any).widget as WidgetCtrl<State>;
-            if (c.view === widget.view) {
+        if ((e as any).ctrl) {
+            const c = (e as any).ctrl as Ctrl<State>;
+            if (c.view === view) {
                 if (state !== undefined) {
                     c.state = state;
                 }
                 c.update();
             } else {
                 c.umount();
-                const c1 = new WidgetCtrl(widget);
+                const c1 = new Ctrl(view);
                 if (state !== undefined) {
                     c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new WidgetCtrl(widget);
+            const c = new Ctrl(view);
             if (state !== undefined) {
                 c.state = state;
             }
@@ -40,20 +40,20 @@ const mount: Mount = <State>(widget: Widget<State>, state?: State): HsmlFnc | Hs
     };
 };
 
-const wNodeAttr = "widget";
+const ctrlAttr = "ctrl";
 
-export class WidgetCtrl<State> implements HsmlHandlerCtx {
+export class Ctrl<State> implements HsmlHandlerCtx {
 
     private static _count = 0;
 
-    private static _widgets: { [ctrl: string]: WidgetCtrl<any> } = {};
+    private static _ctrls: { [ctrl: string]: Ctrl<any> } = {};
 
-    static appActions: Actions<any> = (action: string, data: any, cw: WidgetCtrl<any>): void => {
+    static appActions: Actions<any> = (action: string, data: any, cw: Ctrl<any>): void => {
         console.log("action:", action, data, cw);
     }
 
-    readonly type: string = "Widget";
-    readonly id: string = this.type + "-" + WidgetCtrl._count++;
+    readonly type: string = "Ctrl";
+    readonly id: string = this.type + "-" + Ctrl._count++;
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
@@ -63,24 +63,24 @@ export class WidgetCtrl<State> implements HsmlHandlerCtx {
     view: View<State>;
     actions?: Actions<State>;
 
-    constructor(widget: Widget<State>, state?: State) {
-        this.state = state || widget.state;
-        this.view = widget.view;
-        this.actions = widget.actions;
-        widget.type && (this.type = widget.type);
+    constructor(view: View<State>, state?: State) {
+        this.state = state || view.state;
+        this.view = view;
+        this.actions = view.actions;
+        view.type && (this.type = view.type);
     }
 
     appAction = (action: string, data?: any): void => {
-        WidgetCtrl.appActions(action, data, this);
+        Ctrl.appActions(action, data, this);
     }
 
     appActions(actions: Actions<State>): this {
-        WidgetCtrl.appActions = actions;
+        Ctrl.appActions = actions;
         return this;
     }
 
-    get appWidgets(): WidgetCtrl<any>[] {
-        return Object.values(WidgetCtrl._widgets);
+    get appCtrls(): Ctrl<any>[] {
+        return Object.values(Ctrl._ctrls);
     }
 
     action = (action: string, data?: any): void => {
@@ -100,17 +100,17 @@ export class WidgetCtrl<State> implements HsmlHandlerCtx {
 
     mount = (e: Element | null = document.body): this => {
         if (e) {
-            if ((e as any).widget) {
-                const c = (e as any).widget as WidgetCtrl<State>;
+            if ((e as any).ctrl) {
+                const c = (e as any).ctrl as Ctrl<State>;
                 c && c.umount();
             }
             if (!this.dom) {
-                WidgetCtrl._widgets[this.id] = this;
+                Ctrl._ctrls[this.id] = this;
                 (this as any).dom = e;
-                (e as any).widget = this;
+                (e as any).ctrl = this;
                 const hsmls = (this as any).render();
                 hsmls2idomPatch(e, hsmls, this);
-                e.setAttribute(wNodeAttr, this.type);
+                e.setAttribute(ctrlAttr, this.type);
                 this.action("_mount", this.dom);
             }
         } else {
@@ -121,20 +121,20 @@ export class WidgetCtrl<State> implements HsmlHandlerCtx {
 
     umount = (): this => {
         if (this.dom) {
-            delete WidgetCtrl._widgets[this.id];
+            delete Ctrl._ctrls[this.id];
             this.action("_umount", this.dom);
-            if (this.dom.hasAttribute(wNodeAttr)) {
-                this.dom.removeAttribute(wNodeAttr);
+            if (this.dom.hasAttribute(ctrlAttr)) {
+                this.dom.removeAttribute(ctrlAttr);
             }
-            const cNodes = this.dom.querySelectorAll(`[${wNodeAttr}]`);
+            const cNodes = this.dom.querySelectorAll(`[${ctrlAttr}]`);
             for (let i = 0; i < cNodes.length; i++) {
-                const c = (cNodes[i] as any).widget as WidgetCtrl<State>;
+                const c = (cNodes[i] as any).ctrl as Ctrl<State>;
                 c && c.umount();
             }
             while (this.dom.firstChild) {
                 this.dom.removeChild(this.dom.firstChild);
             }
-            delete (this.dom as any).widget;
+            delete (this.dom as any).ctrl;
             (this as any).dom = undefined;
         }
         return this;
@@ -167,7 +167,7 @@ export class WidgetCtrl<State> implements HsmlHandlerCtx {
                             _skip: true,
                             _id: this.id,
                             _key: this.id,
-                            widget: this.type
+                            ctrl: this.type
                         }
                     ]
                 );
@@ -178,8 +178,8 @@ export class WidgetCtrl<State> implements HsmlHandlerCtx {
             (e: Element) => {
                 if (!this.dom) {
                     (this as any).dom = e;
-                    (e as any).widget = this;
-                    WidgetCtrl._widgets[this.id] = this;
+                    (e as any).ctrl = this;
+                    Ctrl._ctrls[this.id] = this;
                     this.action("_mount", this.dom);
                 }
             });
@@ -188,7 +188,7 @@ export class WidgetCtrl<State> implements HsmlHandlerCtx {
                 {
                     _id: this.id,
                     _key: this.id,
-                    widget: this.type
+                    ctrl: this.type
                 },
                 hsmls
             ]
@@ -203,8 +203,8 @@ export class WidgetCtrl<State> implements HsmlHandlerCtx {
 
 (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
     nodes.forEach(node => {
-        if (node.nodeType === 1 && (node as any).widget) {
-            const c = (node as any).widget as WidgetCtrl<any>;
+        if (node.nodeType === 1 && (node as any).ctrl) {
+            const c = (node as any).ctrl as Ctrl<any>;
             c && c.umount();
         }
     });

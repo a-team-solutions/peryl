@@ -1,5 +1,5 @@
 import { Hsmls, Hsml } from "../src/hsml";
-import { Widget, WidgetCtrl } from "../src/hsml-svac-ctrl";
+import { Ctrl, View } from "../src/hsml-svac-ctrl";
 import { Mount, Action } from "../src/hsml-svac";
 
 const NBSP = "\u00A0";
@@ -15,20 +15,8 @@ enum TicTacToeActions {
     mark = "mark"
 }
 
-const TicTacToe: Widget<TicTacToeState> = {
-
-    type: "TicTacToe",
-
-    state: {
-        board: [
-            [NBSP, NBSP, NBSP],
-            [NBSP, NBSP, NBSP],
-            [NBSP, NBSP, NBSP]
-        ],
-        turn: 0
-    },
-
-    view: (state: TicTacToeState, action: Action, mount: Mount): Hsmls => ([
+const TicTacToe: View<TicTacToeState> =
+    (state: TicTacToeState, action: Action, mount: Mount): Hsmls => [
         ["h1", ["Tic-Tac-Toe Demo"]],
         ["p", [
             "Player: ", state.turn ? CROS : CIRC
@@ -51,15 +39,24 @@ const TicTacToe: Widget<TicTacToeState> = {
                 ])
             ])
         ]
-    ]),
-
-    actions: (action: string, data: any, widget: WidgetCtrl<TicTacToeState>): void => {
+    ];
+TicTacToe.type = "TicTacToe";
+TicTacToe.state = {
+    board: [
+        [NBSP, NBSP, NBSP],
+        [NBSP, NBSP, NBSP],
+        [NBSP, NBSP, NBSP]
+    ],
+    turn: 0
+};
+TicTacToe.actions =
+    (action: string, data: any, ctrl: Ctrl<TicTacToeState>): void => {
         console.log("action", action, data);
         switch (action) {
             case TicTacToeActions.mark:
-                widget.state.board[data.y][data.x] = data.turn ? CROS : CIRC;
-                widget.state.turn = data.turn ? 0 : 1;
-                widget.update();
+                ctrl.state.board[data.y][data.x] = data.turn ? CROS : CIRC;
+                ctrl.state.turn = data.turn ? 0 : 1;
+                ctrl.update();
                 break;
             case "_mount":
             case "_umount":
@@ -67,12 +64,9 @@ const TicTacToe: Widget<TicTacToeState> = {
             default:
                 console.warn("action unhandled:", action, data);
         }
-    }
+    };
 
-};
-
-
-const app = new WidgetCtrl<TicTacToeState>(TicTacToe)
+const app = new Ctrl<TicTacToeState>(TicTacToe)
     .mount(document.getElementById("app"));
 
 (self as any).app = app;
