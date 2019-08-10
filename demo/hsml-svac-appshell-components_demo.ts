@@ -13,7 +13,7 @@ export interface SidebarState {
     }[];
 }
 
-export enum SidebarActions {
+export const enum SidebarActions {
     title = "title",
 }
 
@@ -63,7 +63,7 @@ export interface ContentState {
     text: string;
 }
 
-export enum ContentActions {
+export const enum ContentActions {
     title = "title"
 }
 
@@ -108,7 +108,7 @@ export interface FormState {
     sports: string[];
 }
 
-export enum FormActions {
+export const enum FormActions {
     title = "title",
     formData = "form-data",
     formSubmit = "form-submit"
@@ -266,7 +266,7 @@ export interface AppShellState {
     snackbar: string;
 }
 
-export enum AppShellActions {
+export const enum AppShellActions {
     title = "title",
     subtitle = "subtitle",
     menu = "menu",

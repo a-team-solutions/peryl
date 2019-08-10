@@ -1,7 +1,7 @@
 const path = require('path');
 const glob = require("glob");
 const { CheckerPlugin } = require("awesome-typescript-loader");
-// const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
 const entries = {
     ...glob.sync('./src/**/*.ts')
@@ -20,7 +20,7 @@ const entries = {
 console.log("entries:", entries);
 
 module.exports = {
-    mode: "development",
+    // mode: "development",
     // devtool: false,
     // devtool: "eval",
     // devtool: "source-map",
@@ -36,18 +36,18 @@ module.exports = {
     //     index: "./src/index.ts"
     // },
     entry: entries,
-    // optimization: {
-    //     minimizer: [
-    //         new UglifyJsPlugin({
-    //             uglifyOptions: {
-    //                 output: {
-    //                     comments: false
-    //                 },
-    //             },
-    //             extractComments: true, // /(?:^!|@(?:license|preserve))/i
-    //         })
-    //     ]
-    // },
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                uglifyOptions: {
+                    output: {
+                        comments: false
+                    },
+                },
+                extractComments: true, // /(?:^!|@(?:license|preserve))/i
+            })
+        ]
+    },
     output: {
         // filename: '[name].[chunkhash].js',
         filename: '[name].js',

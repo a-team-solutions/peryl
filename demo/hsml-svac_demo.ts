@@ -7,7 +7,7 @@ interface AppState {
     count: number;
 }
 
-enum AppActions {
+const enum AppActions {
     title = "title",
     dec = "dec",
     inc = "inc",
@@ -63,7 +63,7 @@ App.actions = (action: string, data: any, ctrl: Ctrl<AppState>): void => {
     }
 };
 
-enum SubAppActions {
+const enum SubAppActions {
     xXx = "xXx"
 }
 

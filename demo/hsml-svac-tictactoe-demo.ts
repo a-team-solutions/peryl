@@ -11,7 +11,7 @@ interface TicTacToeState {
     turn: number;
 }
 
-enum TicTacToeActions {
+const enum TicTacToeActions {
     mark = "mark"
 }
 
