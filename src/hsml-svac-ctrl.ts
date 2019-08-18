@@ -3,6 +3,8 @@ import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
+const warn = console.warn;
+
 export interface View<State>  {
     (state: State, action: Action, mount: Mount): Hsmls;
     type: string;
@@ -48,9 +50,7 @@ export class Ctrl<State> implements HsmlHandlerCtx {
 
     private static _ctrls: { [ctrl: string]: Ctrl<any> } = {};
 
-    static appActions: Actions<any> = (action: string, data: any, cw: Ctrl<any>): void => {
-        console.log("action:", action, data, cw);
-    }
+    static appActions?: Actions<any>;
 
     readonly type: string = "Ctrl";
     readonly id: string = this.type + "-" + Ctrl._count++;
@@ -71,7 +71,11 @@ export class Ctrl<State> implements HsmlHandlerCtx {
     }
 
     appAction = (action: string, data?: any): void => {
-        Ctrl.appActions(action, data, this);
+        if (Ctrl.appActions) {
+            Ctrl.appActions(action, data, this);
+        } else {
+            warn("Ctrl.appActions undefined:", action, data, this);
+        }
     }
 
     appActions(actions: Actions<State>): this {
@@ -79,12 +83,16 @@ export class Ctrl<State> implements HsmlHandlerCtx {
         return this;
     }
 
-    get appCtrls(): Ctrl<any>[] {
-        return Object.values(Ctrl._ctrls);
+    action = (action: string, data?: any): void => {
+        if (this.actions) {
+            this.actions(action, data, this);
+        } else {
+            warn("View.actions undefined:", action, data, this);
+        }
     }
 
-    action = (action: string, data?: any): void => {
-        this.actions && this.actions(action, data, this);
+    get appCtrls(): Ctrl<any>[] {
+        return Object.values(Ctrl._ctrls);
     }
 
     render = (): Hsmls => {
