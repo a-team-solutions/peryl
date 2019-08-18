@@ -23,10 +23,12 @@
         "declaration": false,
         "sourceMap": true,
         "inlineSourceMap": false,
-        "removeComments": true
+        "removeComments": true,
         // "preserveConstEnums": true,
         // "pretty": true,
         // "outDir": "dist"
+        "allowSyntheticDefaultImports": false,
+        "allowJs": false
     },
     "include": [
         "src/**/*",

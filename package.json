@@ -49,7 +49,7 @@
     "clean": "rm -rf build; rm -rf dist; cd tools; npm run clean",
     "clean:all": "npm run clean; rm -rf node_modules; cd tools; npm run clean:all",
     "tslint": "tslint --project tsconfig.json",
-    "build": "webpack --mode development # --mode production",
+    "build": "webpack --mode production",
     "build:watch": "webpack --mode development --watch",
     "demo": "npm run build:watch",
     "dist": "rm -rf dist; tsc --declaration --outDir dist",
@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@types/incremental-dom": "^0.5.0",
-    "@types/jasmine": "^3.3.16",
+    "@types/jasmine": "^3.4.0",
     "@types/numeral": "0.0.22",
     "awesome-typescript-loader": "^5.2.1",
     "glob": "^7.1.4",
@@ -75,7 +75,6 @@
     "ts-node": "^7.0.1",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3",
-    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.39.1",
     "webpack-cli": "^3.3.6"
   },
