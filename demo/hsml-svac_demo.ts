@@ -38,7 +38,7 @@ const App: View<AppState> =
         ]],
         ["p", state.title ? mount<AppState>(Sub, state) : []]
     ];
-App.type = "AppView";
+App.type = "App";
 App.state = {
     title: "Counter",
     count: 77

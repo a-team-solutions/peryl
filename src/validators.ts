@@ -205,7 +205,7 @@ export class StringValidator
                     {
                         min: ("min" in opts) ? ("" + opts.min) : "",
                         max: ("max" in opts) ? ("" + opts.max) : "",
-            })
+                    })
                 : notInRangeMsg;
         }
         return "";
@@ -289,7 +289,7 @@ export class NumeralValidator
                             format: ("format" in opts)
                                 ? opts.format!
                                 : numFormatDefault
-            })
+                        })
                     : invalidFormatMsg
             };
         }
@@ -325,14 +325,14 @@ export class NumeralValidator
                         format: ("format" in opts)
                             ? opts.format!
                             : numFormatDefault
-            })
+                    })
                 : notInRangeMsg;
         }
         return "";
     }
 
     protected objToStr(obj: Numeral,
-                       format?: string): { str?: string, err?: string } {
+        format?: string): { str?: string, err?: string } {
         if (obj.constructor === Number) {
             obj = numeral(obj);
         }
@@ -417,7 +417,7 @@ export class MomentValidator
                             format: ("format" in opts)
                                 ? opts.format!
                                 : numFormatDefault
-                    })
+                        })
                     : invalidFormatMsg
             };
         }
@@ -453,14 +453,14 @@ export class MomentValidator
                         format: ("format" in opts)
                             ? opts.format!
                             : numFormatDefault
-            })
+                    })
                 : notInRangeMsg;
         }
         return "";
     }
 
     protected objToStr(obj: Moment,
-                       format?: string): { str?: string, err?: string } {
+        format?: string): { str?: string, err?: string } {
         if (obj.constructor === Date) {
             obj = moment(obj);
         }
