@@ -24,12 +24,12 @@ export class GA {
 
     private _load(): void {
         if (this._trackingId) {
-            const script = <HTMLScriptElement> document.createElement("script");
+            const script = document.createElement("script");
             script.async = true;
             script.src = `https://www.googletagmanager.com/gtag/js?id=${this._trackingId}`;
             document.getElementsByTagName("head")[0].appendChild(script);
 
-            const script1 = <HTMLScriptElement> document.createElement("script");
+            const script1 = document.createElement("script");
             script1.textContent = `
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
