@@ -805,7 +805,7 @@ function tpl(tmpl: string, data: { [k: string]: string }): string {
     return Object.keys(data)
         .map(k => [k, data[k]])
         .reduce((t, d) =>
-            t.replace(new RegExp(`\\$\\{${d[0]}\\}`, "g"), d[1]), tmpl);
+            t.replace(new RegExp(`\\{\\{${d[0]}\\}\\}`, "g"), d[1]), tmpl);
 }
 
 type FormValidators<T> = { [key in keyof T]: Validator<any, any, any> };
@@ -881,9 +881,9 @@ export class FormValidator<T = any> {
 //         // regexp: /^[0123]+$/
 //     },
 //     {
-//         required: "required ${min} ${max} ${regexp}",
-//         invalid_format: "invalid_format ${regexp}",
-//         not_in_range: "not_in_range ${min} ${max}"
+//         required: "required {{min}} {{max}} {{regexp}}",
+//         invalid_format: "invalid_format {{regexp}}",
+//         not_in_range: "not_in_range {{min}} {{max}}"
 //     });
 
 // [
@@ -913,9 +913,9 @@ export class FormValidator<T = any> {
 //         strict: true
 //     },
 //     {
-//         required: "required ${min} ${max} ${locale} ${format}",
-//         invalid_format: "invalid_format ${num} ${locale} ${format}",
-//         not_in_range: "not_in_range ${min} ${max} ${locale}"
+//         required: "required {{min}} {{max}} {{locale}} {{format}}",
+//         invalid_format: "invalid_format {{num}} {{locale}} {{format}}",
+//         not_in_range: "not_in_range {{min}} {{max}} {{locale}}"
 //     });
 
 // [
@@ -946,9 +946,9 @@ export class FormValidator<T = any> {
 //         strict: true
 //     },
 //     {
-//         required: "required ${min} ${max} ${locale} ${format}",
-//         invalid_format: "invalid_format ${date} ${locale}",
-//         not_in_range: "not_in_range ${min} ${max} ${locale} ${format}"
+//         required: "required {{min}} {{max}} {{locale}} {{format}}",
+//         invalid_format: "invalid_format {{date}} {{locale}}",
+//         not_in_range: "not_in_range {{min}} {{max}} {{locale}} {{format}}"
 //     });
 
 // [
