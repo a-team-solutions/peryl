@@ -12,7 +12,7 @@ export class Hash<T> {
         if ("onhashchange" in window) {
             onhashchange = () => cb(this.read());
         } else {
-            // prest.log.warning('browser "window.onhashchange" not implemented, running emulation');
+            // console.warn('browser "window.onhashchange" not implemented, running emulation');
             let prevHash = location.hash;
             if (this._iId) {
                 clearInterval(this._iId);

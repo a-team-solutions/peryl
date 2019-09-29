@@ -298,7 +298,7 @@ export const AppShell: View<AppShellState> =
             ]],
             ["a.w3-bar-item.w3-right.w3-hover-light-grey",
                 {
-                    href: "https://gitlab.com/peter-rybar/prest-lib",
+                    href: "https://gitlab.com/peter-rybar/peryl",
                     title: "GitLab repository",
                     target: "_blank",
                     rel: "noopener"

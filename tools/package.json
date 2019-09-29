@@ -1,6 +1,6 @@
 {
-  "name": "prest-lib-tools",
-  "description": "pREST lib tools",
+  "name": "peryl-tools",
+  "description": "PeRyL tools",
   "version": "1.0.0",
   "license": "GPL-3.0",
   "scripts": {
@@ -11,8 +11,8 @@
     "html2hsml": "node ./build/html2hsml-cli.js"
   },
   "bin": {
-    "prest-html2jsonml": "./build/html2jsonml-cli.js",
-    "prest-html2hsml": "./build/html2hsml-cli.js"
+    "peryl-html2jsonml": "./build/html2jsonml-cli.js",
+    "peryl-html2hsml": "./build/html2hsml-cli.js"
   },
   "repository": {},
   "dependencies": {
