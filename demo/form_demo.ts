@@ -1,5 +1,5 @@
-import * as form from "../src/form";
-import { select } from "../src/dom";
+import * as form from "../lib/form";
+import { select } from "../lib/dom";
 
 const stringValidator = (entry: form.Entry, locale?: string): string => {
     switch (locale) {

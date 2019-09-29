@@ -1,4 +1,4 @@
-import { UrlEncodedData, Base64 } from "../src/encode";
+import { UrlEncodedData, Base64 } from "../lib/encode";
 
 
 // UrlEncodedData

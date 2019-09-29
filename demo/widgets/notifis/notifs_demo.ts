@@ -1,5 +1,5 @@
 import * as notifs from "./notifs";
-import { select } from "../../../src/dom";
+import { select } from "../../../lib/dom";
 
 const notifsWidget = new notifs.NotifsWidget()
     .mount(select("#notifs"));

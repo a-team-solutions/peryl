@@ -1,5 +1,5 @@
-import * as history from "../src/history";
-import { select } from "../src/dom";
+import * as history from "../lib/history";
+import { select } from "../lib/dom";
 
 interface PageState {
     title: string;

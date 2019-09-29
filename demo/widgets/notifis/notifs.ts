@@ -1,4 +1,4 @@
-import { html, Widget } from "../../../src/dom";
+import { html, Widget } from "../../../lib/dom";
 
 
 export const TYPE_SUCCESS = "success";

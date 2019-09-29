@@ -1,6 +1,6 @@
-import * as hash from "../src/hash";
-// import * as encode from "../src/encode";
-import { select } from "../src/dom";
+import * as hash from "../lib/hash";
+// import * as encode from "../lib/encode";
+import { select } from "../lib/dom";
 
 const out = select("#output");
 out && (out.innerHTML = "test");

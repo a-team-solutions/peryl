@@ -1,5 +1,5 @@
 import * as sidebar from "./sidebar";
-import { html, select, Widget } from "../../../src/dom";
+import { html, select, Widget } from "../../../lib/dom";
 
 class Content implements Widget {
     mount(el: HTMLElement): this {

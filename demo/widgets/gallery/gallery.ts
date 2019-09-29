@@ -1,4 +1,4 @@
-import { html, remove, select, Widget } from "../../../src/dom";
+import { html, remove, select, Widget } from "../../../lib/dom";
 
 
 export class Item {

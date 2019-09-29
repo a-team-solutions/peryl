@@ -1,5 +1,5 @@
-import { template, tmpl } from "../src/template";
-import { select } from "../src/dom";
+import { template, tmpl } from "../lib/template";
+import { select } from "../lib/dom";
 
 const results = select("#results");
 if (results) {

@@ -1,5 +1,5 @@
-import { Signal } from "../../../src/signal";
-import { html, select, Widget } from "../../../src/dom";
+import { Signal } from "../../../lib/signal";
+import { html, select, Widget } from "../../../lib/dom";
 
 export class Sidebar implements Widget {
 

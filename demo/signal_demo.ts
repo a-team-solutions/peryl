@@ -1,4 +1,4 @@
-import { Signal } from "../src/signal";
+import { Signal } from "../lib/signal";
 
 
 const s: Signal<string> = new Signal<string>();

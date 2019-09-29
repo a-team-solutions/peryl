@@ -4,11 +4,11 @@ const glob = require("glob");
 const { CheckerPlugin } = require("awesome-typescript-loader");
 
 const entries = {
-    ...glob.sync('./src/**/*.ts')
+    ...glob.sync('./lib/**/*.ts')
         .reduce(
             (entries, entry) =>
                 Object.assign(entries,
-                    { [entry.replace('./src/', '').replace('.ts', '')]: entry }),
+                    { [entry.replace('./lib/', '').replace('.ts', '')]: entry }),
             {}),
     ...glob.sync('./demo/**/*.ts')
         .reduce(
@@ -48,7 +48,7 @@ module.exports = {
     // devtool: "nosources-source-map",
 
     // entry: {
-    //     index: "./src/index.ts"
+    //     index: "./lib/index.ts"
     // },
     entry: entries,
 
@@ -87,7 +87,7 @@ module.exports = {
             // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
             // { test: /.(ts|tsx)?$/, loader: 'ts-loader' },
             { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
-            { include: [path.resolve(__dirname, 'src')] },
+            { include: [path.resolve(__dirname, 'lib')] },
             { exclude: [path.resolve(__dirname, "node_modules")] }
         ]
     },

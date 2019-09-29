@@ -1,7 +1,7 @@
-import { hsmls2htmls } from "../src/hsml-html";
-import { Hsmls, Hsml } from "../src/hsml";
-import { Widget } from "../src/hsml-widget";
-import { Signal } from "../src/signal";
+import { hsmls2htmls } from "../lib/hsml-html";
+import { Hsmls, Hsml } from "../lib/hsml";
+import { Widget } from "../lib/hsml-widget";
+import { Signal } from "../lib/signal";
 
 
 class HelloWidget extends Widget {

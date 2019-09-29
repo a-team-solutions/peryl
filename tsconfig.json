@@ -31,7 +31,7 @@
         "allowJs": false
     },
     "include": [
-        "src/**/*",
+        "lib/**/*",
         "demo/**/*"
     ],
     "exclude": [

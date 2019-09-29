@@ -1,4 +1,4 @@
-import { html, htmls } from "../src/hsml-svac-html";
+import { html, htmls } from "../lib/hsml-svac-html";
 import { AppShellState, AppShell, Sidebar } from "./hsml-svac-appshell-components_demo";
 
 html<AppShellState>(AppShell, AppShell.state, (html: string) => console.log(html), true);

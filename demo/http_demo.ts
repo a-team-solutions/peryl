@@ -1,4 +1,4 @@
-import { get } from "../src/http";
+import { get } from "../lib/http";
 
 get("http_demo.json")
     .onProgress(progress => {

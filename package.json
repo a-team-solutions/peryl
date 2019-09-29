@@ -39,7 +39,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "typescript": {
-    "main": "src/index.ts"
+    "main": "lib/index.ts"
   },
   "scripts": {
     "prepare": "npm run dist",
@@ -52,9 +52,9 @@
     "build": "webpack --mode production",
     "build:watch": "webpack --mode development --watch",
     "demo": "npm run build:watch",
-    "dist": "rm -rf dist; tsc --declaration --outDir dist",
+    "dist": "npm run clean; tsc --declaration --outDir dist",
     "test:jasmine": "ts-node node_modules/jasmine/bin/jasmine 'test/**/*.test.ts'",
-    "test:jasmine:watch": "nodemon --ext ts --watch test --watch src --exec 'ts-node node_modules/jasmine/bin/jasmine \"test/**/*.test.ts\"'",
+    "test:jasmine:watch": "nodemon --ext ts --watch test --watch lib --exec 'ts-node node_modules/jasmine/bin/jasmine \"test/**/*.test.ts\"'",
     "test": "npm run tslint; npm run test:jasmine; npm run build",
     "test:watch": "npm run test:jasmine:watch",
     "start": "npm run demo"
@@ -102,8 +102,8 @@
     ]
   },
   "files": [
-    "dist/**/*",
-    "src/**/*"
+    "lib/**/*",
+    "dist/**/*"
   ],
   "dependencies": {}
 }
