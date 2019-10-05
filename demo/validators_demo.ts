@@ -3,7 +3,7 @@ import {
     NumeralValidator,
     MomentValidator,
     ObjectValidator
-} from "../lib/validators";
+} from "../src/validators";
 import * as moment from "moment";
 
 import "numeral/locales";

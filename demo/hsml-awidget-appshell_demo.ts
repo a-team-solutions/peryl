@@ -1,6 +1,6 @@
-import { AWidget, Action, Mount, Class } from "../lib/hsml-awidget";
-import { Hsmls, Hsml } from "../lib/hsml";
-import { Hash } from "../lib/hash";
+import { AWidget, Action, Mount, Class } from "../src/hsml-awidget";
+import { Hsmls, Hsml } from "../src/hsml";
+import { Hash } from "../src/hash";
 
 export interface SidebarState {
     title: string;

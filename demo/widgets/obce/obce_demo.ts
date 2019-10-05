@@ -6,8 +6,8 @@
 
 // zdroj: https://data.gov.sk/dataset/register-adries-register-obci/resource/15262453-4a0f-4cce-a9e4-7709e135e4b8
 
-import { HttpRequest } from "../../../lib/http";
-import { html, select } from "../../../lib/dom";
+import { HttpRequest } from "../../../src/http";
+import { html, select } from "../../../src/dom";
 
 // "https://data.gov.sk/api/action/datastore_search?resource_id=15262453-4a0f-4cce-a9e4-7709e135e4b8&q=rajec"
 // "https://data.gov.sk/api/action/datastore_search?resource_id=15262453-4a0f-4cce-a9e4-7709e135e4b8&limit=5"

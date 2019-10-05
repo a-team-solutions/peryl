@@ -1,5 +1,5 @@
-import { AWidget, Action, Mount } from "../lib/hsml-awidget";
-import { Hsmls } from "../lib/hsml";
+import { AWidget, Action, Mount } from "../src/hsml-awidget";
+import { Hsmls } from "../src/hsml";
 
 interface AppState {
     title: string;

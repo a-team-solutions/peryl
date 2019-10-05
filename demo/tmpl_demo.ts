@@ -1,4 +1,4 @@
-import { tmpla, tmplo, tmpl } from "../lib/tmpl";
+import { tmpla, tmplo, tmpl } from "../src/tmpl";
 
 const dataArray = ["A", "B"];
 console.log("tmpla: ${0} ${1} ${0}", "|", tmpla("tmpla: ${0} ${1} ${0}", dataArray));

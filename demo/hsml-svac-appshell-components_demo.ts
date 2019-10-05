@@ -1,6 +1,6 @@
-import { Action, Mount } from "../lib/hsml-svac";
-import { Hsmls, Hsml, join } from "../lib/hsml";
-import { Ctrl, View } from "../lib/hsml-svac-ctrl";
+import { Action, Mount } from "../src/hsml-svac";
+import { Hsmls, Hsml, join } from "../src/hsml";
+import { Ctrl, View } from "../src/hsml-svac-ctrl";
 
 const nbsp = "\u00a0 ";
 

@@ -1,6 +1,6 @@
 import "jasmine";
-import { div, span, a, ul, li, h2, input, button } from "../lib/hsml-h";
-import { Hsml } from "../lib/hsml";
+import { div, span, a, ul, li, h2, input, button } from "../src/hsml-h";
+import { Hsml } from "../src/hsml";
 
 describe("hypescript", () => {
 

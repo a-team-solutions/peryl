@@ -1,4 +1,4 @@
-import { Router } from "../lib/router";
+import { Router } from "../src/router";
 
 Router
     // #users/123

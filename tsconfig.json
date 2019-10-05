@@ -3,9 +3,7 @@
         "target": "es5",
         "lib": [
             "dom",
-            "es2015",
-            "es2017.object",
-            "es2016.array.include"
+            "es2017"
         ],
         "module": "commonjs",
         "moduleResolution": "node",
@@ -31,8 +29,7 @@
         "allowJs": false
     },
     "include": [
-        "lib/**/*",
-        "demo/**/*"
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",

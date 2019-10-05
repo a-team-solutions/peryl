@@ -1,6 +1,6 @@
-import { Ctrl, View } from "../lib/hsml-svac-ctrl";
+import { Ctrl, View } from "../src/hsml-svac-ctrl";
 import { AppShellState, AppShellActions, Content, Form, AppShell, FormActions } from "./hsml-svac-appshell-components_demo";
-import { Hash } from "../lib/hash";
+import { Hash } from "../src/hash";
 
 const app = new Ctrl<AppShellState>(AppShell)
     .appActions((action: string, data: any, ctrl: Ctrl<AppShellState>) => {

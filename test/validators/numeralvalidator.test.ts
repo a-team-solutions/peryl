@@ -1,5 +1,5 @@
 import "jasmine";
-import { NumeralValidator } from "../../lib/validators";
+import { NumeralValidator } from "../../src/validators";
 
 describe("NumeralValidator", () => {
 

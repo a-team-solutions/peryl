@@ -1,4 +1,4 @@
-import { Events } from "../lib/events";
+import { Events } from "../src/events";
 
 const e = new Events<string>("ctx");
 

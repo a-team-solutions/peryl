@@ -1,5 +1,5 @@
-import { hsmls2idomPatch } from "../lib/hsml-idom";
-import { Hsmls, Hsml } from "../lib/hsml";
+import { hsmls2idomPatch } from "../src/hsml-idom";
+import { Hsmls, Hsml } from "../src/hsml";
 
 type Component<State> = (state: State, dispatch: Dispatch) => Hsmls;
 
