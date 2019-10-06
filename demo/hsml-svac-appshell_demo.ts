@@ -1,4 +1,4 @@
-import { Ctrl, View } from "../src/hsml-svac-ctrl";
+import { Ctrl, Component } from "../src/hsml-svac-ctrl";
 import { AppShellState, AppShellActions, Content, Form, AppShell, FormActions } from "./hsml-svac-appshell-components_demo";
 import { Hash } from "../src/hash";
 
@@ -17,7 +17,7 @@ setTimeout(() => {
     app.action(AppShellActions.snackbar, "Message");
 }, 1e3);
 
-const views: { [k: string]: View<any> } = {
+const components: { [k: string]: Component<any> } = {
     content: Content,
     form: Form
 };
@@ -30,7 +30,7 @@ new Hash<string>()
     .onChange(module => {
         console.log("hash: " + JSON.stringify(module));
         app.action(AppShellActions.menu, false);
-        app.action(AppShellActions.content, views[module] || Content);
+        app.action(AppShellActions.content, components[module] || Content);
     })
     .listen();
 

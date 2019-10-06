@@ -1,38 +1,39 @@
-import { Mount, Action } from "./hsml-svac";
+import { Mount, View } from "./hsml-svac";
 import { HsmlElement, HsmlFragmet, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
 const warn = console.warn;
 
-export interface View<State extends { [k: string]: any }>  {
-    (state: State, action: Action, mount: Mount): HsmlFragmet;
+
+export interface Component<State extends { [k: string]: any }> {
     type: string;
     state: State;
+    view: View<State>;
     actions?: Actions<State>;
 }
 
 export type Actions<State extends { [k: string]: any }> = (action: string, data: any, ctrl: Ctrl<State>) => void;
 
-const mount: Mount = <State extends { [k: string]: any }>(view: View<State>, state?: State): HsmlFnc | HsmlFragmet => {
+const mount: Mount = <State extends { [k: string]: any }>(component: Component<State>, state?: State): HsmlFnc | HsmlFragmet => {
     return (e: Element) => {
         if ((e as any).ctrl) {
             const c = (e as any).ctrl as Ctrl<State>;
-            if (c.view === view) {
+            if (c.view === component.view) {
                 if (state !== undefined) {
                     c.state = state;
                 }
                 c.update();
             } else {
                 c.umount();
-                const c1 = new Ctrl(view);
+                const c1 = new Ctrl(component);
                 if (state !== undefined) {
                     c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new Ctrl(view);
+            const c = new Ctrl(component);
             if (state !== undefined) {
                 c.state = state;
             }
@@ -63,11 +64,11 @@ export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx 
     state: State;
     actions?: Actions<State>;
 
-    constructor(view: View<State>, state?: State) {
-        this.view = view;
-        this.type = view.type;
-        this.state = state || view.state;
-        this.actions = view.actions;
+    constructor(component: Component<State>, state?: State) {
+        this.view = component.view;
+        this.type = component.type;
+        this.state = state || component.state;
+        this.actions = component.actions;
     }
 
     appAction = (action: string, data?: any): void => {

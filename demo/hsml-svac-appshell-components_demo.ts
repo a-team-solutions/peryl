@@ -1,6 +1,6 @@
 import { Action, Mount } from "../src/hsml-svac";
 import { HsmlFragmet, HsmlElement, join } from "../src/hsml";
-import { Ctrl, View } from "../src/hsml-svac-ctrl";
+import { Ctrl, Component } from "../src/hsml-svac-ctrl";
 
 const nbsp = "\u00a0 ";
 
@@ -17,8 +17,20 @@ export const enum SidebarActions {
     title = "title",
 }
 
-export const Sidebar =
-    (state: SidebarState, action: Action, mount: Mount): HsmlFragmet => [
+export const Sidebar: Component<SidebarState> = {
+
+    type: "Sidebar",
+
+    state: {
+        title: "Sidebar",
+        menu: [
+            { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
+            { url: "#content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
+            { url: "#form", label: "Form", icon: "i.fas.fa-fw.fa-bell" }
+        ]
+    },
+
+    view: (state: SidebarState, action: Action, mount: Mount): HsmlFragmet => [
         ["div.w3-container", [
             ["h2", [state.title]],
             ["div.w3-bar-block", {},
@@ -35,18 +47,9 @@ export const Sidebar =
                 )
             ]
         ]]
-    ];
-Sidebar.type = "Sidebar";
-Sidebar.state = {
-    title: "Sidebar",
-    menu: [
-        { url: "#", label: "Home", icon: "i.fas.fa-fw.fa-info" },
-        { url: "#content", label: "Content", icon: "i.fas.fa-fw.fa-users" },
-        { url: "#form", label: "Form", icon: "i.fas.fa-fw.fa-bell" }
-    ]
-};
-Sidebar.actions =
-    (action: string, data: any, ctrl: Ctrl<SidebarState>): void => {
+    ],
+
+    actions: (action: string, data: any, ctrl: Ctrl<SidebarState>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case SidebarActions.title:
@@ -55,7 +58,8 @@ Sidebar.actions =
             default:
                 ctrl.appAction(action, data);
         }
-    };
+    }
+};
 
 
 export interface ContentState {
@@ -67,18 +71,21 @@ export const enum ContentActions {
     title = "title"
 }
 
-export const Content: View<ContentState> =
-    (state: ContentState, action: Action, mount: Mount): HsmlFragmet => [
+export const Content: Component<ContentState> = {
+
+    type: "Content",
+
+    state: {
+        title: "Content",
+        text: "text text text"
+    },
+
+    view: (state: ContentState, action: Action, mount: Mount): HsmlFragmet => [
         ["h1", [state.title]],
         ["p", [state.text]]
-    ];
-Content.type = "Content";
-Content.state = {
-    title: "Content",
-    text: "text text text"
-};
-Content.actions =
-    (action: string, data: any, ctrl: Ctrl<ContentState>): void => {
+    ],
+
+    actions: (action: string, data: any, ctrl: Ctrl<ContentState>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case ContentActions.title:
@@ -87,7 +94,8 @@ Content.actions =
             default:
                 ctrl.appAction(action, data);
         }
-    };
+    }
+};
 
 
 export interface FormData {
@@ -114,8 +122,27 @@ export const enum FormActions {
     formSubmit = "form-submit"
 }
 
-export const Form: View<FormState> =
-    (state: FormState, action: Action, mount: Mount): HsmlFragmet => [
+export const Form: Component<FormState> = {
+
+    type: "Form",
+
+    state: {
+        title: "Form",
+        data: {
+            name: "Ema",
+            age: 33,
+            married: false,
+            gender: "female",
+            sport: "gymnastics"
+        },
+        genders: [
+            { label: "Male", value: "male" },
+            { label: "Female", value: "female" }
+        ],
+        sports: ["football", "gymnastics"]
+    },
+
+    view: (state: FormState, action: Action, mount: Mount): HsmlFragmet => [
         ["h1", [state.title]],
         ["form.w3-container", [
             ["p", [
@@ -188,41 +215,27 @@ export const Form: View<FormState> =
                 ["Submit"]
             ]
         ]]
-    ];
-Form.type = "Form";
-Form.state = {
-    title: "Form",
-    data: {
-        name: "Ema",
-        age: 33,
-        married: false,
-        gender: "female",
-        sport: "gymnastics"
-    },
-    genders: [
-        { label: "Male", value: "male" },
-        { label: "Female", value: "female" }
     ],
-    sports: ["football", "gymnastics"]
-};
-Form.actions = (action: string, data: any, ctrl: Ctrl<FormState>): void => {
-    // console.log("action:", action, data);
-    switch (action) {
-        case FormActions.title:
-            ctrl.update({ title: data as string });
-            break;
-        case FormActions.formData:
-            formDataCollect(data, ctrl.state.data);
-            // TODO: formDataValidate(ctrl.state.data);
-            console.log(ctrl.state.data);
-            break;
-        case FormActions.formSubmit:
-            data.preventDefault();
-            console.dir(JSON.stringify(ctrl.state.data, null, 4));
-            ctrl.appAction(action, ctrl.state.data);
-            break;
-        default:
-            ctrl.appAction(action, data);
+
+    actions: (action: string, data: any, ctrl: Ctrl<FormState>): void => {
+        // console.log("action:", action, data);
+        switch (action) {
+            case FormActions.title:
+                ctrl.update({ title: data as string });
+                break;
+            case FormActions.formData:
+                formDataCollect(data, ctrl.state.data);
+                // TODO: formDataValidate(ctrl.state.data);
+                console.log(ctrl.state.data);
+                break;
+            case FormActions.formSubmit:
+                data.preventDefault();
+                console.dir(JSON.stringify(ctrl.state.data, null, 4));
+                ctrl.appAction(action, ctrl.state.data);
+                break;
+            default:
+                ctrl.appAction(action, data);
+        }
     }
 };
 
@@ -261,8 +274,8 @@ export interface AppShellState {
     title: string;
     subtitle: string;
     menu: boolean;
-    sidebar: View<any>;
-    content: View<any>;
+    sidebar: Component<any>;
+    content: Component<any>;
     snackbar: string;
 }
 
@@ -275,8 +288,20 @@ export const enum AppShellActions {
     snackbar = "snackbar"
 }
 
-export const AppShell: View<AppShellState> =
-    (state: AppShellState, action: Action, mount: Mount): HsmlFragmet => [
+export const AppShell: Component<AppShellState> = {
+
+    type: "AppShell",
+
+    state: {
+        title: "Title",
+        subtitle: "Subtitle",
+        menu: false,
+        sidebar: Sidebar,
+        content: Content,
+        snackbar: ""
+    },
+
+    view: (state: AppShellState, action: Action, mount: Mount): HsmlFragmet => [
         // header
         ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [
             ["button.w3-bar-item.w3-button.w3-hide-large.w3-hover-none.w3-hover-text-light-grey",
@@ -338,18 +363,9 @@ export const AppShell: View<AppShellState> =
         ["div#snackbar~snackbar", { classes: [["show", !!state.snackbar]] },
             [state.snackbar]
         ]
-    ];
-AppShell.type = "AppShell",
-AppShell.state = {
-    title: "Title",
-    subtitle: "Subtitle",
-    menu: false,
-    sidebar: Sidebar,
-    content: Content,
-    snackbar: ""
-};
-AppShell.actions =
-    (action: string, data: any, ctrl: Ctrl<AppShellState>): void => {
+    ],
+
+    actions: (action: string, data: any, ctrl: Ctrl<AppShellState>): void => {
         // console.log("action:", action, data);
         switch (action) {
             case AppShellActions.title:
@@ -375,4 +391,5 @@ AppShell.actions =
             default:
                 ctrl.appAction(action, data);
         }
-    };
+    }
+};
