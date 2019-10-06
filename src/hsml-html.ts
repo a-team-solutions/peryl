@@ -1,7 +1,7 @@
 import {
     hsml,
     HsmlElement,
-    HsmlFragmet,
+    HsmlFragment,
     HsmlHead,
     HsmlAttrs,
     HsmlAttrClasses,
@@ -36,7 +36,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         this._indent = indent;
     }
 
-    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragmet, ctx?: HsmlHandlerCtx): boolean {
+    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragment, ctx?: HsmlHandlerCtx): boolean {
         const props: any[] = [];
         let id = attrs._id;
         let classes: string[] = attrs._classes ? attrs._classes : [];
@@ -128,7 +128,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         }
         this._onHtml(html);
         if (hsmlObj && "render" in hsmlObj && hsmlObj.render.constructor === Function) {
-            const hsmls = hsmlObj.render() as HsmlFragmet;
+            const hsmls = hsmlObj.render() as HsmlFragment;
             for (const jml of hsmls) {
                 if (jml.constructor === String) {
                     this._onHtml(jml + (this._pretty ? "\n" : ""));
@@ -143,7 +143,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         return false;
     }
 
-    close(tag: HsmlHead, children: HsmlFragmet, ctx?: HsmlHandlerCtx): void {
+    close(tag: HsmlHead, children: HsmlFragment, ctx?: HsmlHandlerCtx): void {
         let html = "";
         const pairTag = (children.length || HsmlHtmlHandler._pairTags.indexOf(tag) !== -1);
         if (this._pretty) {
@@ -199,7 +199,7 @@ export function hsml2html(hsmlEl: HsmlElement, onHtml: (html: string) => void, p
     hsml(hsmlEl, handler);
 }
 
-export function hsmls2html(hsmls: HsmlFragmet, onHtml: (html: string) => void, pretty = false): void {
+export function hsmls2html(hsmls: HsmlFragment, onHtml: (html: string) => void, pretty = false): void {
     for (const jml of hsmls) {
         if (jml.constructor === String) {
             onHtml(jml + (pretty ? "\n" : ""));
@@ -218,7 +218,7 @@ export function hsml2htmls(hsml: HsmlElement, pretty = false): string[] {
     return htmls;
 }
 
-export function hsmls2htmls(hsmls: HsmlFragmet, pretty = false): string[] {
+export function hsmls2htmls(hsmls: HsmlFragment, pretty = false): string[] {
     const htmls: string[] = [];
     hsmls2html(hsmls, html => htmls.push(html), pretty);
     return htmls;

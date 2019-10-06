@@ -1,5 +1,5 @@
 import { hsmls2htmls } from "../src/hsml-html";
-import { HsmlFragmet, HsmlElement } from "../src/hsml";
+import { HsmlFragment, HsmlElement } from "../src/hsml";
 import { Widget } from "../src/hsml-widget";
 import { Signal } from "../src/signal";
 
@@ -31,7 +31,7 @@ class HelloWidget extends Widget {
         console.log("actions", action, data);
     }
 
-    render(): HsmlFragmet {
+    render(): HsmlFragment {
         return [
             ["input~i",
                 { type: "text", value: this._name, input: this._onTextInput }
@@ -89,7 +89,7 @@ class TimerWidget extends Widget {
         this.toggle(false);
     }
 
-    render(): HsmlFragmet {
+    render(): HsmlFragment {
         return [
             ["p", { style: this._interval ? "" : "color: lightgray;" }, [
                 "Time: ", new Date().toLocaleTimeString(), " ",
@@ -153,7 +153,7 @@ class FormWidget extends Widget {
         console.log("onUmount", this.type, this.id);
     }
 
-    render(): HsmlFragmet {
+    render(): HsmlFragment {
         return [
             ["h2", [this._title]],
             ["form", { submit: this._onFormSubmit }, [
@@ -276,7 +276,7 @@ class AppWidget extends Widget {
         console.log("onUmount", this.type, this.id);
     }
 
-    render(): HsmlFragmet {
+    render(): HsmlFragment {
         return [
             ["h1", [this._title]],
             ["fieldset", [

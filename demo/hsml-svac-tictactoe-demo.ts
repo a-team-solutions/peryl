@@ -1,4 +1,4 @@
-import { HsmlFragmet, HsmlElement } from "../src/hsml";
+import { HsmlFragment, HsmlElement } from "../src/hsml";
 import { Ctrl, Component } from "../src/hsml-svac-ctrl";
 import { Mount, Action } from "../src/hsml-svac";
 
@@ -28,7 +28,7 @@ const TicTacToe: Component<TicTacToeState> = {
         turn: 0
     },
 
-    view: (state: TicTacToeState, action: Action, mount: Mount): HsmlFragmet => [
+    view: (state: TicTacToeState, action: Action, mount: Mount): HsmlFragment => [
         ["h1", ["Tic-Tac-Toe Demo"]],
         ["p", [
             "Player: ", state.turn ? CROS : CIRC

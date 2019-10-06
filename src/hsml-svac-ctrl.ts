@@ -1,5 +1,5 @@
 import { Mount, View } from "./hsml-svac";
-import { HsmlElement, HsmlFragmet, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
+import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
@@ -15,7 +15,7 @@ export interface Component<State extends { [k: string]: any }> {
 
 export type Actions<State extends { [k: string]: any }> = (action: string, data: any, ctrl: Ctrl<State>) => void;
 
-const mount: Mount = <State extends { [k: string]: any }>(component: Component<State>, state?: State): HsmlFnc | HsmlFragmet => {
+const mount: Mount = <State extends { [k: string]: any }>(component: Component<State>, state?: State): HsmlFnc | HsmlFragment => {
     return (e: Element) => {
         if ((e as any).ctrl) {
             const c = (e as any).ctrl as Ctrl<State>;
@@ -96,7 +96,7 @@ export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx 
         return Object.values(Ctrl._ctrls);
     }
 
-    render = (): HsmlFragmet => {
+    render = (): HsmlFragment => {
         return this.view(this.state, this.action, mount);
     }
 
@@ -182,7 +182,7 @@ export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx 
                 );
             }
         }
-        const hsmls = this.render() as HsmlFragmet;
+        const hsmls = this.render() as HsmlFragment;
         hsmls.push(
             (e: Element) => {
                 if (!this.dom) {

@@ -1,5 +1,5 @@
 import { Action, Mount } from "../src/hsml-svac";
-import { HsmlFragmet } from "../src/hsml";
+import { HsmlFragment } from "../src/hsml";
 import { Component, Actions, Ctrl } from "../src/hsml-svac-ctrl";
 
 interface AppState {
@@ -23,7 +23,7 @@ const App: Component<AppState> = {
         count: 77
     },
 
-    view: (state: AppState, action: Action, mount: Mount): HsmlFragmet => [
+    view: (state: AppState, action: Action, mount: Mount): HsmlFragment => [
         ["h2", [state.title]],
         ["p", [
             "Title: ",
@@ -78,7 +78,7 @@ const Sub: Component<AppState> = {
 
     state: App.state,
 
-    view: (state: AppState, action: Action, mount: Mount): HsmlFragmet => [
+    view: (state: AppState, action: Action, mount: Mount): HsmlFragment => [
         ["h3", [state.title]],
         ["p", [
             ["em", ["Count"]], ": ", state.count,

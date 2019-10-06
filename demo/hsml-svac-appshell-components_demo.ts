@@ -1,5 +1,5 @@
 import { Action, Mount } from "../src/hsml-svac";
-import { HsmlFragmet, HsmlElement, join } from "../src/hsml";
+import { HsmlFragment, HsmlElement, join } from "../src/hsml";
 import { Ctrl, Component } from "../src/hsml-svac-ctrl";
 
 const nbsp = "\u00a0 ";
@@ -30,7 +30,7 @@ export const Sidebar: Component<SidebarState> = {
         ]
     },
 
-    view: (state: SidebarState, action: Action, mount: Mount): HsmlFragmet => [
+    view: (state: SidebarState, action: Action, mount: Mount): HsmlFragment => [
         ["div.w3-container", [
             ["h2", [state.title]],
             ["div.w3-bar-block", {},
@@ -80,7 +80,7 @@ export const Content: Component<ContentState> = {
         text: "text text text"
     },
 
-    view: (state: ContentState, action: Action, mount: Mount): HsmlFragmet => [
+    view: (state: ContentState, action: Action, mount: Mount): HsmlFragment => [
         ["h1", [state.title]],
         ["p", [state.text]]
     ],
@@ -142,7 +142,7 @@ export const Form: Component<FormState> = {
         sports: ["football", "gymnastics"]
     },
 
-    view: (state: FormState, action: Action, mount: Mount): HsmlFragmet => [
+    view: (state: FormState, action: Action, mount: Mount): HsmlFragment => [
         ["h1", [state.title]],
         ["form.w3-container", [
             ["p", [
@@ -301,7 +301,7 @@ export const AppShell: Component<AppShellState> = {
         snackbar: ""
     },
 
-    view: (state: AppShellState, action: Action, mount: Mount): HsmlFragmet => [
+    view: (state: AppShellState, action: Action, mount: Mount): HsmlFragment => [
         // header
         ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [
             ["button.w3-bar-item.w3-button.w3-hide-large.w3-hover-none.w3-hover-text-light-grey",

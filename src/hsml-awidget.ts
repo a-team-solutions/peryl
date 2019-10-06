@@ -1,8 +1,8 @@
-import { HsmlElement, HsmlFragmet, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
+import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export type View<State> = (state: State, action: Action, mount: Mount) => HsmlFragmet;
+export type View<State> = (state: State, action: Action, mount: Mount) => HsmlFragment;
 
 export type Action = (action: string, data?: any) => void;
 
@@ -10,9 +10,9 @@ export type Actions<State> = (action: string, data: any, widget: AWidget<State>)
 
 export type Class<T = object> = new (...args: any[]) => T;
 
-export type Mount = <State>(xwClass: Class<AWidget<State>>, state?: State) => HsmlFnc | HsmlFragmet;
+export type Mount = <State>(xwClass: Class<AWidget<State>>, state?: State) => HsmlFnc | HsmlFragment;
 
-const mount: Mount = <State>(wClass: Class<AWidget<State>>, state?: State): HsmlFnc | HsmlFragmet => {
+const mount: Mount = <State>(wClass: Class<AWidget<State>>, state?: State): HsmlFnc | HsmlFragment => {
     return (e: Element) => {
         if ((e as any).widget) {
             const w = (e as any).widget as AWidget<State>;
@@ -58,7 +58,7 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
     private _updateSched?: number;
 
     abstract state: State;
-    abstract view(state: State, action: Action, mount: Mount): HsmlFragmet;
+    abstract view(state: State, action: Action, mount: Mount): HsmlFragment;
     abstract actions(action: string, data: any, widget: AWidget<State>): void;
 
     action = (action: string, data?: any): void => {
@@ -78,7 +78,7 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
         return Object.values(AWidget.mounted);
     }
 
-    render = (): HsmlFragmet => {
+    render = (): HsmlFragment => {
         return this.view(this.state, this.action, mount);
     }
 
@@ -164,7 +164,7 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
                 );
             }
         }
-        const hsmls = this.render() as HsmlFragmet;
+        const hsmls = this.render() as HsmlFragment;
         hsmls.push(
             (e: Element) => {
                 if (!this.dom) {

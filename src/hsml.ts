@@ -50,9 +50,9 @@ export interface HsmlObj {
     toHsml?(): HsmlElement;
 }
 
-export interface HsmlFragmet extends Array<HsmlElement> { }
+export interface HsmlFragment extends Array<HsmlElement> { }
 
-export type HsmlChildren = HsmlFragmet | HsmlFnc | HsmlObj;
+export type HsmlChildren = HsmlFragment | HsmlFnc | HsmlObj;
 // export type HsmlChildren = Hsmls | HsmlFnc | HsmlObj | string | boolean | number | Date;
 
 export type HsmlTagNoAttr = [HsmlHead, HsmlChildren?];
@@ -69,8 +69,8 @@ export interface HsmlHandlerCtx extends HsmlObj {
 }
 
 export interface HsmlHandler<C extends HsmlHandlerCtx> {
-    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragmet, ctx?: C): boolean;
-    close(tag: HsmlHead, children: HsmlFragmet, ctx?: C): void;
+    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragment, ctx?: C): boolean;
+    close(tag: HsmlHead, children: HsmlFragment, ctx?: C): void;
     text(text: string, ctx?: C): void;
     fnc(fnc: HsmlFnc, ctx?: C): void;
     obj(obj: HsmlObj, ctx?: C): void;
@@ -144,14 +144,14 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
         const hasAttrs = attrsObj && attrsObj.constructor === Object;
         const childIdx = hasAttrs ? 2 : 1;
 
-        let children: HsmlFragmet = [];
+        let children: HsmlFragment = [];
         let hsmlFnc: HsmlFnc | undefined;
         let hsmlObj: HsmlObj | undefined;
 
         const htc = hmlTag[childIdx];
         switch (htc && htc.constructor) {
             case Array:
-                children = htc as HsmlFragmet;
+                children = htc as HsmlFragment;
                 break;
             case Function:
                 hsmlFnc = htc as HsmlFnc;
@@ -209,8 +209,8 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
     }
 }
 
-export function join(hsmls: HsmlFragmet, sep: string | HsmlElement): HsmlFragmet {
-    const r = hsmls.reduce<HsmlFragmet>((p, c) => (p.push(c, sep), p), [] as HsmlFragmet);
+export function join(hsmls: HsmlFragment, sep: string | HsmlElement): HsmlFragment {
+    const r = hsmls.reduce<HsmlFragment>((p, c) => (p.push(c, sep), p), [] as HsmlFragment);
     r.splice(-1);
     return r;
 }
