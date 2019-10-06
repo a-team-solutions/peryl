@@ -1,5 +1,5 @@
 import { AWidget, Action, Mount } from "../src/hsml-awidget";
-import { HsmlFragmet } from "../src/hsml";
+import { HsmlFragment } from "../src/hsml";
 
 interface AppState {
     title: string;
@@ -20,7 +20,7 @@ class App extends AWidget<AppState> {
         count: 77
     };
 
-    view(state: AppState, action: Action, mount: Mount): HsmlFragmet {
+    view(state: AppState, action: Action, mount: Mount): HsmlFragment {
         return [
             ["h2", [state.title]],
             ["p", [
@@ -79,7 +79,7 @@ class SubApp extends AWidget<AppState> {
         count: 33
     };
 
-    view(state: AppState, action: Action, mount: Mount): HsmlFragmet {
+    view(state: AppState, action: Action, mount: Mount): HsmlFragment {
         return [
             ["h3", [state.title]],
             ["p", [

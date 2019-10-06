@@ -1,5 +1,5 @@
 import { AWidget, Action, Mount, Class } from "../src/hsml-awidget";
-import { HsmlFragmet, HsmlElement } from "../src/hsml";
+import { HsmlFragment, HsmlElement } from "../src/hsml";
 import { Hash } from "../src/hash";
 
 export interface SidebarState {
@@ -26,7 +26,7 @@ export class Sidebar extends AWidget<SidebarState> {
         ]
     };
 
-    view(state: SidebarState, action: Action, mount: Mount): HsmlFragmet {
+    view(state: SidebarState, action: Action, mount: Mount): HsmlFragment {
         const nbsp = "\u00a0 ";
         return [
             ["div.w3-container", [
@@ -74,7 +74,7 @@ export class Content extends AWidget<ContentState> {
         title: "Content"
     };
 
-    view(state: ContentState, action: Action, mount: Mount): HsmlFragmet {
+    view(state: ContentState, action: Action, mount: Mount): HsmlFragment {
         return [
             ["h1", [state.title, ": ", this.id]],
             ["p", ["text text text"]]
@@ -122,7 +122,7 @@ export class AppShell extends AWidget<AppShellState> {
         snackbar: ""
     };
 
-    view(state: AppShellState, action: Action, mount: Mount): HsmlFragmet {
+    view(state: AppShellState, action: Action, mount: Mount): HsmlFragment {
         return [
             // header
             ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [

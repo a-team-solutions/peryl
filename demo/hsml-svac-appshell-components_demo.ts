@@ -1,5 +1,5 @@
 import { Action, Mount } from "../src/hsml-svac";
-import { HsmlFragmet, HsmlElement, join } from "../src/hsml";
+import { HsmlFragment, HsmlElement, join } from "../src/hsml";
 import { Ctrl, View } from "../src/hsml-svac-ctrl";
 
 const nbsp = "\u00a0 ";
@@ -18,7 +18,7 @@ export const enum SidebarActions {
 }
 
 export const Sidebar =
-    (state: SidebarState, action: Action, mount: Mount): HsmlFragmet => [
+    (state: SidebarState, action: Action, mount: Mount): HsmlFragment => [
         ["div.w3-container", [
             ["h2", [state.title]],
             ["div.w3-bar-block", {},
@@ -68,7 +68,7 @@ export const enum ContentActions {
 }
 
 export const Content: View<ContentState> =
-    (state: ContentState, action: Action, mount: Mount): HsmlFragmet => [
+    (state: ContentState, action: Action, mount: Mount): HsmlFragment => [
         ["h1", [state.title]],
         ["p", [state.text]]
     ];
@@ -115,7 +115,7 @@ export const enum FormActions {
 }
 
 export const Form: View<FormState> =
-    (state: FormState, action: Action, mount: Mount): HsmlFragmet => [
+    (state: FormState, action: Action, mount: Mount): HsmlFragment => [
         ["h1", [state.title]],
         ["form.w3-container", [
             ["p", [
@@ -276,7 +276,7 @@ export const enum AppShellActions {
 }
 
 export const AppShell: View<AppShellState> =
-    (state: AppShellState, action: Action, mount: Mount): HsmlFragmet => [
+    (state: AppShellState, action: Action, mount: Mount): HsmlFragment => [
         // header
         ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [
             ["button.w3-bar-item.w3-button.w3-hide-large.w3-hover-none.w3-hover-text-light-grey",

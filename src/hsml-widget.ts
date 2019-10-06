@@ -1,9 +1,9 @@
-import { HsmlElement, HsmlFragmet, HsmlAttrOnData, HsmlHandlerCtx, HsmlAttrOnDataFnc, HsmlObj } from "./hsml";
+import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlHandlerCtx, HsmlAttrOnDataFnc, HsmlObj } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
 export interface IWidget {
-    render(): HsmlFragmet;
+    render(): HsmlFragment;
     onMount(): void;
     onUmount(): void;
     actions(action: string, data?: HsmlAttrOnData): void;
@@ -28,7 +28,7 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
         }
     }
 
-    abstract render(): HsmlFragmet;
+    abstract render(): HsmlFragment;
 
     onMount(): void {
         console.log("mount");
@@ -129,7 +129,7 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
                 );
             }
         }
-        const hsmls = (this as any).render() as HsmlFragmet;
+        const hsmls = (this as any).render() as HsmlFragment;
         hsmls.push(
             (e: Element) => {
                 if (!this.dom) {

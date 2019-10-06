@@ -1,7 +1,7 @@
 import {
     hsml,
     HsmlElement,
-    HsmlFragmet,
+    HsmlFragment,
     HsmlHead,
     HsmlAttrs,
     HsmlAttrClasses,
@@ -17,7 +17,7 @@ import * as idom from "incremental-dom";
 
 class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
 
-    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragmet, ctx?: HsmlHandlerCtx): boolean {
+    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragment, ctx?: HsmlHandlerCtx): boolean {
         const props: any[] = [];
         let id = attrs._id;
         let classes: string[] = attrs._classes ? attrs._classes : [];
@@ -110,7 +110,7 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
         return attrs._skip ? true : false;
     }
 
-    close(tag: HsmlHead, children: HsmlFragmet, ctx?: HsmlHandlerCtx): void {
+    close(tag: HsmlHead, children: HsmlFragment, ctx?: HsmlHandlerCtx): void {
         idom.elementClose(tag);
     }
 
@@ -138,7 +138,7 @@ function hsml2idom(hml: HsmlElement, ctx?: HsmlHandlerCtx): void {
 }
 
 
-function hsmls2idom(hmls: HsmlFragmet, ctx?: HsmlHandlerCtx): void {
+function hsmls2idom(hmls: HsmlFragment, ctx?: HsmlHandlerCtx): void {
     for (const hml of hmls) {
         if (hml.constructor === String) {
             idom.text(hml as string);
@@ -157,7 +157,7 @@ export function hsml2idomPatch(node: Element, hml: HsmlElement, ctx?: HsmlHandle
         (data: HsmlElement) => hsml2idom(data, ctx), hml);
 }
 
-export function hsmls2idomPatch(node: Element, hmls: HsmlFragmet, ctx?: HsmlHandlerCtx): void {
+export function hsmls2idomPatch(node: Element, hmls: HsmlFragment, ctx?: HsmlHandlerCtx): void {
     idom.patch(node,
-        (data: HsmlFragmet) => hsmls2idom(data, ctx), hmls);
+        (data: HsmlFragment) => hsmls2idom(data, ctx), hmls);
 }

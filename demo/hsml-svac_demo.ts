@@ -1,5 +1,5 @@
 import { Action, Mount } from "../src/hsml-svac";
-import { HsmlFragmet } from "../src/hsml";
+import { HsmlFragment } from "../src/hsml";
 import { View, Actions, Ctrl } from "../src/hsml-svac-ctrl";
 
 interface AppState {
@@ -15,7 +15,7 @@ const enum AppActions {
 }
 
 const App: View<AppState> =
-    (state: AppState, action: Action, mount: Mount): HsmlFragmet => [
+    (state: AppState, action: Action, mount: Mount): HsmlFragment => [
         ["h2", [state.title]],
         ["p", [
             "Title: ",
@@ -68,7 +68,7 @@ const enum SubAppActions {
 }
 
 const Sub: View<AppState> =
-    (state: AppState, action: Action, mount: Mount): HsmlFragmet => [
+    (state: AppState, action: Action, mount: Mount): HsmlFragment => [
         ["h3", [state.title]],
         ["p", [
             ["em", ["Count"]], ": ", state.count,
