@@ -22,11 +22,12 @@
         "sourceMap": true,
         "inlineSourceMap": false,
         "removeComments": true,
-        // "preserveConstEnums": true,
-        // "pretty": true,
-        // "outDir": "dist"
         "allowSyntheticDefaultImports": false,
         "allowJs": false
+        // "preserveConstEnums": true,
+        // "esModuleInterop": true
+        // "pretty": true,
+        // "outDir": "dist"
     },
     "include": [
         "src/**/*"

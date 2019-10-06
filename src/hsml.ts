@@ -47,12 +47,12 @@ export interface HsmlAttrs {
 export type HsmlFnc = (e: Element) => boolean | void;
 
 export interface HsmlObj {
-    toHsml?(): Hsml;
+    toHsml?(): HsmlElement;
 }
 
-export interface Hsmls extends Array<Hsml> { }
+export interface HsmlFragmet extends Array<HsmlElement> { }
 
-export type HsmlChildren = Hsmls | HsmlFnc | HsmlObj;
+export type HsmlChildren = HsmlFragmet | HsmlFnc | HsmlObj;
 // export type HsmlChildren = Hsmls | HsmlFnc | HsmlObj | string | boolean | number | Date;
 
 export type HsmlTagNoAttr = [HsmlHead, HsmlChildren?];
@@ -61,7 +61,7 @@ export type HsmlTagAttr = [HsmlHead, HsmlAttrs, HsmlChildren?];
 export type HsmlTag = HsmlTagNoAttr | HsmlTagAttr;
 // export type HsmlTag = [HsmlTagHead, (HsmlTagAttrs | HsmlTagChildren)?, HsmlTagChildren?];
 
-export type Hsml = string | boolean | number | Date | HsmlFnc | HsmlObj | HsmlTag;
+export type HsmlElement = string | boolean | number | Date | HsmlFnc | HsmlObj | HsmlTag;
 
 export interface HsmlHandlerCtx extends HsmlObj {
     refs: { [name: string]: Element };
@@ -69,14 +69,14 @@ export interface HsmlHandlerCtx extends HsmlObj {
 }
 
 export interface HsmlHandler<C extends HsmlHandlerCtx> {
-    open(tag: HsmlHead, attrs: HsmlAttrs, children: Hsmls, ctx?: C): boolean;
-    close(tag: HsmlHead, children: Hsmls, ctx?: C): void;
+    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragmet, ctx?: C): boolean;
+    close(tag: HsmlHead, children: HsmlFragmet, ctx?: C): void;
     text(text: string, ctx?: C): void;
     fnc(fnc: HsmlFnc, ctx?: C): void;
     obj(obj: HsmlObj, ctx?: C): void;
 }
 
-export function hsml<C extends HsmlHandlerCtx>(hml: Hsml, handler: HsmlHandler<C>, ctx?: C): void {
+export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHandler<C>, ctx?: C): void {
     // console.log("hsml", hsml);
     if (hml === undefined) {
         return;
@@ -144,14 +144,14 @@ export function hsml<C extends HsmlHandlerCtx>(hml: Hsml, handler: HsmlHandler<C
         const hasAttrs = attrsObj && attrsObj.constructor === Object;
         const childIdx = hasAttrs ? 2 : 1;
 
-        let children: Hsmls = [];
+        let children: HsmlFragmet = [];
         let hsmlFnc: HsmlFnc | undefined;
         let hsmlObj: HsmlObj | undefined;
 
         const htc = hmlTag[childIdx];
         switch (htc && htc.constructor) {
             case Array:
-                children = htc as Hsmls;
+                children = htc as HsmlFragmet;
                 break;
             case Function:
                 hsmlFnc = htc as HsmlFnc;
@@ -209,8 +209,8 @@ export function hsml<C extends HsmlHandlerCtx>(hml: Hsml, handler: HsmlHandler<C
     }
 }
 
-export function join(hsmls: Hsmls, sep: string | Hsml): Hsmls {
-    const r = hsmls.reduce<Hsmls>((p, c) => (p.push(c, sep), p), [] as Hsmls);
+export function join(hsmls: HsmlFragmet, sep: string | HsmlElement): HsmlFragmet {
+    const r = hsmls.reduce<HsmlFragmet>((p, c) => (p.push(c, sep), p), [] as HsmlFragmet);
     r.splice(-1);
     return r;
 }

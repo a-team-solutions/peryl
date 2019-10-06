@@ -1,7 +1,7 @@
 import {
     hsml,
-    Hsml,
-    Hsmls,
+    HsmlElement,
+    HsmlFragmet,
     HsmlHead,
     HsmlAttrs,
     HsmlAttrClasses,
@@ -21,7 +21,7 @@ class HsmlDomHandler implements HsmlHandler<HsmlHandlerCtx> {
 
     private _current?: HTMLElement;
 
-    open(tag: HsmlHead, attrs: HsmlAttrs, children: Hsmls, ctx?: HsmlHandlerCtx): boolean {
+    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragmet, ctx?: HsmlHandlerCtx): boolean {
         const e = document.createElement(tag);
         let id = attrs._id;
         let classes: string[] = attrs._classes ? attrs._classes : [];
@@ -121,7 +121,7 @@ class HsmlDomHandler implements HsmlHandler<HsmlHandlerCtx> {
         return attrs._skip ? true : false;
     }
 
-    close(tag: HsmlHead, children: Hsmls, ctx?: HsmlHandlerCtx): void {
+    close(tag: HsmlHead, children: HsmlFragmet, ctx?: HsmlHandlerCtx): void {
         if (this._current !== this.element) {
             this._current && (this._current = this._current.parentElement || undefined);
         }
@@ -145,13 +145,13 @@ class HsmlDomHandler implements HsmlHandler<HsmlHandlerCtx> {
 
 }
 
-export function hsml2dom(hml: Hsml, ctx?: HsmlHandlerCtx): HTMLElement | undefined {
+export function hsml2dom(hml: HsmlElement, ctx?: HsmlHandlerCtx): HTMLElement | undefined {
     const handler = new HsmlDomHandler();
     hsml(hml, handler, ctx);
     return handler.element;
 }
 
-export function hsmls2dom(hmls: Hsmls, ctx?: HsmlHandlerCtx): Node[] {
+export function hsmls2dom(hmls: HsmlFragmet, ctx?: HsmlHandlerCtx): Node[] {
     const elems: Node[] = [];
     for (const hml of hmls) {
         if (hml.constructor === String) {

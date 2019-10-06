@@ -1,5 +1,5 @@
 import { AWidget, Action, Mount, Class } from "../src/hsml-awidget";
-import { Hsmls, Hsml } from "../src/hsml";
+import { HsmlFragmet, HsmlElement } from "../src/hsml";
 import { Hash } from "../src/hash";
 
 export interface SidebarState {
@@ -26,13 +26,13 @@ export class Sidebar extends AWidget<SidebarState> {
         ]
     };
 
-    view(state: SidebarState, action: Action, mount: Mount): Hsmls {
+    view(state: SidebarState, action: Action, mount: Mount): HsmlFragmet {
         const nbsp = "\u00a0 ";
         return [
             ["div.w3-container", [
                 ["h2", [state.title, " ", this.id]],
                 ["div.w3-bar-block", {},
-                    state.menu.map<Hsml>(m => (
+                    state.menu.map<HsmlElement>(m => (
                         ["a.w3-bar-item.w3-button.w3-padding",
                             {
                                 href: m.url,
@@ -74,7 +74,7 @@ export class Content extends AWidget<ContentState> {
         title: "Content"
     };
 
-    view(state: ContentState, action: Action, mount: Mount): Hsmls {
+    view(state: ContentState, action: Action, mount: Mount): HsmlFragmet {
         return [
             ["h1", [state.title, ": ", this.id]],
             ["p", ["text text text"]]
@@ -122,7 +122,7 @@ export class AppShell extends AWidget<AppShellState> {
         snackbar: ""
     };
 
-    view(state: AppShellState, action: Action, mount: Mount): Hsmls {
+    view(state: AppShellState, action: Action, mount: Mount): HsmlFragmet {
         return [
             // header
             ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [

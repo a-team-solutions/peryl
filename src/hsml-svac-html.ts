@@ -1,11 +1,11 @@
-import { Hsmls, HsmlFnc } from "./hsml";
+import { HsmlFragmet, HsmlFnc } from "./hsml";
 import { hsmls2htmls, hsmls2html } from "./hsml-html";
 import { Action, Mount, View } from "./hsml-svac";
 
 const actionHtml: Action = (action: string, data: any) => { };
 
 const mountHtml: Mount = <State>(view: View<State>,
-                                 state?: State): HsmlFnc | Hsmls => {
+                                 state?: State): HsmlFnc | HsmlFragmet => {
     return view(state || view.state, actionHtml, mountHtml);
 };
 

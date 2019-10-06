@@ -1,5 +1,5 @@
 import { hsmls2htmls } from "../src/hsml-html";
-import { Hsmls, Hsml } from "../src/hsml";
+import { HsmlFragmet, HsmlElement } from "../src/hsml";
 import { Widget } from "../src/hsml-widget";
 import { Signal } from "../src/signal";
 
@@ -31,7 +31,7 @@ class HelloWidget extends Widget {
         console.log("actions", action, data);
     }
 
-    render(): Hsmls {
+    render(): HsmlFragmet {
         return [
             ["input~i",
                 { type: "text", value: this._name, input: this._onTextInput }
@@ -89,7 +89,7 @@ class TimerWidget extends Widget {
         this.toggle(false);
     }
 
-    render(): Hsmls {
+    render(): HsmlFragmet {
         return [
             ["p", { style: this._interval ? "" : "color: lightgray;" }, [
                 "Time: ", new Date().toLocaleTimeString(), " ",
@@ -153,7 +153,7 @@ class FormWidget extends Widget {
         console.log("onUmount", this.type, this.id);
     }
 
-    render(): Hsmls {
+    render(): HsmlFragmet {
         return [
             ["h2", [this._title]],
             ["form", { submit: this._onFormSubmit }, [
@@ -165,7 +165,7 @@ class FormWidget extends Widget {
                                 type: "text", size: 10, maxlength: 10,
                                 input: this._onNameInput
                             }
-                        ] as Hsml
+                        ] as HsmlElement
                     ]], " ",
                     ["em.error", [this._errors.name]]
                 ]],
@@ -177,7 +177,7 @@ class FormWidget extends Widget {
                                 type: "number", min: "1", max: "120",
                                 input: this._onAgeInput
                             }
-                        ] as Hsml
+                        ] as HsmlElement
                     ]], " ",
                     ["em.error", [this._errors.age]]
                 ]],
@@ -276,7 +276,7 @@ class AppWidget extends Widget {
         console.log("onUmount", this.type, this.id);
     }
 
-    render(): Hsmls {
+    render(): HsmlFragmet {
         return [
             ["h1", [this._title]],
             ["fieldset", [

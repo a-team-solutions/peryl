@@ -1,7 +1,7 @@
 import {
     hsml,
-    Hsml,
-    Hsmls,
+    HsmlElement,
+    HsmlFragmet,
     HsmlHead,
     HsmlAttrs,
     HsmlAttrClasses,
@@ -36,7 +36,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         this._indent = indent;
     }
 
-    open(tag: HsmlHead, attrs: HsmlAttrs, children: Hsmls, ctx?: HsmlHandlerCtx): boolean {
+    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragmet, ctx?: HsmlHandlerCtx): boolean {
         const props: any[] = [];
         let id = attrs._id;
         let classes: string[] = attrs._classes ? attrs._classes : [];
@@ -128,7 +128,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         }
         this._onHtml(html);
         if (hsmlObj && "render" in hsmlObj && hsmlObj.render.constructor === Function) {
-            const hsmls = hsmlObj.render() as Hsmls;
+            const hsmls = hsmlObj.render() as HsmlFragmet;
             for (const jml of hsmls) {
                 if (jml.constructor === String) {
                     this._onHtml(jml + (this._pretty ? "\n" : ""));
@@ -136,14 +136,14 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
                     const obj = jml as HsmlObj;
                     obj.toHsml && hsml(obj.toHsml(), this);
                 } else {
-                    hsml(jml as Hsml, this);
+                    hsml(jml as HsmlElement, this);
                 }
             }
         }
         return false;
     }
 
-    close(tag: HsmlHead, children: Hsmls, ctx?: HsmlHandlerCtx): void {
+    close(tag: HsmlHead, children: HsmlFragmet, ctx?: HsmlHandlerCtx): void {
         let html = "";
         const pairTag = (children.length || HsmlHtmlHandler._pairTags.indexOf(tag) !== -1);
         if (this._pretty) {
@@ -194,12 +194,12 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
 
 }
 
-export function hsml2html(hsmlEl: Hsml, onHtml: (html: string) => void, pretty = false): void {
+export function hsml2html(hsmlEl: HsmlElement, onHtml: (html: string) => void, pretty = false): void {
     const handler = new HsmlHtmlHandler(onHtml, pretty);
     hsml(hsmlEl, handler);
 }
 
-export function hsmls2html(hsmls: Hsmls, onHtml: (html: string) => void, pretty = false): void {
+export function hsmls2html(hsmls: HsmlFragmet, onHtml: (html: string) => void, pretty = false): void {
     for (const jml of hsmls) {
         if (jml.constructor === String) {
             onHtml(jml + (pretty ? "\n" : ""));
@@ -207,18 +207,18 @@ export function hsmls2html(hsmls: Hsmls, onHtml: (html: string) => void, pretty 
             const obj = jml as HsmlObj;
             obj.toHsml && hsml2html(obj.toHsml(), onHtml, pretty);
         } else {
-            hsml2html(jml as Hsml, onHtml, pretty);
+            hsml2html(jml as HsmlElement, onHtml, pretty);
         }
     }
 }
 
-export function hsml2htmls(hsml: Hsml, pretty = false): string[] {
+export function hsml2htmls(hsml: HsmlElement, pretty = false): string[] {
     const htmls: string[] = [];
     hsml2html(hsml, html => htmls.push(html), pretty);
     return htmls;
 }
 
-export function hsmls2htmls(hsmls: Hsmls, pretty = false): string[] {
+export function hsmls2htmls(hsmls: HsmlFragmet, pretty = false): string[] {
     const htmls: string[] = [];
     hsmls2html(hsmls, html => htmls.push(html), pretty);
     return htmls;

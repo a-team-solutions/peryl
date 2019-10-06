@@ -1,19 +1,21 @@
 import { hsmls2idomPatch } from "../src/hsml-idom";
-import { Hsmls, Hsml } from "../src/hsml";
+import { HsmlFragmet, HsmlElement } from "../src/hsml";
 
-type Component<State> = (state: State, dispatch: Dispatch) => Hsmls;
+type View<State> = (state: State, dispatch: Dispatch) => HsmlFragmet;
 
 type Dispatch = (event: string, data?: any) => void;
 
 function render<State>(element: HTMLElement,
-                       component: Component<State>,
+                       view: View<State>,
                        state: State,
                        dispatch: Dispatch): void {
     (render as any).scheduled || ((render as any).scheduled = null);
-    if (!state) return;
+    if (!state) {
+        return;
+    }
     if (!(render as any).scheduled) {
         (render as any).scheduled = setTimeout(() => {
-            const hsml = component(state, dispatch);
+            const hsml = view(state, dispatch);
             // console.log("render", hsml);
             hsmls2idomPatch(element, hsml);
             (render as any).scheduled = null;
@@ -30,7 +32,7 @@ const appState = {
 
 type AppState = typeof appState;
 
-function app(state: AppState, dispatch: Dispatch): Hsmls {
+function app(state: AppState, dispatch: Dispatch): HsmlFragmet {
     return [
         ["h2", [state.title]],
         ["p", [
@@ -44,7 +46,7 @@ function app(state: AppState, dispatch: Dispatch): Hsmls {
     ];
 }
 
-function button(label: string, cb: (e: Event) => void): Hsml {
+function button(label: string, cb: (e: Event) => void): HsmlElement {
     return ["button", { click: cb }, [label]];
 }
 

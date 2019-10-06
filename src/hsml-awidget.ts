@@ -1,8 +1,8 @@
-import { Hsml, Hsmls, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
+import { HsmlElement, HsmlFragmet, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export type View<State> = (state: State, action: Action, mount: Mount) => Hsmls;
+export type View<State> = (state: State, action: Action, mount: Mount) => HsmlFragmet;
 
 export type Action = (action: string, data?: any) => void;
 
@@ -10,9 +10,9 @@ export type Actions<State> = (action: string, data: any, widget: AWidget<State>)
 
 export type Class<T = object> = new (...args: any[]) => T;
 
-export type Mount = <State>(xwClass: Class<AWidget<State>>, state?: State) => HsmlFnc | Hsmls;
+export type Mount = <State>(xwClass: Class<AWidget<State>>, state?: State) => HsmlFnc | HsmlFragmet;
 
-const mount: Mount = <State>(wClass: Class<AWidget<State>>, state?: State): HsmlFnc | Hsmls => {
+const mount: Mount = <State>(wClass: Class<AWidget<State>>, state?: State): HsmlFnc | HsmlFragmet => {
     return (e: Element) => {
         if ((e as any).widget) {
             const w = (e as any).widget as AWidget<State>;
@@ -58,7 +58,7 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
     private _updateSched?: number;
 
     abstract state: State;
-    abstract view(state: State, action: Action, mount: Mount): Hsmls;
+    abstract view(state: State, action: Action, mount: Mount): HsmlFragmet;
     abstract actions(action: string, data: any, widget: AWidget<State>): void;
 
     action = (action: string, data?: any): void => {
@@ -78,7 +78,7 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
         return Object.values(AWidget.mounted);
     }
 
-    render = (): Hsmls => {
+    render = (): HsmlFragmet => {
         return this.view(this.state, this.action, mount);
     }
 
@@ -146,7 +146,7 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
         return this;
     }
 
-    toHsml = (): Hsml => {
+    toHsml = (): HsmlElement => {
         if (this.dom) {
             if (this._updateSched) {
                 clearTimeout(this._updateSched);
@@ -164,7 +164,7 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
                 );
             }
         }
-        const hsmls = this.render() as Hsmls;
+        const hsmls = this.render() as HsmlFragmet;
         hsmls.push(
             (e: Element) => {
                 if (!this.dom) {

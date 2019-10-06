@@ -44,7 +44,7 @@
   "scripts": {
     "prepare": "npm run dist",
     "prepublishOnly": "npm test",
-    "preversion": "npm run test",
+    "preversion": "npm test",
     "postversion": "git push && git push --tags",
     "clean": "rm -rf build; rm -rf dist; cd tools; npm run clean",
     "clean:all": "npm run clean; rm -rf node_modules; cd tools; npm run clean:all",

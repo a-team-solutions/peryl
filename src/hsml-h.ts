@@ -1,14 +1,14 @@
-import { Hsml } from "./hsml";
+import { HsmlElement } from "./hsml";
 
-declare function htagt(tags: string): Hsml;
-declare function htagt(hsmls: Hsml[]): Hsml;
-declare function htagt(tags: string, hsmls: Hsml[]): Hsml;
-declare function htagt(attr: {}): Hsml;
-declare function htagt(attr: {}, hsmls: Hsml[]): Hsml;
-declare function htagt(tags: string, attr: {}): Hsml;
-declare function htagt(tags: string, attr: {}, hsmls: Hsml[]): Hsml;
+declare function htagt(tags: string): HsmlElement;
+declare function htagt(hsmls: HsmlElement[]): HsmlElement;
+declare function htagt(tags: string, hsmls: HsmlElement[]): HsmlElement;
+declare function htagt(attr: {}): HsmlElement;
+declare function htagt(attr: {}, hsmls: HsmlElement[]): HsmlElement;
+declare function htagt(tags: string, attr: {}): HsmlElement;
+declare function htagt(tags: string, attr: {}, hsmls: HsmlElement[]): HsmlElement;
 
-function h(tag: string, second?: Hsml[], third?: Hsml | Hsml[], fourth?: Hsml[]): Hsml {
+function h(tag: string, second?: HsmlElement[], third?: HsmlElement | HsmlElement[], fourth?: HsmlElement[]): HsmlElement {
     const result = [tag] as any[];
     if (second) {
         if (typeof second === "string") {
@@ -37,7 +37,7 @@ function h(tag: string, second?: Hsml[], third?: Hsml | Hsml[], fourth?: Hsml[])
             result.push(fourth);
         }
     }
-    return result as Hsml;
+    return result as HsmlElement;
 }
 
 function htag(tag: string) {
