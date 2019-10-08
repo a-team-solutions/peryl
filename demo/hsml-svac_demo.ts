@@ -36,7 +36,7 @@ const App: View<AppState> =
             ["button", { on: ["click", AppActions.inc, 2] }, ["+"]],
             ["button", { on: ["click", AppActions.xXx] }, ["xXx"]]
         ]],
-        ["p", state.title ? mount<AppState>(Sub, state) : []]
+        ["p", state.title ? mount<AppState>(Sub, state, action) : []]
     ];
 App.type = "App";
 App.state = {
@@ -59,7 +59,7 @@ App.actions = (action: string, data: any, ctrl: Ctrl<AppState>): void => {
             ctrl.update({ count: ctrl.state.count - data as number });
             break;
         default:
-            ctrl.appAction(action, data);
+            ctrl.extAction(action, data);
     }
 };
 
@@ -82,7 +82,7 @@ Sub.actions = (action: string, data: any, ctrl: Ctrl<AppState>): void => {
     // console.log("action:", action, data);
     switch (action) {
         case SubAppActions.xXx:
-            console.log(action);
+            ctrl.extAction(action, data);
             break;
         default:
             ctrl.appAction(action, data);
@@ -98,6 +98,8 @@ const appActions: Actions<AppState> =
                 break;
         }
     };
+
+Ctrl.debug = true;
 
 const app = new Ctrl<AppState>(App)
     .appActions(appActions)

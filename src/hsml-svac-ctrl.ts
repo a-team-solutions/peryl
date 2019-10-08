@@ -3,8 +3,6 @@ import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandl
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-const warn = console.warn;
-
 export interface View<State extends { [k: string]: any }>  {
     (state: State, action: Action, mount: Mount): HsmlFragment;
     type: string;
@@ -12,10 +10,16 @@ export interface View<State extends { [k: string]: any }>  {
     actions?: Actions<State>;
 }
 
-export type Actions<State extends { [k: string]: any }> = (action: string, data: any, ctrl: Ctrl<State>) => void;
+export type Actions<State extends { [k: string]: any }> = (
+    action: string,
+    data: any,
+    ctrl: Ctrl<State>) => void;
 
-const mount: Mount = <State extends { [k: string]: any }>(view: View<State>, state?: State): HsmlFnc | HsmlFragment => {
-    return (e: Element) => {
+const mount: Mount = <State extends { [k: string]: any }>(
+    view: View<State>,
+    state?: State,
+    action?: Action): HsmlFnc | HsmlFragment =>
+    (e: Element) => {
         if ((e as any).ctrl) {
             const c = (e as any).ctrl as Ctrl<State>;
             if (c.view === view) {
@@ -25,14 +29,14 @@ const mount: Mount = <State extends { [k: string]: any }>(view: View<State>, sta
                 c.update();
             } else {
                 c.umount();
-                const c1 = new Ctrl(view);
+                const c1 = new Ctrl(view, action);
                 if (state !== undefined) {
                     c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new Ctrl(view);
+            const c = new Ctrl(view, action);
             if (state !== undefined) {
                 c.state = state;
             }
@@ -40,42 +44,44 @@ const mount: Mount = <State extends { [k: string]: any }>(view: View<State>, sta
         }
         return true;
     };
-};
 
 const ctrlAttr = "ctrl";
 
 export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx {
 
+    static debug = false;
+
+    static appActions?: Actions<any>;
+
     private static _count = 0;
 
     private static _ctrls: { [ctrl: string]: Ctrl<any> } = {};
-
-    static appActions?: Actions<any>;
 
     readonly type: string = "Ctrl";
     readonly id: string = this.type + "-" + Ctrl._count++;
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
+    state: State;
+
+    readonly view: View<State>;
+
+    private _actions?: Actions<State>;
+    private _extAction?: Action;
+
     private _updateSched?: number;
 
-    view: View<State>;
-    state: State;
-    actions?: Actions<State>;
-
-    constructor(view: View<State>, state?: State) {
+    constructor(view: View<State>, extAction?: Action) {
         this.view = view;
         this.type = view.type;
-        this.state = state || view.state;
-        this.actions = view.actions;
+        this.state = view.state;
+        this._actions = view.actions;
+        this._extAction = extAction || this.appAction;
     }
 
     appAction = (action: string, data?: any): void => {
-        if (Ctrl.appActions) {
-            Ctrl.appActions(action, data, this);
-        } else {
-            warn("Ctrl.appActions undefined:", action, data, this);
-        }
+        Ctrl.debug && console.log("appAction", this.type, action, data);
+        Ctrl.appActions && Ctrl.appActions(action, data, this);
     }
 
     appActions(actions: Actions<State>): this {
@@ -83,15 +89,17 @@ export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx 
         return this;
     }
 
-    action = (action: string, data?: any): void => {
-        if (this.actions) {
-            this.actions(action, data, this);
-        } else {
-            warn("View.actions undefined:", action, data, this);
-        }
+    extAction = (action: string, data?: any): void => {
+        Ctrl.debug && console.log("extAction", this.type, action, data);
+        this._extAction && this._extAction(action, data);
     }
 
-    get appCtrls(): Ctrl<any>[] {
+    action = (action: string, data?: any): void => {
+        Ctrl.debug && console.log("action", this.type, action, data);
+        this._actions && this._actions(action, data, this);
+    }
+
+    appCtrls(): Ctrl<any>[] {
         return Object.values(Ctrl._ctrls);
     }
 
