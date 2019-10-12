@@ -16,7 +16,7 @@ import {
 class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
 
     private static _pairTags = [
-        "script",
+        "script", "iframe",
         "html", "head", "body", "title", "div",
         "h1", "h2", "h3", "h4", "h5", "h6",
         "p", "a", "pre", "blockquote", "i", "b", "em", "strong", "tt", "cite",
