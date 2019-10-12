@@ -1,23 +1,23 @@
 import { HsmlFragment, HsmlFnc } from "./hsml";
 import { hsmls2htmls, hsmls2html } from "./hsml-html";
-import { Action, Mount, View } from "./hsml-svac";
+import { Action, Mount, Component } from "./hsml-svac";
 
 const actionHtml: Action = (action: string, data: any) => { };
 
-const mountHtml: Mount = <State>(view: View<State>,
+const mountHtml: Mount = <State>(component: Component<State>,
                                  state?: State): HsmlFnc | HsmlFragment => {
-    return view(state || view.state, actionHtml, mountHtml);
+    return component.view(state || component.state, actionHtml, mountHtml);
 };
 
-export function html<State>(view: View<State>,
+export function html<State>(component: Component<State>,
                             state: State,
                             onHtml: (html: string) => void,
                             pretty = false): void {
-    hsmls2html(view(state, actionHtml, mountHtml), onHtml, pretty);
+    hsmls2html(component.view(state, actionHtml, mountHtml), onHtml, pretty);
 }
 
-export function htmls<State>(view: View<State>,
+export function htmls<State>(component: Component<State>,
                              state: State,
                              pretty = false): string {
-    return hsmls2htmls(view(state, actionHtml, mountHtml), pretty).join("");
+    return hsmls2htmls(component.view(state, actionHtml, mountHtml), pretty).join("");
 }

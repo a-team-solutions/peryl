@@ -1,5 +1,5 @@
 import { HsmlFragment, HsmlElement } from "../src/hsml";
-import { Ctrl, View } from "../src/hsml-svac-ctrl";
+import { Ctrl, Component } from "../src/hsml-svac-ctrl";
 import { Mount, Action } from "../src/hsml-svac";
 
 const NBSP = "\u00A0";
@@ -15,8 +15,20 @@ const enum TicTacToeActions {
     mark = "mark"
 }
 
-const TicTacToe: View<TicTacToeState> =
-    (state: TicTacToeState, action: Action, mount: Mount): HsmlFragment => [
+const TicTacToe: Component<TicTacToeState> = {
+
+    type: "TicTacToe",
+
+    state: {
+        board: [
+            [NBSP, NBSP, NBSP],
+            [NBSP, NBSP, NBSP],
+            [NBSP, NBSP, NBSP]
+        ],
+        turn: 0
+    },
+
+    view: (state: TicTacToeState, action: Action, mount: Mount): HsmlFragment => [
         ["h1", ["Tic-Tac-Toe Demo"]],
         ["p", [
             "Player: ", state.turn ? CROS : CIRC
@@ -39,18 +51,9 @@ const TicTacToe: View<TicTacToeState> =
                 ])
             ])
         ]
-    ];
-TicTacToe.type = "TicTacToe";
-TicTacToe.state = {
-    board: [
-        [NBSP, NBSP, NBSP],
-        [NBSP, NBSP, NBSP],
-        [NBSP, NBSP, NBSP]
     ],
-    turn: 0
-};
-TicTacToe.actions =
-    (action: string, data: any, ctrl: Ctrl<TicTacToeState>): void => {
+
+    actions: (action: string, data: any, ctrl: Ctrl<TicTacToeState>): void => {
         console.log("action", action, data);
         switch (action) {
             case TicTacToeActions.mark:
@@ -64,7 +67,8 @@ TicTacToe.actions =
             default:
                 console.warn("action unhandled:", action, data);
         }
-    };
+    }
+};
 
 const app = new Ctrl<TicTacToeState>(TicTacToe)
     .mount(document.getElementById("app"));

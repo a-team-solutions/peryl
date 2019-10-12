@@ -1,42 +1,39 @@
-import { Mount, Action } from "./hsml-svac";
+import { Mount, Action, View, Component as SvacComponent, MergebleState } from "./hsml-svac";
 import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export interface View<State extends { [k: string]: any }>  {
-    (state: State, action: Action, mount: Mount): HsmlFragment;
-    type: string;
-    state: State;
+export interface Component<State extends MergebleState> extends SvacComponent<State> {
     actions?: Actions<State>;
 }
 
-export type Actions<State extends { [k: string]: any }> = (
+export type Actions<State extends MergebleState> = (
     action: string,
     data: any,
     ctrl: Ctrl<State>) => void;
 
-const mount: Mount = <State extends { [k: string]: any }>(
-    view: View<State>,
+const mount: Mount = <State extends MergebleState>(
+    component: Component<State>,
     state?: State,
     action?: Action): HsmlFnc | HsmlFragment =>
     (e: Element) => {
         if ((e as any).ctrl) {
             const c = (e as any).ctrl as Ctrl<State>;
-            if (c.view === view) {
+            if (c.view === component.view) {
                 if (state !== undefined) {
                     c.state = state;
                 }
                 c.update();
             } else {
                 c.umount();
-                const c1 = new Ctrl(view, action);
+                const c1 = new Ctrl<State>(component, action);
                 if (state !== undefined) {
                     c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new Ctrl(view, action);
+            const c = new Ctrl<State>(component, action);
             if (state !== undefined) {
                 c.state = state;
             }
@@ -47,7 +44,7 @@ const mount: Mount = <State extends { [k: string]: any }>(
 
 const ctrlAttr = "ctrl";
 
-export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx {
+export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
 
     static debug = false;
 
@@ -71,11 +68,11 @@ export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx 
 
     private _updateSched?: number;
 
-    constructor(view: View<State>, extAction?: Action) {
-        this.view = view;
-        this.type = view.type;
-        this.state = view.state;
-        this._actions = view.actions;
+    constructor(component: Component<State>, extAction?: Action) {
+        this.view = component.view;
+        this.type = component.type;
+        this.state = component.state;
+        this._actions = component.actions;
         this._extAction = extAction || this.appAction;
     }
 
@@ -226,7 +223,7 @@ export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx 
     });
 };
 
-const merge = <T extends { [k: string]: any }>(target: T, source: Partial<T>): T => {
+const merge = <T extends MergebleState>(target: T, source: Partial<T>): T => {
     if (isMergeble(target) && isMergeble(source)) {
         Object.keys(source).forEach(key => {
             if (isMergeble(source[key] as object)) {
