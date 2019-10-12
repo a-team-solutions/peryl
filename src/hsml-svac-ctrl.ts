@@ -1,22 +1,22 @@
-import { Mount, View } from "./hsml-svac";
+import { Mount, Action, View, Component as SvacComponent, MergebleState } from "./hsml-svac";
 import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-const warn = console.warn;
-
-
-export interface Component<State extends { [k: string]: any }> {
-    type: string;
-    state: State;
-    view: View<State>;
+export interface Component<State extends MergebleState> extends SvacComponent<State> {
     actions?: Actions<State>;
 }
 
-export type Actions<State extends { [k: string]: any }> = (action: string, data: any, ctrl: Ctrl<State>) => void;
+export type Actions<State extends MergebleState> = (
+    action: string,
+    data: any,
+    ctrl: Ctrl<State>) => void;
 
-const mount: Mount = <State extends { [k: string]: any }>(component: Component<State>, state?: State): HsmlFnc | HsmlFragment => {
-    return (e: Element) => {
+const mount: Mount = <State extends MergebleState>(
+    component: Component<State>,
+    state?: State,
+    action?: Action): HsmlFnc | HsmlFragment =>
+    (e: Element) => {
         if ((e as any).ctrl) {
             const c = (e as any).ctrl as Ctrl<State>;
             if (c.view === component.view) {
@@ -26,14 +26,14 @@ const mount: Mount = <State extends { [k: string]: any }>(component: Component<S
                 c.update();
             } else {
                 c.umount();
-                const c1 = new Ctrl(component);
+                const c1 = new Ctrl<State>(component, action);
                 if (state !== undefined) {
                     c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new Ctrl(component);
+            const c = new Ctrl<State>(component, action);
             if (state !== undefined) {
                 c.state = state;
             }
@@ -41,42 +41,44 @@ const mount: Mount = <State extends { [k: string]: any }>(component: Component<S
         }
         return true;
     };
-};
 
 const ctrlAttr = "ctrl";
 
-export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx {
+export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
+
+    static debug = false;
+
+    static appActions?: Actions<any>;
 
     private static _count = 0;
 
     private static _ctrls: { [ctrl: string]: Ctrl<any> } = {};
-
-    static appActions?: Actions<any>;
 
     readonly type: string = "Ctrl";
     readonly id: string = this.type + "-" + Ctrl._count++;
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
+    state: State;
+
+    readonly view: View<State>;
+
+    private _actions?: Actions<State>;
+    private _extAction?: Action;
+
     private _updateSched?: number;
 
-    view: View<State>;
-    state: State;
-    actions?: Actions<State>;
-
-    constructor(component: Component<State>, state?: State) {
+    constructor(component: Component<State>, extAction?: Action) {
         this.view = component.view;
         this.type = component.type;
-        this.state = state || component.state;
-        this.actions = component.actions;
+        this.state = component.state;
+        this._actions = component.actions;
+        this._extAction = extAction || this.appAction;
     }
 
     appAction = (action: string, data?: any): void => {
-        if (Ctrl.appActions) {
-            Ctrl.appActions(action, data, this);
-        } else {
-            warn("Ctrl.appActions undefined:", action, data, this);
-        }
+        Ctrl.debug && console.log("appAction", this.type, action, data);
+        Ctrl.appActions && Ctrl.appActions(action, data, this);
     }
 
     appActions(actions: Actions<State>): this {
@@ -84,15 +86,17 @@ export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx 
         return this;
     }
 
-    action = (action: string, data?: any): void => {
-        if (this.actions) {
-            this.actions(action, data, this);
-        } else {
-            warn("View.actions undefined:", action, data, this);
-        }
+    extAction = (action: string, data?: any): void => {
+        Ctrl.debug && console.log("extAction", this.type, action, data);
+        this._extAction && this._extAction(action, data);
     }
 
-    get appCtrls(): Ctrl<any>[] {
+    action = (action: string, data?: any): void => {
+        Ctrl.debug && console.log("action", this.type, action, data);
+        this._actions && this._actions(action, data, this);
+    }
+
+    appCtrls(): Ctrl<any>[] {
         return Object.values(Ctrl._ctrls);
     }
 
@@ -219,7 +223,7 @@ export class Ctrl<State extends { [k: string]: any }> implements HsmlHandlerCtx 
     });
 };
 
-const merge = <T extends { [k: string]: any }>(target: T, source: Partial<T>): T => {
+const merge = <T extends MergebleState>(target: T, source: Partial<T>): T => {
     if (isMergeble(target) && isMergeble(source)) {
         Object.keys(source).forEach(key => {
             if (isMergeble(source[key] as object)) {
