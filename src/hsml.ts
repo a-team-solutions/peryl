@@ -93,23 +93,25 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
             //         tag.length === 2 &&
             //         (
             //             tag[0].constructor === String &&
-            //             tag[1].constructor === Array
+            //             (tag[1]!.constructor === Array || tag[1]!.constructor === Function)
             //         ) ||
             //         (
             //             tag[0].constructor === String &&
-            //             tag[1].constructor === Object
+            //             tag[1]!.constructor === Object
             //         )
             //     ) ||
             //     (
             //         tag.length === 3 &&
             //         tag[0].constructor === String &&
             //         tag[1].constructor === Object &&
-            //         tag[2].constructor === Array
+            //         tag[2]!.constructor === Array
             //     )
             // ) {
             //     hsmlTag(hml as HsmlTag, handler, ctx);
             // } else {
-            //     throw Error(`error parse tag: ${JSON.stringify(hml)}`);
+            //     console.error("hsml parse error:", hml);
+            //     // console.error("hsml parse error:", JSON.stringify(hml, null, 4));
+            //     // throw Error(`hsml parse error: ${JSON.stringify(hml)}`);
             // }
             hsmlTag(hml as HsmlTag, handler, ctx);
             break;
@@ -138,6 +140,11 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
 
     function hsmlTag(hmlTag: HsmlTag, handler: HsmlHandler<C>, ctx?: C): void {
         // console.log("hsml tag", hmlTag);
+
+        if (typeof hmlTag[0] !== "string") {
+            console.error("hsml tag head not string:", hmlTag);
+            return;
+        }
 
         const head = hmlTag[0] as HsmlHead;
         const attrsObj = hmlTag[1] as any;
