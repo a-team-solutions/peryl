@@ -1,6 +1,7 @@
 import { Action, Mount } from "../src/hsml-svac";
 import { HsmlFragment, HsmlElement, join } from "../src/hsml";
 import { Ctrl, Component } from "../src/hsml-svac-ctrl";
+import { FormValidator, StringValidator, NumberValidator, SelectValidator, BooleanValidator, Str, Err } from "../src/validators";
 
 const nbsp = "\u00a0 ";
 
@@ -98,7 +99,7 @@ export const Content: Component<ContentState> = {
 };
 
 
-export interface FormData {
+export interface FormModel {
     name: string;
     age: number;
     married: boolean;
@@ -108,18 +109,22 @@ export interface FormData {
 
 export interface FormState {
     title: string;
-    data: FormData;
     genders: {
         label: string;
         value: string;
     }[];
     sports: string[];
+    obj: FormModel;
+    str: Str<FormModel>;
+    err: Err<FormModel>;
+    valid: boolean;
 }
 
 export const enum FormActions {
     title = "title",
-    formData = "form-data",
-    formSubmit = "form-submit"
+    data = "data",
+    submit = "submit",
+    cancel = "cancel"
 }
 
 export const Form: Component<FormState> = {
@@ -128,18 +133,33 @@ export const Form: Component<FormState> = {
 
     state: {
         title: "Form",
-        data: {
-            name: "Ema",
-            age: 33,
-            married: false,
-            gender: "female",
-            sport: "gymnastics"
-        },
         genders: [
             { label: "Male", value: "male" },
             { label: "Female", value: "female" }
         ],
-        sports: ["football", "gymnastics"]
+        sports: ["football", "gymnastics"],
+        obj: {
+            name: "Ema",
+            age: 20,
+            married: false,
+            gender: "male",
+            sport: "gymnastics"
+        },
+        str: {
+            name: "",
+            age: "",
+            married: "",
+            gender: "",
+            sport: ""
+        },
+        err: {
+            name: "",
+            age: "",
+            married: "",
+            gender: "",
+            sport: ""
+        },
+        valid: false
     },
 
     view: (state: FormState, action: Action, mount: Mount): HsmlFragment => [
@@ -150,53 +170,59 @@ export const Form: Component<FormState> = {
                     ["input.w3-input", {
                         type: "text",
                         name: "name",
-                        value: state.data.name,
-                        on: ["change", FormActions.formData]
+                        value: state.str["name"],
+                        on: ["change", FormActions.data]
                     }]
-                ]]
+                ]],
+                ["p.w3-text-red", [state.err["name"]]]
             ]],
             ["p", [
                 ["label", ["Age",
                     ["input.w3-input", {
                         type: "number",
                         name: "age",
-                        value: state.data.age,
-                        on: ["change", FormActions.formData]
+                        value: state.str.age,
+                        on: ["change", FormActions.data]
                     }]
-                ]]
+                ]],
+                ["p.w3-text-red", [state.err["age"]]]
             ]],
             ["p", [
                 ["label", [
                     ["input.w3-check", {
                         type: "checkbox",
                         name: "married",
-                        checked: state.data.married,
-                        on: ["change", FormActions.formData]
+                        checked: state.str.married,
+                        on: ["change", FormActions.data]
                     }],
                     " Married"
-                ]]
+                ]],
+                ["p.w3-text-red", [state.err["married"]]]
             ]],
             ["p",
-                join(
-                    state.genders.map<HsmlElement>(g => (
-                        ["label", [
-                            ["input.w3-radio", {
-                                type: "radio",
-                                name: "gender",
-                                value: g.value,
-                                checked: state.data.gender === g.value,
-                                on: ["change", FormActions.formData]
-                            }],
-                            " ", g.label
-                        ]]
-                    )),
-                    ["br"]
-                )
+                [
+                    ...join(
+                        state.genders.map<HsmlElement>(g => (
+                            ["label", [
+                                ["input.w3-radio", {
+                                    type: "radio",
+                                    name: "gender",
+                                    value: g.value,
+                                    checked: state.str.gender === g.value,
+                                    on: ["change", FormActions.data]
+                                }],
+                                " ", g.label
+                            ]]
+                        )),
+                        ["br"]
+                    ),
+                    ["p.w3-text-red", [state.err["name"]]]
+                ]
             ],
             ["p", [
                 ["select.w3-select", {
                     name: "sport",
-                    on: ["change", FormActions.formData]
+                    on: ["change", FormActions.data]
                 }, [
                     ["option",
                         { value: "", disabled: true, selected: true },
@@ -204,43 +230,120 @@ export const Form: Component<FormState> = {
                     ],
                     ...state.sports.map<HsmlElement>(s => (
                         ["option",
-                            { value: s, selected: s === state.data.sport },
+                            { value: s, selected: s === state.str.sport },
                             [s]
                         ])
                     )
-                ]]
+                    ]],
+                    ["p.w3-text-red", [state.err["name"]]]
             ]],
             ["button.w3-btn.w3-blue",
-                { type: "submit", on: ["click", FormActions.formSubmit] },
+                {
+                    type: "submit",
+                    disabled: !state.valid,
+                    on: ["click", FormActions.submit]
+                },
                 ["Submit"]
+            ],
+            " ",
+            ["button.w3-btn",
+                {
+                    type: "button",
+                    on: ["click", FormActions.cancel]
+                },
+                ["Cancel"]
             ]
         ]]
     ],
 
     actions: (action: string, data: any, ctrl: Ctrl<FormState>): void => {
         // console.log("action:", action, data);
+
+        const ctx = ctrl as Ctrl<FormState>
+            & {
+                fv: FormValidator<FormModel>;
+            };
+
         switch (action) {
+
+            case "_init":
+                const fv = new FormValidator<FormModel>()
+                    .addValidator("name",
+                        new StringValidator(
+                            { required: true, min: 3, max: 5 },
+                            {
+                                required: "Required {{min}} {{max}} {{regexp}}",
+                                invalid_format: "Invalid format {{regexp}}",
+                                not_in_range: "Not in range {{min}}-{{max}}"
+                            }))
+                    .addValidator("age",
+                        new NumberValidator(
+                            { required: true, min: 1, max: 100, },
+                            {
+                                required: "Required {{min}} {{max}} {{locale}} {{format}}",
+                                invalid_format: "Invalid format {{num}} {{locale}} {{format}}",
+                                not_in_range: "Not in range {{min}}-{{max}}"
+                            }))
+                    .addValidator("gender",
+                        new SelectValidator(
+                            { required: true, options: ctrl.state.genders.map(g => g.value) },
+                            {
+                                required: "Required {{options}}",
+                                invalid_option: "Invalod option {{option}} {{options}}"
+                            }))
+                    .addValidator("married",
+                        new BooleanValidator(
+                            { required: true },
+                            {
+                                required: "Required",
+                                invalid_value: "Invalid value {{value}}"
+                            }))
+                    .addValidator("sport",
+                        new SelectValidator(
+                            { required: true, options: ctrl.state.sports },
+                            {
+                                required: "Required {{options}}",
+                                invalid_option: "Invalod option {{option}} {{options}}"
+                            }))
+                    .format(ctrl.state.obj);
+                ctx.fv = fv;
+                ctrl.update(fv.data());
+                break;
+
             case FormActions.title:
                 ctrl.update({ title: data as string });
                 break;
-            case FormActions.formData:
-                formDataCollect(data, ctrl.state.data);
-                // TODO: formDataValidate(ctrl.state.data);
-                console.log(ctrl.state.data);
+
+            case FormActions.data: {
+                const value = formValue<Str<FormModel>>(data as Event);
+                const formData = ctx.fv
+                    .validate({ ...ctrl.state.str, ...value })
+                    .data();
+                console.log("obj:", JSON.stringify(formData, null, 4));
+                ctrl.update({ ...formData });
                 break;
-            case FormActions.formSubmit:
+            }
+
+            case FormActions.submit:
                 data.preventDefault();
-                console.dir(JSON.stringify(ctrl.state.data, null, 4));
-                ctrl.appAction(action, ctrl.state.data);
+                console.dir(JSON.stringify(ctrl.state.obj, null, 4));
+                ctrl.extAction(action, ctrl.state.obj);
                 break;
+
+            case FormActions.cancel:
+                data.preventDefault();
+                ctrl.extAction(action);
+                break;
+
             default:
                 ctrl.appAction(action, data);
         }
     }
 };
 
-function formDataCollect(e: Event, data: any): void {
+function formValue<T>(e: Event): Partial<T> {
     e.preventDefault();
+    const value = {} as any;
     const el = (e.target as HTMLElement);
     const nn = el.nodeName;
     switch (nn) {
@@ -249,24 +352,24 @@ function formDataCollect(e: Event, data: any): void {
             switch (iel.type) {
                 case "text":
                 case "radio":
-                    data[iel.name] = iel.value;
+                    value[iel.name] = iel.value;
                     break;
                 case "number":
-                    data[iel.name] = Number(iel.value);
+                    value[iel.name] = iel.value;
                     break;
                 case "checkbox":
-                    data[iel.name] = iel.checked;
+                    value[iel.name] = "" + iel.checked;
                     break;
             }
             break;
         case "SELECT":
             const sel = (el as HTMLSelectElement);
-            data[sel.name] = sel.value;
+            value[sel.name] = sel.value;
             break;
         default:
             console.warn("unknowen form element", nn);
-            return undefined;
     }
+    return value;
 }
 
 

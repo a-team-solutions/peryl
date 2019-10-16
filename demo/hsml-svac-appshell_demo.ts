@@ -6,7 +6,7 @@ const app = new Ctrl<AppShellState>(AppShell)
     .appActions((action: string, data: any, ctrl: Ctrl<AppShellState>) => {
         console.log("app action", ctrl.type, action, data);
         switch (action) {
-            case FormActions.formSubmit:
+            case FormActions.submit:
                 alert(`Form submit: \n${JSON.stringify(data, null, 4)}`);
                 break;
         }

@@ -74,6 +74,7 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
         this.state = component.state;
         this._actions = component.actions;
         this._extAction = extAction || this.appAction;
+        this.action("_init");
     }
 
     appAction = (action: string, data?: any): void => {

@@ -561,7 +561,7 @@ export class NumberValidator
     protected objToStr(obj: number,
                        format?: string): { str?: string, err?: string } {
         return {
-            str: obj ? ("" + obj) : undefined
+            str: obj !== undefined ? ("" + obj) : undefined
         };
     }
 
@@ -810,13 +810,24 @@ function tpl(tmpl: string, data: { [k: string]: string }): string {
 
 type FormValidators<T> = { [key in keyof T]: Validator<any, any, any> };
 
+export type Str<T> = { [key in keyof T]: string };
+export type Obj<T> = { [key in keyof T]: any };
+export type Err<T> = { [key in keyof T]: string };
+
+export interface Data<T> {
+    str: Str<T>;
+    obj: Obj<T>;
+    err: Err<T>;
+    valid: boolean;
+}
+
 export class FormValidator<T = any> {
 
     readonly validators: FormValidators<T> = {} as FormValidators<T>;
 
-    readonly str?: { [key in keyof T]: string };
-    readonly obj?: { [key in keyof T]: any };
-    readonly err?: { [key in keyof T]: string };
+    readonly str?: Str<T>;
+    readonly obj?: Obj<T>;
+    readonly err?: Err<T>;
 
     readonly valid?: boolean;
 
@@ -827,7 +838,13 @@ export class FormValidator<T = any> {
 
     validate(data: { [key in keyof T]: string },
              defaults?: { [key in keyof T]: string }): this {
-        const d = { ...defaults as object, ...data as object };
+        const d = {
+            ...defaults || Object.getOwnPropertyNames(this.validators)
+                .reduce<any>(
+                    (a, v) => { if (a[v] === undefined) a[v] = ""; return a; },
+                    {}),
+            ...data as object
+        };
         const res = Object.keys(this.validators)
             .reduce(
                 (a, k) => {
@@ -865,6 +882,15 @@ export class FormValidator<T = any> {
         (this.err as any) = res.err;
         (this.valid as any) = res.valid;
         return this;
+    }
+
+    data(): Data<T> {
+        return {
+            str: this.str!,
+            obj: this.obj!,
+            err: this.err!,
+            valid: this.valid!
+        };
     }
 
 }
@@ -915,7 +941,7 @@ export class FormValidator<T = any> {
 //     {
 //         required: "required {{min}} {{max}} {{locale}} {{format}}",
 //         invalid_format: "invalid_format {{num}} {{locale}} {{format}}",
-//         not_in_range: "not_in_range {{min}} {{max}} {{locale}}"
+//         not_in_range: "not_in_range {{min}} {{max}}"
 //     });
 
 // [
