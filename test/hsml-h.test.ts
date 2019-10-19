@@ -1,18 +1,18 @@
 import "jasmine";
-import { div, span, a, ul, li, h2, input, button } from "../src/hsml-h";
+import { h } from "../src/hsml-h";
 import { HsmlElement } from "../src/hsml";
 
 describe("hypescript", () => {
 
     it("basic elements", () => {
         expect(
-            div("")
+            h("div")
         )
         .toEqual(
             ["div"]
         );
         expect(
-            span("#app.body")
+            h("span#app.body")
         )
         .toEqual(
             ["span#app.body"]
@@ -21,12 +21,12 @@ describe("hypescript", () => {
 
     it("element with props", () => {
         expect(
-            div({ click: "special" })
+            h("div", { click: "special" })
         )
         .toEqual(
             ["div", { click: "special" }]);
         expect(
-            div(".app", { title: "z" })
+            h("div.app", { title: "z" })
         )
         .toEqual(
             ["div.app", { title: "z" }]
@@ -35,10 +35,10 @@ describe("hypescript", () => {
 
     it("nested elements", () => {
         expect(
-            ul([
-                li(["1. line"]),
-                li(["2. line"]),
-                li(["3. line"])
+            h("ul", [
+                h("li", "1. line"),
+                h("li", "2. line"),
+                h("li", "3. line")
             ])
         )
         .toEqual(["ul", [
@@ -50,12 +50,12 @@ describe("hypescript", () => {
 
     it("deeply nested", () => {
         expect(
-            div("#app", [
-                span(["body"]),
-                ul([
-                    li(["1. line"]),
-                    li(["2. line"]),
-                    li(["3. line"])
+            h("div#app", [
+                h("span", "body"),
+                h("ul", [
+                    h("li", "1. line"),
+                    h("li", "2. line"),
+                    h("li", "3. line")
                 ])
             ])
         )
@@ -74,15 +74,15 @@ describe("hypescript", () => {
     it("should be equal with hsml", () => {
         const todos = ["first", "second", "third"];
         expect(
-            div("#todo-app", [
-                h2(["Todo App"]),
-                div(".main", [
-                    input(".input-text", { type: "checkbox" }, ["placeholder"]),
-                    button({ onclick: ["click"] }),
-                    ul(".todos",
+            h("div#todo-app", [
+                h("h2", "Todo App"),
+                h("div.main", [
+                    h("input.input-text", { type: "checkbox" }, "placeholder"),
+                    h("button", { onclick: ["click"] }),
+                    h("ul.todos",
                         todos.map<HsmlElement>(todo =>
-                            li([
-                                a({ href: "#" }, [todo])
+                            h("li", [
+                                h("a", { href: "#" }, todo)
                             ])
                         )
                     )
