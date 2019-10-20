@@ -326,8 +326,10 @@ export const Form: Component<FormState> = {
 
             case FormActions.submit:
                 data.preventDefault();
-                console.dir(JSON.stringify(ctrl.state.obj, null, 4));
-                ctrl.extAction(action, ctrl.state.obj);
+                if (ctx.fv.valid) {
+                    console.dir(JSON.stringify(ctrl.state.obj, null, 4));
+                    ctrl.extAction(action, ctrl.state.obj);
+                }
                 break;
 
             case FormActions.cancel:
