@@ -45,7 +45,6 @@ const actions: Actions<State> = (action: string, data: any, app: App<State>): vo
     console.log("action:", action, data);
     switch (action) {
         case Action.title:
-            // const title = data;
             const title = ((data as Event).target as HTMLInputElement).value;
             app.update({ title });
             break;
@@ -61,8 +60,7 @@ const actions: Actions<State> = (action: string, data: any, app: App<State>): vo
     }
 };
 
-const app = new App(state, view, actions)
-    .mount(document.getElementById("app"));
+const app = new App(state, view, actions).mount("app");
 
 (self as any).app = app;
 

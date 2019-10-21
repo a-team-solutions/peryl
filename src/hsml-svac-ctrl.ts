@@ -112,23 +112,22 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
         this.action(action, data);
     }
 
-    mount = (e: Element | null = document.body): this => {
-        if (e) {
-            if ((e as any).ctrl) {
-                const c = (e as any).ctrl as Ctrl<State>;
-                c && c.umount();
-            }
-            if (!this.dom) {
-                Ctrl._ctrls[this.id] = this;
-                (this as any).dom = e;
-                (e as any).ctrl = this;
-                const hsmls = (this as any).render();
-                hsmls2idomPatch(e, hsmls, this);
-                e.setAttribute(ctrlAttr, this.type);
-                this.action("_mount", this.dom);
-            }
-        } else {
-            console.warn("invalit element", e);
+    mount = (e?: string | Element | null): this => {
+        const el = typeof e === "string"
+            ? document.getElementById(e) || document.body
+            : e || document.body;
+        if ((el as any).ctrl) {
+            const c = (el as any).ctrl as Ctrl<State>;
+            c && c.umount();
+        }
+        if (!this.dom) {
+            Ctrl._ctrls[this.id] = this;
+            (this as any).dom = el;
+            (el as any).ctrl = this;
+            const hsmls = (this as any).render();
+            hsmls2idomPatch(el, hsmls, this);
+            el.setAttribute(ctrlAttr, this.type);
+            this.action("_mount", this.dom);
         }
         return this;
     }

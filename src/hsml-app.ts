@@ -42,21 +42,20 @@ export class App<State> implements HsmlHandlerCtx {
         this.action(action, data);
     }
 
-    mount = (e: Element | null = document.body): this => {
-        if (e) {
-            if ("app" in e) {
-                const w = (e as any).app as App<State>;
-                w && w.umount();
-            }
-            if (!this.dom) {
-                (this as any).dom = e;
-                (e as any).app = this;
-                const hsmls = (this as any).render();
-                hsmls2idomPatch(e, hsmls, this);
-                this.action("_mount", this.dom);
-            }
-        } else {
-            console.warn("invalit element", e);
+    mount = (e?: string | Element | null): this => {
+        const el = typeof e === "string"
+            ? document.getElementById(e) || document.body
+            : e || document.body;
+        if ((el as any).app) {
+            const a = (el as any).app as App<State>;
+            a && a.umount();
+        }
+        if (!this.dom) {
+            (this as any).dom = el;
+            (el as any).app = this;
+            const hsmls = (this as any).render();
+            hsmls2idomPatch(el, hsmls, this);
+            this.action("_mount", this.dom);
         }
         return this;
     }
@@ -67,10 +66,10 @@ export class App<State> implements HsmlHandlerCtx {
             if (this.dom.hasAttribute("app")) {
                 this.dom.removeAttribute("app");
             }
-            const wNodes = this.dom.querySelectorAll("[app]");
-            for (let i = 0; i < wNodes.length; i++) {
-                const w = (wNodes[i] as any).app as App<State>;
-                w && w.umount();
+            const aNodes = this.dom.querySelectorAll("[app]");
+            for (let i = 0; i < aNodes.length; i++) {
+                const a = (aNodes[i] as any).app as App<State>;
+                a && a.umount();
             }
             while (this.dom.firstChild /*.hasChildNodes()*/) {
                 this.dom.removeChild(this.dom.firstChild);
@@ -126,8 +125,8 @@ export class App<State> implements HsmlHandlerCtx {
 (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
     nodes.forEach(node => {
         if (node.nodeType === 1 && "app" in node) {
-            const w = (node as any).app as App<any>;
-            w && w.umount();
+            const a = (node as any).app as App<any>;
+            a && a.umount();
         }
     });
 };

@@ -89,23 +89,22 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
         this.action(action, data);
     }
 
-    mount = (e: Element | null = document.body): this => {
-        if (e) {
-            if ("widget" in e) {
-                const w = (e as any).widget as AWidget<State>;
-                w && w.umount();
-            }
-            if (!this.dom) {
-                AWidget.mounted[this.id] = this;
-                (this as any).dom = e;
-                (e as any).widget = this;
-                const hsmls = (this as any).render();
-                hsmls2idomPatch(e, hsmls, this);
-                e.setAttribute("widget", this.type);
-                this.action("_mount", this.dom);
-            }
-        } else {
-            console.warn("invalit element", e);
+    mount = (e?: string | Element | null): this => {
+        const el = typeof e === "string"
+            ? document.getElementById(e) || document.body
+            : e || document.body;
+        if ("widget" in el) {
+            const w = (el as any).widget as AWidget<State>;
+            w && w.umount();
+        }
+        if (!this.dom) {
+            AWidget.mounted[this.id] = this;
+            (this as any).dom = el;
+            (el as any).widget = this;
+            const hsmls = (this as any).render();
+            hsmls2idomPatch(el, hsmls, this);
+            el.setAttribute("widget", this.type);
+            this.action("_mount", this.dom);
         }
         return this;
     }
