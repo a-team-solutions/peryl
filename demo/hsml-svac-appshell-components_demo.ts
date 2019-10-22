@@ -315,7 +315,7 @@ export const Form: Component<FormState> = {
                 break;
 
             case FormActions.data: {
-                const value = formValue<Str<FormModel>>(data as Event);
+                const value = formValue(data as Event);
                 const formData = ctx.fv
                     .validate({ ...ctrl.state.str, ...value })
                     .data();
@@ -343,9 +343,9 @@ export const Form: Component<FormState> = {
     }
 };
 
-function formValue<T>(e: Event): Partial<T> {
+function formValue(e: Event): { [k: string]: string } {
     e.preventDefault();
-    const value = {} as any;
+    const value = {} as { [k: string]: string };
     const el = (e.target as HTMLElement);
     const nn = el.nodeName;
     switch (nn) {
