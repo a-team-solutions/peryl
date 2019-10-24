@@ -11,17 +11,16 @@ export function scriptLib(url: string,
 }
 
 export function script(url: string, callback?: () => void): void {
-    const script = <HTMLScriptElement> document.createElement("script");
+    const script = document.createElement("script");
     script.type = "text/javascript";
     script.charset = "utf-8";
     script.src = url;
-
-    if ((<any>script).readyState) { // IE
-        (<any>script).onreadystatechange = () => {
-            const loaded = (<any>script).readyState === "loaded";
-            const completed = (<any>script).readyState === "complete";
+    if ((script as any).readyState) { // IE
+        (script as any).onreadystatechange = () => {
+            const loaded = (script as any).readyState === "loaded";
+            const completed = (script as any).readyState === "complete";
             if (loaded || completed) {
-                (<any>script).onreadystatechange = null;
+                (script as any).onreadystatechange = null;
                 if (typeof callback === "function") {
                     callback();
                 }
@@ -42,13 +41,10 @@ export function scripts(urls: string[], callback?: () => void): void {
     let callbackTmp = callback;
     for (let i = 0; i < urls.length; i++) {
         const url = urls[i];
-        callbackTmp = (function (url, callbackTmp) {
-            return () => {
-                script(url, () => {
-                    callbackTmp && callbackTmp();
-                });
-            };
-        })(url, callbackTmp);
+        callbackTmp = (
+            (url, callbackTmp) => () =>
+                script(url, () => callbackTmp && callbackTmp())
+        )(url, callbackTmp);
     }
     callbackTmp && callbackTmp();
 }
@@ -56,9 +52,8 @@ export function scripts(urls: string[], callback?: () => void): void {
 export function image(url: string, callback?: () => void): void {
     const img = new Image();
     img.src = url;
-
-    if ((<any>img).readyState) {
-        (<any>img).onreadystatechange = () => {
+    if ((img as any).readyState) {
+        (img as any).onreadystatechange = () => {
             if (typeof callback === "function") {
                 callback();
             }
@@ -77,9 +72,8 @@ export function css(url: string, callback?: () => void): void {
     link.type = "text/css";
     link.rel = "stylesheet";
     link.href = url;
-
-    if ((<any>link).readyState) {
-        (<any>link).onreadystatechange = () => {
+    if ((link as any).readyState) {
+        (link as any).onreadystatechange = () => {
             if (typeof callback === "function") {
                 callback();
             }

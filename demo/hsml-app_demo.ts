@@ -25,6 +25,7 @@ const view: View<State> = (state: State): HsmlFragment => [
         ["input",
             {
                 type: "text",
+                name: "title",
                 value: state.title,
                 on: ["input", Action.title]
             }
@@ -41,12 +42,11 @@ const view: View<State> = (state: State): HsmlFragment => [
     ]]
 ];
 
-const actions: Actions<State> = (action: string, data: any, app: App<State>): void => {
-    console.log("action:", action, data);
+const actions: Actions<State> = ([action, data, e], app: App<State>): void => {
+    console.log("action:", action, data, e);
     switch (action) {
         case Action.title:
-            const title = ((data as Event).target as HTMLInputElement).value;
-            app.update({ title });
+            app.update(data);
             break;
         case Action.inc:
             app.update({ count: app.state.count + data as number });
