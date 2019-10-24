@@ -6,7 +6,7 @@ export type View<State> = (state: State) => HsmlFragment;
 
 export type Action = (action: string, data?: any) => void;
 
-export type Actions<State> = (action: string, data: any, app: App<State>) => void;
+export type Actions<State> = (action: [string, any?, Event?], app: App<State>) => void;
 
 export type Class<T = object> = new (...args: any[]) => T;
 
@@ -29,8 +29,8 @@ export class App<State> implements HsmlHandlerCtx {
         this.action("_init");
     }
 
-    action = (action: string, data?: any): void => {
-        this.actions(action, data, this);
+    action = (action: string, data?: any, e?: Event): void => {
+        this.actions([action, data, e], this);
     }
 
     render = (): HsmlFragment => this.view(this.state);
@@ -38,8 +38,11 @@ export class App<State> implements HsmlHandlerCtx {
     onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {
         data = (data && data.constructor === Function)
             ? (data as HsmlAttrOnDataFnc)(e)
-            : data === undefined ? e : data;
-        this.action(action, data);
+            : data;
+        if (data === undefined && e) {
+            data = formInputData(e);
+        }
+        this.action(action, data, e);
     }
 
     mount = (e?: string | Element | null): this => {
@@ -156,3 +159,38 @@ const isObject = (item: any): boolean => {
 const isMergeble = (item: object): boolean => {
     return isObject(item) && !Array.isArray(item);
 };
+
+function formInputData(e: Event): { [k: string]: string } {
+    const value = {} as { [k: string]: string };
+    const el = (e.target as HTMLElement);
+    switch (el.nodeName) {
+        case "INPUT":
+            const iel = (el as HTMLInputElement);
+            switch (iel.type) {
+                case "text":
+                case "radio":
+                    value[iel.name] = iel.value;
+                    break;
+                case "number":
+                    value[iel.name] = iel.value;
+                    break;
+                case "checkbox":
+                    value[iel.name] = "" + iel.checked;
+                    break;
+            }
+            break;
+        case "SELECT":
+            const sel = (el as HTMLSelectElement);
+            value[sel.name] = sel.value;
+            break;
+        case "BUTTON":
+            const bel = (el as HTMLButtonElement);
+            value[bel.name] = bel.value;
+            break;
+        case "TEXTAREA":
+            const tel = (el as HTMLTextAreaElement);
+            value[tel.name] = tel.innerText;
+            break;
+    }
+    return value;
+}
