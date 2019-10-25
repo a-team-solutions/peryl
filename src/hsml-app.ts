@@ -10,6 +10,13 @@ export type Actions<State> = (action: [string, any?, Event?], app: App<State>) =
 
 export type Class<T = object> = new (...args: any[]) => T;
 
+export function app<State>(state: State,
+                           view: View<State>,
+                           actions: Actions<State>,
+                           element?: string | Element | null) {
+    return new App<State>(state, view, actions).mount(element);
+}
+
 export class App<State> implements HsmlHandlerCtx {
 
     state: State;
