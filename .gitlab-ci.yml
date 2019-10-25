@@ -26,7 +26,8 @@ pages:
     - ls -lah
     - npm install
     - npm run dist
-    - npx cpx 'dist/**/!(*.map)' 'public/' -u -v
+    - npx cpx 'dist/**/' 'public/dist/' -u -v
+    # - npx cpx 'dist/**/!(*.map)' 'public/dist/' -u -v
     - npm run build
     - npx cpx 'build/**/' 'public/build/' -u -v
     - npx cpx 'demo/**/' 'public/demo/' -u -v

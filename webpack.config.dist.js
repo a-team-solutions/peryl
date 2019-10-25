@@ -9,12 +9,6 @@ const entries = {
             (entries, entry) =>
                 Object.assign(entries,
                     { [entry.replace('./src/', '').replace('.ts', '')]: entry }),
-            {}),
-    ...glob.sync('./demo/**/*.ts')
-        .reduce(
-            (entries, entry) =>
-                Object.assign(entries,
-                    { [entry.replace('./demo/', '').replace('.ts', '')]: entry }),
             {})
 };
 console.log("entries:", entries);
@@ -33,7 +27,7 @@ console.log("entries:", entries);
  */
 
 const conf = {
-    mode: 'development',
+    mode: 'production',
 
     // devtool: false,
     // devtool: "eval",
@@ -68,9 +62,11 @@ const conf = {
     },
 
     output: {
+        // library: 'peryl',
+        libraryTarget: 'global',
         // filename: '[name].[chunkhash].js',
         filename: '[name].js',
-        path: path.resolve(__dirname, 'build')
+        path: path.resolve(__dirname, 'dist/umd')
     },
 
     resolve: {
