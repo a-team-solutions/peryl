@@ -4,48 +4,65 @@
 <head>
     <meta charset="UTF-8">
     <title>PeRyL hsml app demo</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
 
 <body>
-    <h1>PeRyL hsml app demo</h1>
-    <div id="app"></div>
+    <div class="w3-container">
+        <h1>PeRyL hsml app demo</h1>
+        <div id="app"></div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/incremental-dom/0.6.0/incremental-dom-min.js"></script>
     <script src="../dist/umd/hsml-app.js"></script>
     <script>
-        const Action = {
-            title: "title",
-            dec: "dec",
-            inc: "inc",
-            xXx: "xXx"
-        }
 
         const state = {
             title: "Counter",
             count: 77
         };
 
+        const Action = {
+            title: "title",
+            dec: "dec",
+            inc: "inc",
+            clear: "clear"
+        }
+
         function view(state) {
             return [
-                ["h2", [state.title]],
-                ["p", [
-                    "Title: ",
-                    ["input",
-                        {
-                            type: "text",
-                            name: "title",
-                            value: state.title,
-                            on: ["input", Action.title]
-                        }
-                    ],
+                ["h2", { classes: [["w3-text-light-grey", !state.title]] }, [
+                    state.title || "No title"
                 ]],
                 ["p", [
-                    ["em", ["Count"]], ": ", state.count,
+                    ["label", ["Title:"]],
+                    ["input.w3-input.w3-border", {
+                        type: "text",
+                        name: "title",
+                        value: new String(state.title),
+                        on: ["input", Action.title]
+                    }]
+                ]],
+                ["p", [
+                    ["button.w3-button.w3-blue",
+                        { on: ["click", Action.clear] },
+                        ["Clear title"]
+                    ]
+                ]],
+                ["hr"],
+                ["p", [
+                    ["h2", [
+                        "Count: ",
+                        ["strong", {
+                            classes: [ // conditional classes
+                                ["w3-text-red", state.count < 77],
+                                ["w3-text-green", state.count > 77],
+                            ]},
+                            [state.count]
+                        ]
+                    ]],
+                    ["button.w3-button.w3-blue", { on: ["click", Action.dec, 1] }, ["<"]],
                     " ",
-                    ["button", { on: ["click", Action.dec, 1] }, ["-"]],
-                    ["button", { on: ["click", Action.inc, 2] }, ["+"]]
-                ]],
-                ["p", [
-                    ["button", { on: ["click", Action.xXx] }, ["xXx"]]
+                    ["button.w3-button.w3-blue", { on: ["click", Action.inc, 2] }, [">"]]
                 ]]
             ]
         };
@@ -53,16 +70,25 @@
         function actions([action, data, event], app) {
             console.log("action:", action, data, event);
             switch (action) {
+
                 case Action.title:
                     app.update(data);
                     break;
+
                 case Action.inc:
                     app.update({ count: app.state.count + data });
-                    setTimeout(() => app.action(Action.dec, 1), 1e3); // async call
+                    // async action call
+                    setTimeout(() => app.action(Action.dec, 1), 1e3);
                     break;
+
                 case Action.dec:
                     app.update({ count: app.state.count - data });
                     break;
+
+                case Action.clear:
+                    app.update({ title: "" });
+                    break;
+
                 default:
                     console.warn("action unhandled:", action, data);
             }
