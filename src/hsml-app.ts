@@ -4,7 +4,7 @@ import * as idom from "incremental-dom";
 
 export type View<State> = (state: State) => HsmlFragment;
 
-export type Action = (action: string, data?: any) => void;
+export type Action = (action: string, data?: any, event?: Event) => void;
 
 export type Actions<State> = (app: App<State>,
                               action: string,
@@ -39,7 +39,7 @@ export class App<State> implements HsmlHandlerCtx {
         this.action("_init");
     }
 
-    action = (action: string, data?: any, event?: Event): void => {
+    action: Action = (action: string, data?: any, event?: Event): void => {
         this.actions(this, action, data, event);
     }
 

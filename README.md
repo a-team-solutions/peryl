@@ -84,9 +84,9 @@ function actions(app, action, data, event) {
             break;
 
         default:
-            console.warn("action unhandled:", action, data);
+            console.warn("action unhandled:", action, data, event);
     }
 };
 
-app(state, view, actions, "app");
+peryl.app(state, view, actions, "app");
 ```

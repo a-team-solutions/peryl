@@ -5,6 +5,7 @@ import * as events from "./events";
 import * as form from "./form";
 import * as hash from "./hash";
 import * as history from "./history";
+import * as hsmlapp from "./hsml-app";
 import * as hsmlawidget from "./hsml-awidget";
 import * as hsmldom from "./hsml-dom";
 import * as hsmlh from "./hsml-h";
@@ -32,16 +33,17 @@ export {
     form,
     hash,
     history,
-    hsml,
+    hsmlapp,
+    hsmlawidget,
     hsmldom,
+    hsmlh,
     hsmlhtml,
     hsmlidom,
-    hsmlwidget,
-    hsmlawidget,
-    hsmlsvac,
-    hsmlsvachtml,
     hsmlsvacctrl,
-    hsmlh,
+    hsmlsvachtml,
+    hsmlsvac,
+    hsmlwidget,
+    hsml,
     http,
     load,
     objpaths,

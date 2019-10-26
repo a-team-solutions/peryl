@@ -11,7 +11,7 @@ export function debounce<F extends (...args: any[]) => void>(func: F, delay: num
 }
 
 // Decorator
-export function debounceFnc(delay: number = 300) {
+export function Debounce(delay: number = 300) {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
         descriptor.value = debounce(originalMethod, delay);
@@ -42,7 +42,7 @@ export function debounceFnc(delay: number = 300) {
 // class O {
 //     x: string = "O.x";
 
-//     @debounceFnc(300)
+//     @Debounce(300)
 //     m(y: string) {
 //         console.log("O.m", this.x, y);
 //     }

@@ -9,7 +9,7 @@ export class Hash<T> {
 
     onChange(cb: (data: T) => void): this {
         this._cb = cb;
-        if ("onhashchange" in window) {
+        if (window.onhashchange) {
             onhashchange = () => cb(this.read());
         } else {
             // console.warn('browser "window.onhashchange" not implemented, running emulation');

@@ -62,7 +62,7 @@ const conf = {
     },
 
     output: {
-        // library: 'peryl',
+        library: 'peryl',
         libraryTarget: 'global',
         // filename: '[name].[chunkhash].js',
         filename: '[name].js',
