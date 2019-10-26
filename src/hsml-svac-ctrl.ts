@@ -7,10 +7,10 @@ export interface Component<State extends MergebleState> extends SvacComponent<St
     actions?: Actions<State>;
 }
 
-export type Actions<State extends MergebleState> = (
-    action: string,
-    data: any,
-    ctrl: Ctrl<State>) => void;
+export type Actions<State extends MergebleState> = (ctrl: Ctrl<State>,
+                                                    action: string,
+                                                    data?: any,
+                                                    event?: Event) => void;
 
 const mount: Mount = <State extends MergebleState>(
     component: Component<State>,
@@ -77,9 +77,9 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
         this.action("_init");
     }
 
-    appAction = (action: string, data?: any): void => {
-        Ctrl.debug && console.log("appAction", this.type, action, data);
-        Ctrl.appActions && Ctrl.appActions(action, data, this);
+    appAction = (action: string, data?: any, event?: Event): void => {
+        Ctrl.debug && console.log("appAction", this.type, action, data, event);
+        Ctrl.appActions && Ctrl.appActions(this, action, data, event);
     }
 
     appActions(actions: Actions<State>): this {
@@ -87,14 +87,14 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
         return this;
     }
 
-    extAction = (action: string, data?: any): void => {
-        Ctrl.debug && console.log("extAction", this.type, action, data);
-        this._extAction && this._extAction(action, data);
+    extAction = (action: string, data?: any, event?: Event): void => {
+        Ctrl.debug && console.log("extAction", this.type, action, data, event);
+        this._extAction && this._extAction(action, data, event);
     }
 
-    action = (action: string, data?: any): void => {
-        Ctrl.debug && console.log("action", this.type, action, data);
-        this._actions && this._actions(action, data, this);
+    action = (action: string, data?: any, event?: Event): void => {
+        Ctrl.debug && console.log("action", this.type, action, data, event);
+        this._actions && this._actions(this, action, data, event);
     }
 
     appCtrls(): Ctrl<any>[] {
@@ -105,11 +105,14 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
         return this.view(this.state, this.action, mount);
     }
 
-    onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {
+    onHsml = (action: string, data: HsmlAttrOnData, event: Event): void => {
         data = (data && data.constructor === Function)
-            ? (data as HsmlAttrOnDataFnc)(e)
-            : data === undefined ? e : data;
-        this.action(action, data);
+            ? (data as HsmlAttrOnDataFnc)(event)
+            : data;
+        if (data === undefined && event) {
+            data = formInputData(event);
+        }
+        this.action(action, data, event);
     }
 
     mount = (e?: string | Element | null): this => {
@@ -248,3 +251,38 @@ const isObject = (item: any): boolean => {
 const isMergeble = (item: object): boolean => {
     return isObject(item) && !Array.isArray(item);
 };
+
+function formInputData(e: Event): { [k: string]: string } {
+    const value = {} as { [k: string]: string };
+    const el = (e.target as HTMLElement);
+    switch (el.nodeName) {
+        case "INPUT":
+            const iel = (el as HTMLInputElement);
+            switch (iel.type) {
+                case "text":
+                case "radio":
+                    value[iel.name] = iel.value;
+                    break;
+                case "number":
+                    value[iel.name] = iel.value;
+                    break;
+                case "checkbox":
+                    value[iel.name] = "" + iel.checked;
+                    break;
+            }
+            break;
+        case "SELECT":
+            const sel = (el as HTMLSelectElement);
+            value[sel.name] = sel.value;
+            break;
+        case "TEXTAREA":
+            const tel = (el as HTMLTextAreaElement);
+            value[tel.name] = tel.innerText;
+            break;
+        case "BUTTON":
+            const bel = (el as HTMLButtonElement);
+            value[bel.name] = bel.value;
+            break;
+    }
+    return value;
+}

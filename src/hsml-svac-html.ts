@@ -2,7 +2,7 @@ import { HsmlFragment, HsmlFnc } from "./hsml";
 import { hsmls2htmls, hsmls2html } from "./hsml-html";
 import { Action, Mount, Component } from "./hsml-svac";
 
-const actionHtml: Action = (action: string, data: any) => { };
+const actionHtml: Action = (action: string, data: any, event?: Event) => { };
 
 const mountHtml: Mount = <State>(component: Component<State>,
                                  state?: State): HsmlFnc | HsmlFragment => {

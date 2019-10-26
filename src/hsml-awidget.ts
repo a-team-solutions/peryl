@@ -6,7 +6,10 @@ export type View<State> = (state: State, action: Action, mount: Mount) => HsmlFr
 
 export type Action = (action: string, data?: any) => void;
 
-export type Actions<State> = (action: string, data: any, widget: AWidget<State>) => void;
+export type Actions<State> = (widget: AWidget<State>,
+                              action: string,
+                              data?: any,
+                              event?: Event) => void;
 
 export type Class<T = object> = new (...args: any[]) => T;
 
@@ -46,8 +49,11 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
 
     static readonly mounted: { [wid: string]: AWidget<any> } = {};
 
-    static appActions: Actions<any> = (action: string, data: any, widget: AWidget<any>): void => {
-        console.log("action:", action, data, widget);
+    static appActions: Actions<any> = (widget: AWidget<any>,
+                                       action: string,
+                                       data?: any,
+                                       event?: Event): void => {
+        console.log("action:", widget, action, data, event);
     }
 
     readonly type: string = this.constructor.name; // "XWidget"
@@ -59,14 +65,14 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
 
     abstract state: State;
     abstract view(state: State, action: Action, mount: Mount): HsmlFragment;
-    abstract actions(action: string, data: any, widget: AWidget<State>): void;
+    abstract actions(widget: AWidget<State>, action: string, data?: any, event?: Event): void;
 
-    action = (action: string, data?: any): void => {
-        this.actions(action, data, this);
+    action = (action: string, data?: any, event?: Event): void => {
+        this.actions(this, action, data, event);
     }
 
-    appAction = (action: string, data?: any): void => {
-        AWidget.appActions(action, data, this);
+    appAction = (action: string, data?: any, event?: Event): void => {
+        AWidget.appActions(this, action, data, event);
     }
 
     appActions(actions: Actions<State>): this {
@@ -82,11 +88,14 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
         return this.view(this.state, this.action, mount);
     }
 
-    onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {
+    onHsml = (action: string, data: HsmlAttrOnData, event: Event): void => {
         data = (data && data.constructor === Function)
-            ? (data as HsmlAttrOnDataFnc)(e)
-            : data === undefined ? e : data;
-        this.action(action, data);
+            ? (data as HsmlAttrOnDataFnc)(event)
+            : data;
+        if (data === undefined && event) {
+            data = formInputData(event);
+        }
+        this.action(action, data, event);
     }
 
     mount = (e?: string | Element | null): this => {
@@ -225,3 +234,38 @@ const isObject = (item: any): boolean => {
 const isMergeble = (item: object): boolean => {
     return isObject(item) && !Array.isArray(item);
 };
+
+function formInputData(e: Event): { [k: string]: string } {
+    const value = {} as { [k: string]: string };
+    const el = (e.target as HTMLElement);
+    switch (el.nodeName) {
+        case "INPUT":
+            const iel = (el as HTMLInputElement);
+            switch (iel.type) {
+                case "text":
+                case "radio":
+                    value[iel.name] = iel.value;
+                    break;
+                case "number":
+                    value[iel.name] = iel.value;
+                    break;
+                case "checkbox":
+                    value[iel.name] = "" + iel.checked;
+                    break;
+            }
+            break;
+        case "SELECT":
+            const sel = (el as HTMLSelectElement);
+            value[sel.name] = sel.value;
+            break;
+        case "TEXTAREA":
+            const tel = (el as HTMLTextAreaElement);
+            value[tel.name] = tel.innerText;
+            break;
+        case "BUTTON":
+            const bel = (el as HTMLButtonElement);
+            value[bel.name] = bel.value;
+            break;
+    }
+    return value;
+}

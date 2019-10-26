@@ -53,8 +53,8 @@ const TicTacToe: Component<TicTacToeState> = {
         ]
     ],
 
-    actions: (action: string, data: any, ctrl: Ctrl<TicTacToeState>): void => {
-        console.log("action", action, data);
+    actions: (ctrl: Ctrl<TicTacToeState>, action: string, data?: any, event?: Event): void => {
+        console.log("action", action, data, event);
         switch (action) {
             case TicTacToeActions.mark:
                 ctrl.state.board[data.y][data.x] = data.turn ? CROS : CIRC;
@@ -65,7 +65,7 @@ const TicTacToe: Component<TicTacToeState> = {
             case "_umount":
                 break;
             default:
-                console.warn("action unhandled:", action, data);
+                console.warn("action unhandled:", action, data, event);
         }
     }
 };

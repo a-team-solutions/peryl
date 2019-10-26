@@ -50,14 +50,14 @@ export const Sidebar: Component<SidebarState> = {
         ]]
     ],
 
-    actions: (action: string, data: any, ctrl: Ctrl<SidebarState>): void => {
-        // console.log("action:", action, data);
+    actions: (ctrl: Ctrl<SidebarState>, action: string, data?: any, event?: Event): void => {
+        // console.log("action:", action, data, event);
         switch (action) {
             case SidebarActions.title:
                 ctrl.update({ title: data as string });
                 break;
             default:
-                ctrl.appAction(action, data);
+                ctrl.appAction(action, data, event);
         }
     }
 };
@@ -86,14 +86,14 @@ export const Content: Component<ContentState> = {
         ["p", [state.text]]
     ],
 
-    actions: (action: string, data: any, ctrl: Ctrl<ContentState>): void => {
-        // console.log("action:", action, data);
+    actions: (ctrl: Ctrl<ContentState>, action: string, data: any, event?: Event): void => {
+        // console.log("action:", action, data, event);
         switch (action) {
             case ContentActions.title:
                 ctrl.update({ title: data as string });
                 break;
             default:
-                ctrl.appAction(action, data);
+                ctrl.appAction(action, data, event);
         }
     }
 };
@@ -256,8 +256,8 @@ export const Form: Component<FormState> = {
         ]]
     ],
 
-    actions: (action: string, data: any, ctrl: Ctrl<FormState>): void => {
-        // console.log("action:", action, data);
+    actions: (ctrl: Ctrl<FormState>, action: string, data?: any, event?: Event): void => {
+        // console.log("action:", action, data, event);
 
         const ctx = ctrl as Ctrl<FormState>
             & {
@@ -315,9 +315,8 @@ export const Form: Component<FormState> = {
                 break;
 
             case FormActions.data: {
-                const value = formValue(data as Event);
                 const formData = ctx.fv
-                    .validate({ ...ctrl.state.str, ...value })
+                    .validate({ ...ctrl.state.str, ...data })
                     .data();
                 console.log("obj:", JSON.stringify(formData, null, 4));
                 ctrl.update({ ...formData });
@@ -325,7 +324,7 @@ export const Form: Component<FormState> = {
             }
 
             case FormActions.submit:
-                data.preventDefault();
+                event!.preventDefault();
                 if (ctx.fv.valid) {
                     console.dir(JSON.stringify(ctrl.state.obj, null, 4));
                     ctrl.extAction(action, ctrl.state.obj);
@@ -338,42 +337,10 @@ export const Form: Component<FormState> = {
                 break;
 
             default:
-                ctrl.appAction(action, data);
+                ctrl.appAction(action, data, event);
         }
     }
 };
-
-function formValue(e: Event): { [k: string]: string } {
-    e.preventDefault();
-    const value = {} as { [k: string]: string };
-    const el = (e.target as HTMLElement);
-    const nn = el.nodeName;
-    switch (nn) {
-        case "INPUT":
-            const iel = (el as HTMLInputElement);
-            switch (iel.type) {
-                case "text":
-                case "radio":
-                    value[iel.name] = iel.value;
-                    break;
-                case "number":
-                    value[iel.name] = iel.value;
-                    break;
-                case "checkbox":
-                    value[iel.name] = "" + iel.checked;
-                    break;
-            }
-            break;
-        case "SELECT":
-            const sel = (el as HTMLSelectElement);
-            value[sel.name] = sel.value;
-            break;
-        default:
-            console.warn("unknowen form element", nn);
-    }
-    return value;
-}
-
 
 export interface AppShellState {
     title: string;
@@ -470,8 +437,8 @@ export const AppShell: Component<AppShellState> = {
         ]
     ],
 
-    actions: (action: string, data: any, ctrl: Ctrl<AppShellState>): void => {
-        // console.log("action:", action, data);
+    actions: (ctrl: Ctrl<AppShellState>, action: string, data?: any, event?: Event): void => {
+        // console.log("action:", action, data, event);
         switch (action) {
             case AppShellActions.title:
                 ctrl.update({ title: data as string });
@@ -494,7 +461,7 @@ export const AppShell: Component<AppShellState> = {
                 setTimeout(ctrl.update, 3e3, { snackbar: undefined });
                 break;
             default:
-                ctrl.appAction(action, data);
+                ctrl.appAction(action, data, event);
         }
     }
 };

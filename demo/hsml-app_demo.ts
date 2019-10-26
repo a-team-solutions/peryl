@@ -10,6 +10,7 @@ enum Action {
     title = "title",
     dec = "dec",
     inc = "inc",
+    clear = "clear",
     xXx = "xXx"
 }
 
@@ -26,10 +27,14 @@ const view: View<State> = (state: State): HsmlFragment => [
             {
                 type: "text",
                 name: "title",
-                value: state.title,
+                value: new String(state.title),
                 on: ["input", Action.title]
             }
-        ],
+        ], " ",
+        ["button.w3-button.w3-blue",
+            { on: ["click", Action.clear] },
+            ["Clear title"]
+        ]
     ]],
     ["p", [
         ["em", ["Count"]], ": ", state.count,
@@ -42,8 +47,8 @@ const view: View<State> = (state: State): HsmlFragment => [
     ]]
 ];
 
-const actions: Actions<State> = ([action, data, e], app: App<State>): void => {
-    console.log("action:", action, data, e);
+const actions: Actions<State> = (app, action, data, event): void => {
+    console.log("action:", action, data, event);
     switch (action) {
         case Action.title:
             app.update(data);
@@ -54,6 +59,9 @@ const actions: Actions<State> = ([action, data, e], app: App<State>): void => {
             break;
         case Action.dec:
             app.update({ count: app.state.count - data as number });
+            break;
+        case Action.clear:
+            app.update({ title: "" });
             break;
         default:
             console.warn("action unhandled:", action, data);

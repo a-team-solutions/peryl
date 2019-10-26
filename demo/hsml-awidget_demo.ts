@@ -28,6 +28,7 @@ class App extends AWidget<AppState> {
                 ["input",
                     {
                         type: "text",
+                        name: "title",
                         value: state.title,
                         // on: ["input", e => action(AppActions.title, (e.target as HTMLInputElement).value)],
                         // on: ["input", Actions.title, e => (e.target as HTMLInputElement).value]
@@ -46,13 +47,11 @@ class App extends AWidget<AppState> {
         ];
     }
 
-    actions(action: string, data: any, widget: AWidget<AppState>): void {
+    actions(widget: AWidget<AppState>, action: string, data?: any, event?: Event): void {
         // console.log("action:", action, data);
         switch (action) {
             case AppActions.title:
-                // const title = data;
-                const title = ((data as Event).target as HTMLInputElement).value;
-                widget.update({ title });
+                widget.update(data);
                 break;
             case AppActions.inc:
                 widget.update({ count: widget.state.count + data as number });
@@ -93,8 +92,8 @@ class SubApp extends AWidget<AppState> {
         ];
     }
 
-    actions(action: string, data: any, widget: AWidget<AppState>): void {
-        // console.log("action:", action, data);
+    actions(widget: AWidget<AppState>, action: string, data?: any, event?: Event): void {
+        // console.log("action:", action, data, event);
         switch (action) {
             case SubAppActions.xXx:
                 console.log(action);
@@ -107,8 +106,8 @@ class SubApp extends AWidget<AppState> {
 }
 
 
-function appActions(action: string, data: any, widget: AWidget<AppState>) {
-    console.log(action, data);
+function appActions(widget: AWidget<AppState>, action: string, data?: any, event?: Event) {
+    console.log(action, data, event);
     switch (action) {
         case "xXx":
             widget.update({ title: "xXx" });

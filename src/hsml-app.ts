@@ -6,7 +6,10 @@ export type View<State> = (state: State) => HsmlFragment;
 
 export type Action = (action: string, data?: any) => void;
 
-export type Actions<State> = (action: [string, any?, Event?], app: App<State>) => void;
+export type Actions<State> = (app: App<State>,
+                              action: string,
+                              data?: any,
+                              event?: Event) => void;
 
 export type Class<T = object> = new (...args: any[]) => T;
 
@@ -36,20 +39,20 @@ export class App<State> implements HsmlHandlerCtx {
         this.action("_init");
     }
 
-    action = (action: string, data?: any, e?: Event): void => {
-        this.actions([action, data, e], this);
+    action = (action: string, data?: any, event?: Event): void => {
+        this.actions(this, action, data, event);
     }
 
     render = (): HsmlFragment => this.view(this.state);
 
-    onHsml = (action: string, data: HsmlAttrOnData, e: Event): void => {
+    onHsml = (action: string, data: HsmlAttrOnData, event: Event): void => {
         data = (data && data.constructor === Function)
-            ? (data as HsmlAttrOnDataFnc)(e)
+            ? (data as HsmlAttrOnDataFnc)(event)
             : data;
-        if (data === undefined && e) {
-            data = formInputData(e);
+        if (data === undefined && event) {
+            data = formInputData(event);
         }
-        this.action(action, data, e);
+        this.action(action, data, event);
     }
 
     mount = (e?: string | Element | null): this => {
@@ -190,13 +193,13 @@ function formInputData(e: Event): { [k: string]: string } {
             const sel = (el as HTMLSelectElement);
             value[sel.name] = sel.value;
             break;
-        case "BUTTON":
-            const bel = (el as HTMLButtonElement);
-            value[bel.name] = bel.value;
-            break;
         case "TEXTAREA":
             const tel = (el as HTMLTextAreaElement);
             value[tel.name] = tel.innerText;
+            break;
+        case "BUTTON":
+            const bel = (el as HTMLButtonElement);
+            value[bel.name] = bel.value;
             break;
     }
     return value;

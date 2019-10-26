@@ -3,8 +3,8 @@ import { AppShellState, AppShellActions, Content, Form, AppShell, FormActions } 
 import { Hash } from "../src/hash";
 
 const app = new Ctrl<AppShellState>(AppShell)
-    .appActions((action: string, data: any, ctrl: Ctrl<AppShellState>) => {
-        console.log("app action", ctrl.type, action, data);
+    .appActions((ctrl, action, data, event) => {
+        console.log("app action", ctrl.type, action, data, event);
         switch (action) {
             case FormActions.submit:
                 alert(`Form submit: \n${JSON.stringify(data, null, 4)}`);

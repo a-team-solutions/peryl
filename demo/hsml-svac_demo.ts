@@ -30,6 +30,7 @@ const App: Component<AppState> = {
             ["input",
                 {
                     type: "text",
+                    name: "title",
                     value: state.title,
                     // on: ["input", e => action(AppActions.title, (e.target as HTMLInputElement).value)],
                     // on: ["input", Actions.title, e => (e.target as HTMLInputElement).value]
@@ -47,13 +48,11 @@ const App: Component<AppState> = {
         ["p", state.title ? mount<AppState>(Sub, state, action) : []]
     ],
 
-    actions: (action: string, data: any, ctrl: Ctrl<AppState>): void => {
-        // console.log("action:", action, data);
+    actions: (ctrl: Ctrl<AppState>, action: string, data?: any, event?: Event): void => {
+        // console.log("action:", action, data, event);
         switch (action) {
             case AppActions.title:
-                // const title = data;
-                const title = ((data as Event).target as HTMLInputElement).value;
-                ctrl.update({ title });
+                ctrl.update(data);
                 break;
             case AppActions.inc:
                 ctrl.update({ count: ctrl.state.count + data as number });
@@ -63,7 +62,7 @@ const App: Component<AppState> = {
                 ctrl.update({ count: ctrl.state.count - data as number });
                 break;
             default:
-                ctrl.extAction(action, data);
+                ctrl.extAction(action, data, event);
         }
     }
 };
@@ -87,20 +86,20 @@ const Sub: Component<AppState> = {
         ]]
     ],
 
-    actions: (action: string, data: any, ctrl: Ctrl<AppState>): void => {
-        // console.log("action:", action, data);
+    actions: (ctrl: Ctrl<AppState>, action: string, data?: any, event?: Event): void => {
+        // console.log("action:", action, data, event);
         switch (action) {
             case SubAppActions.xXx:
-                ctrl.extAction(action, data);
+                ctrl.extAction(action, data, event);
                 break;
             default:
-                ctrl.appAction(action, data);
+                ctrl.appAction(action, data, event);
         }
     }
 };
 
 const appActions: Actions<AppState> =
-    (action: string, data: any, ctrl: Ctrl<AppState>) => {
+    (ctrl: Ctrl<AppState>, action: string, data: any, event?: Event) => {
         console.log(action, data);
         switch (action) {
             case "xXx":

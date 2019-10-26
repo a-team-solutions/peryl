@@ -48,7 +48,7 @@ export class Sidebar extends AWidget<SidebarState> {
         ];
     }
 
-    actions(action: string, data: any, widget: AWidget<SidebarState>): void {
+    actions(widget: AWidget<SidebarState>, action: string, data?: any, event?: Event): void {
         console.log("action:", action, data);
         switch (action) {
             case SidebarActions.title:
@@ -81,7 +81,7 @@ export class Content extends AWidget<ContentState> {
         ];
     }
 
-    actions(action: string, data: any, widget: AWidget<ContentState>): void {
+    actions(widget: AWidget<ContentState>, action: string, data?: any, event?: Event): void {
         console.log("action:", action, data);
         switch (action) {
             case ContentActions.title:
@@ -218,7 +218,7 @@ export class AppShell extends AWidget<AppShellState> {
         ];
     }
 
-    actions(action: string, data: any, widget: AWidget<AppShellState>): void {
+    actions(widget: AWidget<AppShellState>, action: string, data?: any, event?: Event): void {
         console.log("action:", action, data);
         switch (action) {
             case AppShellActions.title:
@@ -247,8 +247,8 @@ export class AppShell extends AWidget<AppShellState> {
 }
 
 
-function appActions(action: string, data: any, widget: AWidget<AppShellState>) {
-    console.log("app action", widget.type, action, data);
+function appActions(widget: AWidget<AppShellState>, action: string, data?: any, event?: Event) {
+    console.log("app action", widget.type, action, data, event);
     switch (action) {
         case "xXx":
             widget.update({ title: "xXx" });

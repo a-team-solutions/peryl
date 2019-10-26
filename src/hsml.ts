@@ -32,6 +32,7 @@ export interface HsmlAttrs {
     readonly on?: HsmlAttrOn;
     readonly [key: string]:
         | string
+        | String
         | string[]
         | number
         | boolean
