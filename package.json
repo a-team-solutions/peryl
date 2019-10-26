@@ -57,7 +57,7 @@
     "dist": "npm run clean; npm run dist:es6; npm run dist:umd",
     "test:jasmine": "ts-node node_modules/jasmine/bin/jasmine 'test/**/*.test.ts'",
     "test:jasmine:watch": "nodemon --ext ts --watch test --watch src --exec 'ts-node node_modules/jasmine/bin/jasmine \"test/**/*.test.ts\"'",
-    "test": "npm run tslint; npm run test:jasmine; npm run build",
+    "test": "npm run tslint; npm run test:jasmine",
     "test:watch": "npm run test:jasmine:watch",
     "start": "npm run demo"
   },
@@ -82,7 +82,8 @@
   },
   "pre-commit": [
     "test",
-    "dist"
+    "dist",
+    "build"
   ],
   "pre-push": [],
   "prettier": {
