@@ -8,6 +8,7 @@ import {
     HsmlAttrData,
     HsmlAttrStyles,
     HsmlAttrOn,
+    HsmlAttrOnAction,
     HsmlAttrOnData,
     HsmlFnc,
     HsmlObj,
@@ -78,11 +79,11 @@ class HsmlDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                         const attrOn = attrs[a] as HsmlAttrOn;
                         if (typeof attrOn[1] === "function") {
                             e.addEventListener(attrOn[0] as string, attrOn[1] as (e: Event) => void);
-                        } else if (typeof attrOn[1] === "string") {
+                        } else {
                             e.addEventListener(attrOn[0] as string, (e: Event) => {
                                 ctx && ctx.onHsml &&
                                 typeof ctx.onHsml === "function" &&
-                                ctx.onHsml(attrOn[1] as string,
+                                ctx.onHsml(attrOn[1] as HsmlAttrOnAction,
                                            attrOn[2] as HsmlAttrOnData,
                                            e);
                             });

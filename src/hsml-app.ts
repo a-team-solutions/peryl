@@ -2,25 +2,27 @@ import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandl
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export type View<State> = (state: State) => HsmlFragment;
+export type MergebleState = { [k: string]: any };
 
-export type Action = (action: string, data?: any, event?: Event) => void;
+export type View<State extends MergebleState> = (state: State) => HsmlFragment;
 
-export type Actions<State> = (app: App<State>,
-                              action: string,
-                              data?: any,
-                              event?: Event) => void;
+export type Action = (action: string | number, data?: any, event?: Event) => void;
+
+export type Actions<State extends MergebleState> = (app: App<State>,
+                                                    action: string | number,
+                                                    data?: any,
+                                                    event?: Event) => void;
 
 export type Class<T = object> = new (...args: any[]) => T;
 
-export function app<State>(state: State,
-                           view: View<State>,
-                           actions: Actions<State>,
-                           element?: string | Element | null) {
+export function app<State extends MergebleState>(state: State,
+                                                 view: View<State>,
+                                                 actions: Actions<State>,
+                                                 element?: string | Element | null) {
     return new App<State>(state, view, actions).mount(element);
 }
 
-export class App<State> implements HsmlHandlerCtx {
+export class App<State extends MergebleState> implements HsmlHandlerCtx {
 
     state: State;
 
@@ -39,7 +41,7 @@ export class App<State> implements HsmlHandlerCtx {
         this.action("_init");
     }
 
-    action: Action = (action: string, data?: any, event?: Event): void => {
+    action: Action = (action: string | number, data?: any, event?: Event): void => {
         this.actions(this, action, data, event);
     }
 
@@ -144,7 +146,7 @@ export class App<State> implements HsmlHandlerCtx {
     });
 };
 
-const merge = <T extends { [k: string]: any }>(target: T, source: Partial<T>): T => {
+const merge = <T extends MergebleState>(target: T, source: Partial<T>): T => {
     if (isMergeble(target) && isMergeble(source)) {
         Object.keys(source).forEach(key => {
             if (isMergeble(source[key] as object)) {

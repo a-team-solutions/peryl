@@ -7,16 +7,18 @@ export type HsmlAttrStyles = { [key: string]: string };
 
 export type HsmlAttrData = { [key: string]: string | number | Array<any> | Object };
 
+export type HsmlAttrOnAction = string | number;
+
 export type HsmlAttrOnDataFnc = (e: Event) => any;
 
 export type HsmlAttrOnData = string | number | Array<any> | Object | HsmlAttrOnDataFnc;
 
 export type HsmlAttrOn =
     | [keyof HTMLElementEventMap, EventListener]
-    | [keyof HTMLElementEventMap, string, HsmlAttrOnData?]
+    | [keyof HTMLElementEventMap, HsmlAttrOnAction, HsmlAttrOnData?]
     | Array<
         | [keyof HTMLElementEventMap, EventListener]
-        | [keyof HTMLElementEventMap, string, HsmlAttrOnData?]
+        | [keyof HTMLElementEventMap, HsmlAttrOnAction, HsmlAttrOnData?]
     >;
 
 export interface HsmlAttrs {
@@ -66,7 +68,7 @@ export type HsmlElement = string | boolean | number | Date | HsmlFnc | HsmlObj |
 
 export interface HsmlHandlerCtx extends HsmlObj {
     refs: { [name: string]: Element };
-    onHsml(action: string, data: HsmlAttrOnData, e: Event): void;
+    onHsml(action: HsmlAttrOnAction, data: HsmlAttrOnData, e: Event): void;
 }
 
 export interface HsmlHandler<C extends HsmlHandlerCtx> {

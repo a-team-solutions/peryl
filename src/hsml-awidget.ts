@@ -2,18 +2,23 @@ import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandl
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export type View<State> = (state: State, action: Action, mount: Mount) => HsmlFragment;
+export type MergebleState = { [k: string]: any };
 
-export type Action = (action: string, data?: any) => void;
+export type View<State extends MergebleState> = (state: State,
+                                                 action: Action,
+                                                 mount: Mount) => HsmlFragment;
 
-export type Actions<State> = (widget: AWidget<State>,
-                              action: string,
-                              data?: any,
-                              event?: Event) => void;
+export type Action = (action: string | number, data?: any) => void;
+
+export type Actions<State extends MergebleState> = (widget: AWidget<State>,
+                                                    action: string | number,
+                                                    data?: any,
+                                                    event?: Event) => void;
 
 export type Class<T = object> = new (...args: any[]) => T;
 
-export type Mount = <State>(xwClass: Class<AWidget<State>>, state?: State) => HsmlFnc | HsmlFragment;
+export type Mount = <State extends MergebleState>(xwClass: Class<AWidget<State>>,
+                                                  state?: State) => HsmlFnc | HsmlFragment;
 
 const mount: Mount = <State>(wClass: Class<AWidget<State>>, state?: State): HsmlFnc | HsmlFragment => {
     return (e: Element) => {
@@ -43,14 +48,14 @@ const mount: Mount = <State>(wClass: Class<AWidget<State>>, state?: State): Hsml
     };
 };
 
-export abstract class AWidget<State> implements HsmlHandlerCtx {
+export abstract class AWidget<State extends MergebleState> implements HsmlHandlerCtx {
 
     private static _count = 0;
 
     static readonly mounted: { [wid: string]: AWidget<any> } = {};
 
     static appActions: Actions<any> = (widget: AWidget<any>,
-                                       action: string,
+                                       action: string | number,
                                        data?: any,
                                        event?: Event): void => {
         console.log("action:", widget, action, data, event);
@@ -65,9 +70,9 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
 
     abstract state: State;
     abstract view(state: State, action: Action, mount: Mount): HsmlFragment;
-    abstract actions(widget: AWidget<State>, action: string, data?: any, event?: Event): void;
+    abstract actions(widget: AWidget<State>, action: string | number, data?: any, event?: Event): void;
 
-    action = (action: string, data?: any, event?: Event): void => {
+    action = (action: string | number, data?: any, event?: Event): void => {
         this.actions(this, action, data, event);
     }
 
@@ -209,7 +214,7 @@ export abstract class AWidget<State> implements HsmlHandlerCtx {
     });
 };
 
-const merge = <T extends { [k: string]: any }>(target: T, source: Partial<T>): T => {
+const merge = <T extends MergebleState>(target: T, source: Partial<T>): T => {
     if (isMergeble(target) && isMergeble(source)) {
         Object.keys(source).forEach(key => {
             if (isMergeble(source[key] as object)) {

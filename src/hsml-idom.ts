@@ -6,7 +6,9 @@ import {
     HsmlAttrs,
     HsmlAttrClasses,
     HsmlAttrData,
+    HsmlAttrStyles,
     HsmlAttrOn,
+    HsmlAttrOnAction,
     HsmlAttrOnData,
     HsmlFnc,
     HsmlObj,
@@ -63,17 +65,17 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                         }
                         break;
                     case "styles":
-                        props.push("style", attrs[a]);
+                        props.push("style", attrs[a] as HsmlAttrStyles);
                         break;
                     case "on":
                         const attrOn = attrs[a] as HsmlAttrOn;
                         if (typeof attrOn[1] === "function") {
                             props.push("on" + attrOn[0], attrOn[1]);
-                        } else if (typeof attrOn[1] === "string") {
+                        } else {
                             props.push("on" + attrOn[0], (e: Event) => {
                                 ctx && ctx.onHsml &&
                                 typeof ctx.onHsml === "function" &&
-                                ctx.onHsml(attrOn[1] as string,
+                                ctx.onHsml(attrOn[1] as HsmlAttrOnAction,
                                            attrOn[2] as HsmlAttrOnData,
                                            e);
                             });

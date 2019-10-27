@@ -8,7 +8,7 @@ export interface Component<State extends MergebleState> extends SvacComponent<St
 }
 
 export type Actions<State extends MergebleState> = (ctrl: Ctrl<State>,
-                                                    action: string,
+                                                    action: string | number,
                                                     data?: any,
                                                     event?: Event) => void;
 
@@ -77,7 +77,7 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
         this.action("_init");
     }
 
-    appAction = (action: string, data?: any, event?: Event): void => {
+    appAction = (action: string | number, data?: any, event?: Event): void => {
         Ctrl.debug && console.log("appAction", this.type, action, data, event);
         Ctrl.appActions && Ctrl.appActions(this, action, data, event);
     }
@@ -87,12 +87,12 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
         return this;
     }
 
-    extAction = (action: string, data?: any, event?: Event): void => {
+    extAction = (action: string | number, data?: any, event?: Event): void => {
         Ctrl.debug && console.log("extAction", this.type, action, data, event);
         this._extAction && this._extAction(action, data, event);
     }
 
-    action = (action: string, data?: any, event?: Event): void => {
+    action = (action: string | number, data?: any, event?: Event): void => {
         Ctrl.debug && console.log("action", this.type, action, data, event);
         this._actions && this._actions(this, action, data, event);
     }

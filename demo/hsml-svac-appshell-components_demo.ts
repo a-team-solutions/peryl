@@ -50,7 +50,7 @@ export const Sidebar: Component<SidebarState> = {
         ]]
     ],
 
-    actions: (ctrl: Ctrl<SidebarState>, action: string, data?: any, event?: Event): void => {
+    actions: (ctrl: Ctrl<SidebarState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case SidebarActions.title:
@@ -86,7 +86,7 @@ export const Content: Component<ContentState> = {
         ["p", [state.text]]
     ],
 
-    actions: (ctrl: Ctrl<ContentState>, action: string, data: any, event?: Event): void => {
+    actions: (ctrl: Ctrl<ContentState>, action: string | number, data: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case ContentActions.title:
@@ -256,7 +256,7 @@ export const Form: Component<FormState> = {
         ]]
     ],
 
-    actions: (ctrl: Ctrl<FormState>, action: string, data?: any, event?: Event): void => {
+    actions: (ctrl: Ctrl<FormState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
 
         const ctx = ctrl as Ctrl<FormState>
@@ -437,7 +437,7 @@ export const AppShell: Component<AppShellState> = {
         ]
     ],
 
-    actions: (ctrl: Ctrl<AppShellState>, action: string, data?: any, event?: Event): void => {
+    actions: (ctrl: Ctrl<AppShellState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case AppShellActions.title:

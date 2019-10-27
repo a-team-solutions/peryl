@@ -48,7 +48,7 @@ const App: Component<AppState> = {
         ["p", state.title ? mount<AppState>(Sub, state, action) : []]
     ],
 
-    actions: (ctrl: Ctrl<AppState>, action: string, data?: any, event?: Event): void => {
+    actions: (ctrl: Ctrl<AppState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case AppActions.title:
@@ -86,7 +86,7 @@ const Sub: Component<AppState> = {
         ]]
     ],
 
-    actions: (ctrl: Ctrl<AppState>, action: string, data?: any, event?: Event): void => {
+    actions: (ctrl: Ctrl<AppState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case SubAppActions.xXx:
@@ -99,7 +99,7 @@ const Sub: Component<AppState> = {
 };
 
 const appActions: Actions<AppState> =
-    (ctrl: Ctrl<AppState>, action: string, data: any, event?: Event) => {
+    (ctrl: Ctrl<AppState>, action: string | number, data: any, event?: Event) => {
         console.log(action, data);
         switch (action) {
             case "xXx":

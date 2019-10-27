@@ -7,11 +7,11 @@ interface State {
 }
 
 enum Action {
-    title = "title",
-    dec = "dec",
-    inc = "inc",
-    clear = "clear",
-    xXx = "xXx"
+    title,
+    dec,
+    inc,
+    clear,
+    xXx
 }
 
 const state: State = {
@@ -48,7 +48,7 @@ const view: View<State> = (state: State): HsmlFragment => [
 ];
 
 const actions: Actions<State> = (app, action, data, event): void => {
-    console.log("action:", action, data, event);
+    console.log("action:", Action[action as number], data, event);
     switch (action) {
         case Action.title:
             app.update(data);
@@ -64,7 +64,7 @@ const actions: Actions<State> = (app, action, data, event): void => {
             app.update({ title: "" });
             break;
         default:
-            console.warn("action unhandled:", action, data);
+            console.warn("action unhandled:", action, data, event);
     }
 };
 

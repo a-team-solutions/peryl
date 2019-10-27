@@ -8,7 +8,7 @@ export interface Component<State extends MergebleState> {
     view: View<State>;
 }
 
-export type Action = (action: string, data?: any, event?: Event) => void;
+export type Action = (action: string | number, data?: any, event?: Event) => void;
 
 export type View<State extends MergebleState> = (
     state: State,

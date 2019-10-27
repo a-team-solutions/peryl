@@ -53,7 +53,7 @@ const TicTacToe: Component<TicTacToeState> = {
         ]
     ],
 
-    actions: (ctrl: Ctrl<TicTacToeState>, action: string, data?: any, event?: Event): void => {
+    actions: (ctrl: Ctrl<TicTacToeState>, action: string | number, data?: any, event?: Event): void => {
         console.log("action", action, data, event);
         switch (action) {
             case TicTacToeActions.mark:

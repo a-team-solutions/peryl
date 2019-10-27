@@ -106,7 +106,7 @@ class SubApp extends AWidget<AppState> {
 }
 
 
-function appActions(widget: AWidget<AppState>, action: string, data?: any, event?: Event) {
+function appActions(widget: AWidget<AppState>, action: string | number, data?: any, event?: Event) {
     console.log(action, data, event);
     switch (action) {
         case "xXx":

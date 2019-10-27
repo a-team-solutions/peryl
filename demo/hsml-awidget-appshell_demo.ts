@@ -247,7 +247,7 @@ export class AppShell extends AWidget<AppShellState> {
 }
 
 
-function appActions(widget: AWidget<AppShellState>, action: string, data?: any, event?: Event) {
+function appActions(widget: AWidget<AppShellState>, action: string | number, data?: any, event?: Event) {
     console.log("app action", widget.type, action, data, event);
     switch (action) {
         case "xXx":
