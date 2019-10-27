@@ -6,7 +6,6 @@ import * as form from "./form";
 import * as hash from "./hash";
 import * as history from "./history";
 import * as hsmlapp from "./hsml-app";
-import * as hsmlawidget from "./hsml-awidget";
 import * as hsmldom from "./hsml-dom";
 import * as hsmlh from "./hsml-h";
 import * as hsmlhtml from "./hsml-html";
@@ -34,7 +33,6 @@ export {
     hash,
     history,
     hsmlapp,
-    hsmlawidget,
     hsmldom,
     hsmlh,
     hsmlhtml,
