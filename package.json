@@ -6,20 +6,20 @@
     "PeRyL",
     "javascript",
     "typescript",
-    "jsonml",
+    "cache",
     "dom",
     "encode",
     "events",
     "form",
     "hash",
     "history",
+    "hsml",
     "http",
     "load",
     "router",
     "signal",
     "template",
-    "validators",
-    "widgets"
+    "validators"
   ],
   "license": "GPL-3.0",
   "author": {

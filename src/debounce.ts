@@ -1,8 +1,10 @@
 
-export function debounce<F extends (...args: any[]) => void>(func: F, delay: number = 300) {
-    type Params = F extends (...args: infer P) => void ? P : never;
+type Fnc = (...args: any[]) => void;
+
+export function debounce<F extends Fnc>(func: F, delay = 300) {
+    type Args = F extends (...args: infer P) => void ? P : never;
     let timeout: number;
-    return function (this: any, ...args: Params) {
+    return function (this: any, ...args: Args) {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
             func.apply(this, args);
@@ -11,7 +13,7 @@ export function debounce<F extends (...args: any[]) => void>(func: F, delay: num
 }
 
 // Decorator
-export function Debounce(delay: number = 300) {
+export function Debounce(delay = 300) {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
         descriptor.value = debounce(originalMethod, delay);
