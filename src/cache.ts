@@ -3,22 +3,31 @@ type Fnc<R> = (this: any, ...args: any[]) => R;
 
 export function cache<R, F extends Fnc<R>>(func: F, delay = 300) {
     type Args = F extends (...args: infer P) => R ? P : never;
-    let expire = Date.now() + delay;
-    let data: R;
+    let data: { [key: string]: [R, Args, number] } = {};
     return async function (this: any, ...args: Args): Promise<R> {
-        if (!data || Date.now() > expire) {
-            expire = Date.now() + delay;
-            data = await func.apply(this, args);
+        const key = JSON.stringify(args);
+        const record = data[key];
+        const now = Date.now();
+        if (!record || now > record[2] + delay) {
+            const value = await func.apply(this, args);
+            data[key] = [value, args, now];
         }
-        return data;
+        const res = data[key][0];
+        Object.keys(data).forEach(key => {
+            if (data[key][2] + delay < now) {
+                delete data[key];
+                console.log("delete", key);
+            }
+        });
+        return res;
     };
 }
 
 // Decorator
 export function Cache(delay = 300) {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-        const originalMethod = descriptor.value;
-        descriptor.value = cache(originalMethod, delay);
+        const method = descriptor.value;
+        descriptor.value = cache<any, typeof method>(method, delay);
         return descriptor;
     };
 }
@@ -63,9 +72,10 @@ export function Cache(delay = 300) {
 // }
 // const obj = new O();
 // // obj.m = cache(obj.m, 300); // decorator equivalent
-// obj.m("m(p)");
+// // obj.m("m(p)");
 
 // obj.m("m(p)").then(console.log);
 // setTimeout(() => obj.m("m(p)").then(console.log), 200);
 // setTimeout(() => obj.m("m(p)").then(console.log), 500);
 // setTimeout(() => obj.m("m(p)").then(console.log), 700);
+// setTimeout(() => obj.m("m(p)").then(console.log), 900);

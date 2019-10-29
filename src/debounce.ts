@@ -15,8 +15,8 @@ export function debounce<F extends Fnc>(func: F, delay = 300) {
 // Decorator
 export function Debounce(delay = 300) {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-        const originalMethod = descriptor.value;
-        descriptor.value = debounce(originalMethod, delay);
+        const method = descriptor.value;
+        descriptor.value = debounce(method, delay);
         return descriptor;
     };
 }
