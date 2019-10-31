@@ -22,6 +22,12 @@ export function app<State extends MergebleState>(state: State,
     return new App<State>(state, view, actions).mount(element);
 }
 
+export enum AppAction {
+    _init = "_init",
+    _mount = "_mount",
+    _umount = "_umount",
+}
+
 export class App<State extends MergebleState> implements HsmlHandlerCtx {
 
     state: State;
@@ -38,7 +44,7 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
         this.state = state;
         this.view = view;
         this.actions = actions;
-        this.action("_init");
+        this.action(AppAction._init);
     }
 
     action: Action = (action: string | number, data?: any, event?: Event): void => {
@@ -70,14 +76,14 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
             (el as any).app = this;
             const hsmls = (this as any).render();
             hsmls2idomPatch(el, hsmls, this);
-            this.action("_mount", this.dom);
+            this.action(AppAction._mount, this.dom);
         }
         return this;
     }
 
     umount = (): this => {
         if (this.dom) {
-            this.action("_umount", this.dom);
+            this.action(AppAction._umount, this.dom);
             if (this.dom.hasAttribute("app")) {
                 this.dom.removeAttribute("app");
             }
@@ -125,7 +131,7 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
                 if (!this.dom) {
                     (this as any).dom = e;
                     (e as any).app = this;
-                    this.action("_mount", this.dom);
+                    this.action(AppAction._mount, this.dom);
                 }
             });
         return ["div", hsmls];
