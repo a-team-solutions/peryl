@@ -8,6 +8,8 @@ import {
     HsmlAttrData,
     HsmlAttrStyles,
     HsmlAttrOn,
+    HsmlAttrOnCb,
+    HsmlAttrOnAct,
     HsmlAttrOnAction,
     HsmlAttrOnData,
     HsmlFnc,
@@ -69,16 +71,33 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                         break;
                     case "on":
                         const attrOn = attrs[a] as HsmlAttrOn;
-                        if (typeof attrOn[1] === "function") {
-                            props.push("on" + attrOn[0], attrOn[1]);
+                        if (typeof attrOn[0] === "string") {
+                            if (typeof attrOn[1] === "function") {
+                                props.push("on" + attrOn[0], attrOn[1]);
+                            } else {
+                                props.push("on" + attrOn[0], (e: Event) => {
+                                    ctx && ctx.onHsml &&
+                                    typeof ctx.onHsml === "function" &&
+                                    ctx.onHsml(attrOn[1] as HsmlAttrOnAction,
+                                            attrOn[2] as HsmlAttrOnData,
+                                            e);
+                                });
+                            }
                         } else {
-                            props.push("on" + attrOn[0], (e: Event) => {
-                                ctx && ctx.onHsml &&
-                                typeof ctx.onHsml === "function" &&
-                                ctx.onHsml(attrOn[1] as HsmlAttrOnAction,
-                                           attrOn[2] as HsmlAttrOnData,
-                                           e);
-                            });
+                            (attrOn as Array<HsmlAttrOnCb | HsmlAttrOnAct>)
+                                .forEach(attr => {
+                                    if (typeof attr[1] === "function") {
+                                        props.push("on" + attr[0], attr[1]);
+                                    } else {
+                                        props.push("on" + attr[0], (e: Event) => {
+                                            ctx && ctx.onHsml &&
+                                            typeof ctx.onHsml === "function" &&
+                                            ctx.onHsml(attr[1] as HsmlAttrOnAction,
+                                                    attr[2] as HsmlAttrOnData,
+                                                    e);
+                                        });
+                                    }
+                                });
                         }
                         break;
                     default:

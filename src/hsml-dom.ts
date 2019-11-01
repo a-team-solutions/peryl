@@ -8,6 +8,8 @@ import {
     HsmlAttrData,
     HsmlAttrStyles,
     HsmlAttrOn,
+    HsmlAttrOnCb,
+    HsmlAttrOnAct,
     HsmlAttrOnAction,
     HsmlAttrOnData,
     HsmlFnc,
@@ -77,16 +79,33 @@ class HsmlDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                         break;
                     case "on":
                         const attrOn = attrs[a] as HsmlAttrOn;
-                        if (typeof attrOn[1] === "function") {
-                            e.addEventListener(attrOn[0] as string, attrOn[1] as (e: Event) => void);
+                        if (typeof attrOn[0] === "string") {
+                            if (typeof attrOn[1] === "function") {
+                                e.addEventListener(attrOn[0] as string, attrOn[1] as (e: Event) => void);
+                            } else {
+                                e.addEventListener(attrOn[0] as string, (e: Event) => {
+                                    ctx && ctx.onHsml &&
+                                    typeof ctx.onHsml === "function" &&
+                                    ctx.onHsml(attrOn[1] as HsmlAttrOnAction,
+                                            attrOn[2] as HsmlAttrOnData,
+                                            e);
+                                });
+                            }
                         } else {
-                            e.addEventListener(attrOn[0] as string, (e: Event) => {
-                                ctx && ctx.onHsml &&
-                                typeof ctx.onHsml === "function" &&
-                                ctx.onHsml(attrOn[1] as HsmlAttrOnAction,
-                                           attrOn[2] as HsmlAttrOnData,
-                                           e);
-                            });
+                            (attrOn as Array<HsmlAttrOnCb | HsmlAttrOnAct>)
+                                .forEach(attr => {
+                                    if (typeof attrOn[1] === "function") {
+                                        e.addEventListener(attrOn[0] as string, attrOn[1] as (e: Event) => void);
+                                    } else {
+                                        e.addEventListener(attrOn[0] as string, (e: Event) => {
+                                            ctx && ctx.onHsml &&
+                                            typeof ctx.onHsml === "function" &&
+                                            ctx.onHsml(attrOn[1] as HsmlAttrOnAction,
+                                                    attrOn[2] as HsmlAttrOnData,
+                                                    e);
+                                        });
+                                    }
+                                });
                         }
                         break;
                     default:

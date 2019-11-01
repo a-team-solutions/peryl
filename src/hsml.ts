@@ -13,13 +13,11 @@ export type HsmlAttrOnDataFnc = (e: Event) => any;
 
 export type HsmlAttrOnData = string | number | Array<any> | Object | HsmlAttrOnDataFnc;
 
-export type HsmlAttrOn =
-    | [keyof HTMLElementEventMap, EventListener]
-    | [keyof HTMLElementEventMap, HsmlAttrOnAction, HsmlAttrOnData?]
-    | Array<
-        | [keyof HTMLElementEventMap, EventListener]
-        | [keyof HTMLElementEventMap, HsmlAttrOnAction, HsmlAttrOnData?]
-    >;
+export type HsmlAttrOnCb = [keyof HTMLElementEventMap, EventListener];
+
+export type HsmlAttrOnAct = [keyof HTMLElementEventMap, HsmlAttrOnAction, HsmlAttrOnData?];
+
+export type HsmlAttrOn = HsmlAttrOnCb | HsmlAttrOnAct | Array<HsmlAttrOnCb | HsmlAttrOnAct>;
 
 export interface HsmlAttrs {
     readonly _id?: string;
