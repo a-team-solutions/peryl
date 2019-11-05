@@ -43,14 +43,14 @@ const mount: Mount = <State extends MergebleState>(
     };
 
 const schedule = window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
+    // window.webkitRequestAnimationFrame ||
     // (window as any).mozRequestAnimationFrame ||
     // (window as any).oRequestAnimationFrame ||
     // (window as any).msRequestAnimationFrame ||
     function (handler) { window.setTimeout(handler, 1000 / 60); };
 
 const unschedule = window.cancelAnimationFrame ||
-    window.webkitCancelAnimationFrame ||
+    // window.webkitCancelAnimationFrame ||
     // (window as any).mozCancelAnimationFrame ||
     // (window as any).oCancelAnimationFrame ||
     // (window as any).msCancelAnimationFrame ||
