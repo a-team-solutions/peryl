@@ -1,16 +1,8 @@
-import * as numeral from "numeral";
-import * as moment from "moment";
-import { Moment } from "moment";
-
 const requiredMsg = "required";
 const notInRangeMsg = "not_in_range";
 const invalidFormatMsg = "invalid_format";
 const invalidOptionMsg = "invalid_option";
 const invalidValueMsg = "invalid_value";
-
-const localeDefault = "en";
-const dateFormatFefault = "L";
-const numFormatDefault = "0,0.[00]";
 
 export abstract class Validator<T, O, M> {
 
@@ -219,263 +211,6 @@ export class StringValidator
 }
 
 export const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-
-export interface NumeralValidatorOpts {
-    required?: boolean;
-    min?: number;
-    max?: number;
-    locale?: string;
-    format?: string;
-    strict?: boolean;
-}
-
-export interface NumeralValidatorMsgs {
-    required?: string;
-    invalid_format?: string;
-    not_in_range?: string;
-}
-
-export class NumeralValidator
-    extends Validator<Numeral, NumeralValidatorOpts, NumeralValidatorMsgs> {
-
-    constructor(opts?: NumeralValidatorOpts, msgs?: NumeralValidatorMsgs) {
-        super(opts, msgs);
-    }
-
-    protected strToObj(str: string): { obj?: Numeral, err?: string } {
-        const opts = this.opts;
-        const msgs = this.msgs;
-        if ("required" in opts) {
-            if (opts.required && !str) {
-                return {
-                    err: msgs.required
-                        ? tpl(msgs.required,
-                            {
-                                min: ("min" in opts) ? ("" + opts.min) : "",
-                                max: ("max" in opts) ? ("" + opts.max) : "",
-                                locale: ("locale" in opts)
-                                    ? opts.locale!
-                                    : localeDefault,
-                                format: ("format" in opts)
-                                    ? opts.format!
-                                    : numFormatDefault
-                            })
-                        : requiredMsg
-                };
-            }
-        }
-        numeral.locale(opts.locale || localeDefault);
-        const n = numeral(str);
-        let err: boolean = false;
-        if (n.value() === null) {
-            err = true;
-        }
-        if ("strict" in opts) {
-            if (opts.strict && (str !== this.objToStr(n).str)) {
-                err = true;
-            }
-        }
-        if (err) {
-            const num = (n.value() !== null) ? n : numeral(1234.45);
-            return {
-                obj: (n.value() !== null) ? n : undefined,
-                err: msgs.invalid_format
-                    ? tpl(msgs.invalid_format,
-                        {
-                            num: this.objToStr(num).str || "",
-                            locale: ("locale" in opts)
-                                ? opts.locale!
-                                : localeDefault,
-                            format: ("format" in opts)
-                                ? opts.format!
-                                : numFormatDefault
-                        })
-                    : invalidFormatMsg
-            };
-        }
-        return { obj: n };
-    }
-
-    protected objCheck(obj: Numeral): string {
-        if (obj.constructor === Number) {
-            obj = numeral(obj);
-        }
-        const opts = this.opts;
-        const msgs = this.msgs;
-        let err: boolean = false;
-        if ("max" in opts) {
-            if (obj.value() > opts.max!) {
-                err = true;
-            }
-        }
-        if ("min" in opts) {
-            if (obj.value() < opts.min!) {
-                err = true;
-            }
-        }
-        if (err) {
-            return msgs.not_in_range
-                ? tpl(msgs.not_in_range,
-                    {
-                        min: ("min" in opts) ? ("" + opts.min) : "",
-                        max: ("max" in opts) ? ("" + opts.max) : "",
-                        locale: ("locale" in opts)
-                            ? opts.locale!
-                            : localeDefault,
-                        format: ("format" in opts)
-                            ? opts.format!
-                            : numFormatDefault
-                    })
-                : notInRangeMsg;
-        }
-        return "";
-    }
-
-    protected objToStr(obj: Numeral,
-        format?: string): { str?: string, err?: string } {
-        if (obj.constructor === Number) {
-            obj = numeral(obj);
-        }
-        numeral.locale(this.opts.locale || localeDefault);
-        return {
-            str: obj
-                ? obj.format(format
-                    ? format
-                    : this.opts.format || numFormatDefault)
-                : undefined
-        };
-    }
-
-}
-
-export interface MomentValidatorOpts {
-    required?: boolean;
-    min?: moment.Moment;
-    max?: moment.Moment;
-    locale?: string;
-    format?: string;
-    strict?: boolean;
-}
-
-export interface MomentValidatorMsgs {
-    required?: string;
-    invalid_format?: string;
-    not_in_range?: string;
-}
-
-export class MomentValidator
-    extends Validator<Moment, MomentValidatorOpts, MomentValidatorMsgs> {
-
-    constructor(opts?: MomentValidatorOpts, msgs?: MomentValidatorMsgs) {
-        super(opts, msgs);
-    }
-
-    protected strToObj(str: string): { obj?: Moment, err?: string } {
-        const opts = this.opts;
-        const msgs = this.msgs;
-        if ("required" in opts) {
-            if (opts.required && !str) {
-                return {
-                    err: msgs.required
-                        ? tpl(msgs.required,
-                            {
-                                min: ("min" in opts) ? ("" + opts.min) : "",
-                                max: ("max" in opts) ? ("" + opts.max) : "",
-                                locale: ("locale" in opts)
-                                    ? opts.locale!
-                                    : localeDefault,
-                                format: ("format" in opts)
-                                    ? opts.format!
-                                    : numFormatDefault
-                            })
-                        : requiredMsg
-                };
-            }
-        }
-        const d = moment(str,
-            opts.format || dateFormatFefault,
-            opts.locale || localeDefault,
-            opts.strict || false);
-        let err: boolean = false;
-        if (!d.isValid()) {
-            err = true;
-        }
-        if (opts.strict && (str !== this.objToStr(d).str)) {
-            err = true;
-        }
-        if (err) {
-            const date = d.isValid() ? d : moment(new Date());
-            return {
-                obj: d.isValid() ? d : undefined,
-                err: msgs.invalid_format
-                    ? tpl(msgs.invalid_format,
-                        {
-                            date: this.objToStr(date).str || "",
-                            locale: ("locale" in opts)
-                                ? opts.locale!
-                                : localeDefault,
-                            format: ("format" in opts)
-                                ? opts.format!
-                                : numFormatDefault
-                        })
-                    : invalidFormatMsg
-            };
-        }
-        return { obj: d };
-    }
-
-    protected objCheck(obj: Moment): string {
-        if (obj.constructor === Date) {
-            obj = moment(obj);
-        }
-        const opts = this.opts;
-        const msgs = this.msgs;
-        let err: boolean = false;
-        if ("max" in opts) {
-            if (obj.isAfter(opts.max)) {
-                err = true;
-            }
-        }
-        if ("min" in opts) {
-            if (obj.isBefore(opts.min)) {
-                err = true;
-            }
-        }
-        if (err) {
-            return msgs.not_in_range
-                ? tpl(msgs.not_in_range,
-                    {
-                        min: ("min" in opts) ? ("" + opts.min) : "",
-                        max: ("max" in opts) ? ("" + opts.max) : "",
-                        locale: ("locale" in opts)
-                            ? opts.locale!
-                            : localeDefault,
-                        format: ("format" in opts)
-                            ? opts.format!
-                            : numFormatDefault
-                    })
-                : notInRangeMsg;
-        }
-        return "";
-    }
-
-    protected objToStr(obj: Moment,
-        format?: string): { str?: string, err?: string } {
-        if (obj.constructor === Date) {
-            obj = moment(obj);
-        }
-        return {
-            str: obj
-                ? obj
-                    .locale(this.opts.locale || localeDefault)
-                    .format(format
-                        ? format
-                        : this.opts.format || dateFormatFefault)
-                : undefined
-        };
-    }
-
-}
 
 export interface NumberValidatorOpts {
     required?: boolean;
@@ -801,7 +536,7 @@ export class ObjectValidator<T = any> {
 
 }
 
-function tpl(tmpl: string, data: { [k: string]: string }): string {
+export function tpl(tmpl: string, data: { [k: string]: string }): string {
     return Object.keys(data)
         .map(k => [k, data[k]])
         .reduce((t, d) =>
@@ -895,9 +630,8 @@ export class FormValidator<T = any> {
 
 }
 
-// TEST
 
-// import "numeral/locales";
+// TEST
 
 // const sv = new StringValidator(
 //     {
@@ -929,14 +663,11 @@ export class FormValidator<T = any> {
 
 // console.log();
 
-// const nv = new NumeralValidator(
+// const nv = new NumberValidator(
 //     {
 //         required: true,
 //         min: 3,
-//         max: 5000,
-//         locale: "sk",
-//         format: "0,0.0[00]",
-//         strict: true
+//         max: 5000
 //     },
 //     {
 //         required: "required {{min}} {{max}} {{locale}} {{format}}",
@@ -944,66 +675,23 @@ export class FormValidator<T = any> {
 //         not_in_range: "not_in_range {{min}} {{max}}"
 //     });
 
-// [
-//     "1234,56",
-//     "1 234,56",
-//     "1 234,56y",
-//     "xy"
-// ].forEach(v => {
-//     console.log();
-//     console.log(v);
-//     const r = nv.validate(v);
-//     console.log(r);
-//     if (r.obj) {
-//         const f = nv.format(r.obj);
-//         console.log(f);
-//     }
-// });
-
-// console.log();
-
-// const dv = new MomentValidator(
-//     {
-//         required: true,
-//         locale: "sk",
-//         format: "l LT",
-//         min: moment("03/01/2017", "L", "en"),
-//         max: moment("03/01/2020", "L", "en"),
-//         strict: true
-//     },
-//     {
-//         required: "required {{min}} {{max}} {{locale}} {{format}}",
-//         invalid_format: "invalid_format {{date}} {{locale}}",
-//         not_in_range: "not_in_range {{min}} {{max}} {{locale}} {{format}}"
-//     });
-
-// [
-//     "01.03.2018 5:35",
-//     "1.3.2018 5:35",
-//     "5:35",
-//     "01.13.2018",
-//     "1.13.2018",
-//     "03/01/2018",
-//     "3/1/2018"
-// ].forEach(v => {
-//     console.log();
-//     console.log(v);
-//     const r = dv.validate(v);
-//     console.log(r);
-//     if (r.obj) {
-//         const f = dv.format(r.obj);
-//         console.log(f);
-//     }
-// });
-
-// console.log();
+// // const dv = new DateValidator(
+// //     {
+// //         required: true,
+// //         strict: true
+// //     },
+// //     {
+// //         required: "required {{min}} {{max}} {{locale}} {{format}}",
+// //         invalid_format: "invalid_format {{date}} {{locale}}",
+// //         not_in_range: "not_in_range {{min}} {{max}} {{locale}} {{format}}"
+// //     });
 
 // const fvData = { str: "123a", num: "123.45", date: "02.01.2019 12:12" };
 
 // const fv = new FormValidator<typeof fvData>()
 //     .addValidator("str", sv)
 //     .addValidator("num", nv)
-//     .addValidator("date", dv)
+//     // .addValidator("date", dv)
 //     .validate(fvData);
 
 // console.log(fv);
@@ -1016,7 +704,7 @@ export class FormValidator<T = any> {
 // const ov = new ObjectValidator<typeof ovData>()
 //     .addValidator("str", sv)
 //     .addValidator("num", nv)
-//     .addValidator("date", dv)
+//     // .addValidator("date", dv)
 //     .validate(ovData);
 
 // // console.log(ov);
@@ -1038,7 +726,7 @@ export class FormValidator<T = any> {
 
 // const dov = new ObjectValidator<ReportFormData>()
 //             .addValidator("spz", new StringValidator({ required: true }))
-//             .addValidator("tachometer", new NumeralValidator({ required: true, min: 1 } ))
+//             .addValidator("tachometer", new NumberValidator({ required: true, min: 1 } ))
 //             .addValidator("dateCreated", new StringValidator({ required: true }))
 //             .addValidator("user", new ObjectValidator<ReportFormData["user"]>()
 //                 .addValidator("email", new StringValidator({ required: true}))

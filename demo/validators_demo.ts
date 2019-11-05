@@ -1,9 +1,6 @@
-import {
-    StringValidator,
-    NumeralValidator,
-    MomentValidator,
-    ObjectValidator
-} from "../src/validators";
+import { StringValidator, ObjectValidator } from "../src/validators";
+import { NumeralValidator } from "../src/validators-numeral";
+import { MomentValidator } from "../src/validators-moment";
 import * as moment from "moment";
 
 import "numeral/locales";
