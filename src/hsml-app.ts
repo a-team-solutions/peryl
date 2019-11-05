@@ -28,6 +28,20 @@ export enum AppAction {
     _umount = "_umount",
 }
 
+const schedule = window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    // (window as any).mozRequestAnimationFrame ||
+    // (window as any).oRequestAnimationFrame ||
+    // (window as any).msRequestAnimationFrame ||
+    function (callback) { window.setTimeout(callback, 1000 / 60); };
+
+const unschedule = window.cancelAnimationFrame ||
+    window.webkitCancelAnimationFrame ||
+    // (window as any).mozCancelAnimationFrame ||
+    // (window as any).oCancelAnimationFrame ||
+    // (window as any).msCancelAnimationFrame ||
+    function (handle: number) { window.clearTimeout(handle); };
+
 export class App<State extends MergebleState> implements HsmlHandlerCtx {
 
     state: State;
@@ -58,7 +72,7 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
             ? (data as HsmlAttrOnDataFnc)(event)
             : data;
         if (data === undefined && event) {
-            data = formInputData(event);
+            data = inputEventData(event);
         }
         this.action(action, data, event);
     }
@@ -106,12 +120,12 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
             this.state = merge(this.state, state);
         }
         if (this.dom && !this._updateSched) {
-            this._updateSched = setTimeout(() => {
+            this._updateSched = schedule(() => {
                 if (this.dom) {
                     hsmls2idomPatch(this.dom, this.render(), this);
                 }
                 this._updateSched = undefined;
-            }, 0);
+            });
         }
         return this;
     }
@@ -119,7 +133,7 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
     toHsml = (): HsmlElement => {
         if (this.dom) {
             if (this._updateSched) {
-                clearTimeout(this._updateSched);
+                unschedule(this._updateSched);
                 this._updateSched = undefined;
             } else {
                 return ["div", { _skip: true }];
@@ -178,7 +192,7 @@ const isMergeble = (item: object): boolean => {
     return isObject(item) && !Array.isArray(item);
 };
 
-function formInputData(e: Event): { [k: string]: string } {
+function inputEventData(e: Event): { [k: string]: string } {
     const value = {} as { [k: string]: string };
     const el = (e.target as HTMLElement);
     switch (el.nodeName) {
@@ -212,3 +226,20 @@ function formInputData(e: Event): { [k: string]: string } {
     }
     return value;
 }
+
+// export const formInputData = <State>(actions: Actions<State>): Actions<State> =>
+//     (app: App<State>, action: string | number, data?: any, event?: Event): void => {
+//         if (data === undefined && event) {
+//             data = inputEventData(event);
+//         }
+//         actions(app, action, data, event);
+//     };
+
+// // Decorator
+// export function FormInputData() {
+//     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+//         const method = descriptor.value;
+//         descriptor.value = formInputData(method);
+//         return descriptor;
+//     };
+// }

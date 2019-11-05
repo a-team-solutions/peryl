@@ -814,7 +814,7 @@ export type Str<T> = { [key in keyof T]: string };
 export type Obj<T> = { [key in keyof T]: any };
 export type Err<T> = { [key in keyof T]: string };
 
-export interface Data<T> {
+export interface FormValidatorData<T> {
     str: Str<T>;
     obj: Obj<T>;
     err: Err<T>;
@@ -884,7 +884,7 @@ export class FormValidator<T = any> {
         return this;
     }
 
-    data(): Data<T> {
+    data(): FormValidatorData<T> {
         return {
             str: this.str!,
             obj: this.obj!,

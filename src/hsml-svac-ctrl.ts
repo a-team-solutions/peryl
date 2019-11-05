@@ -42,6 +42,20 @@ const mount: Mount = <State extends MergebleState>(
         return true;
     };
 
+const schedule = window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    // (window as any).mozRequestAnimationFrame ||
+    // (window as any).oRequestAnimationFrame ||
+    // (window as any).msRequestAnimationFrame ||
+    function (handler) { window.setTimeout(handler, 1000 / 60); };
+
+const unschedule = window.cancelAnimationFrame ||
+    window.webkitCancelAnimationFrame ||
+    // (window as any).mozCancelAnimationFrame ||
+    // (window as any).oCancelAnimationFrame ||
+    // (window as any).msCancelAnimationFrame ||
+    function (handle: number) { window.clearTimeout(handle); };
+
 const ctrlAttr = "ctrl";
 
 export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
@@ -161,12 +175,12 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
             this.state = merge(this.state, state);
         }
         if (this.dom && !this._updateSched) {
-            this._updateSched = setTimeout(() => {
+            this._updateSched = schedule(() => {
                 if (this.dom) {
                     hsmls2idomPatch(this.dom, this.render(), this);
                 }
                 this._updateSched = undefined;
-            }, 0);
+            });
         }
         return this;
     }
@@ -174,7 +188,7 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
     toHsml = (): HsmlElement => {
         if (this.dom) {
             if (this._updateSched) {
-                clearTimeout(this._updateSched);
+                unschedule(this._updateSched);
                 this._updateSched = undefined;
             } else {
                 return (
