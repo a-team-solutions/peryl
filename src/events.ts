@@ -3,12 +3,10 @@ export type Callback<C> = (data: any, e: string, ctx?: C) => void;
 export class Events<C = any> {
 
     private _ctx?: C;
-    private _cbs: { [e: string]: Array<Callback<C>> };
-    private _cb: Array<Callback<C>>;
+    private _cb: Array<Callback<C>> = [];
+    private _cbs: { [e: string]: Array<Callback<C>> } = {};
 
     constructor(ctx?: C) {
-        this._cb = [];
-        this._cbs = {};
         ctx && (this._ctx = ctx);
     }
 
@@ -18,10 +16,8 @@ export class Events<C = any> {
                 this._cbs[e][i](data, e, this._ctx);
             }
         }
-        if (this._cb) {
-            for (let i = 0, l = this._cb.length; i < l; i++) {
-                this._cb[i](data, e, this._ctx);
-            }
+        for (let i = 0, l = this._cb.length; i < l; i++) {
+            this._cb[i](data, e, this._ctx);
         }
         return this;
     }
@@ -42,9 +38,6 @@ export class Events<C = any> {
     }
 
     any(cb: Callback<C>): this {
-        if (!this._cb) {
-            this._cb = [];
-        }
         this._cb.push(cb);
         return this;
     }
@@ -69,7 +62,6 @@ export class Events<C = any> {
                 this._cb = this._cb.filter(c => c !== cb);
             } else {
                 this._cb.length = 0;
-                delete this._cb;
             }
         }
         if (e && e in this._cbs) {
