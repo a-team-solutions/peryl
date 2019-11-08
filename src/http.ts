@@ -118,6 +118,13 @@ export type HttpResponseType =
 
 export class HttpRequest {
 
+    static readonly xhrs: HttpRequest[] = [];
+
+    static abort() {
+        HttpRequest.xhrs.forEach(x => x.abort());
+        HttpRequest.xhrs.length = 0;
+    }
+
     private _url?: string;
     private _query?: Object;
     private _method: HttpMethod = "GET";
@@ -238,6 +245,17 @@ export class HttpRequest {
         this._send(data, this._headers);
     }
 
+    sendPromise(data?: any, contentType?: string): Promise<HttpResponse> {
+        return new Promise<HttpResponse>((res, rej) => {
+            this._onResponse = res;
+            this._onError = rej;
+            if (contentType) {
+                this._headers["Content-Type"] = contentType;
+            }
+            this._send(data, this._headers);
+        });
+    }
+
     private _send(data?: any, headers?: { [key: string]: string }): void {
         const xhr = new XMLHttpRequest();
         this._xhr = xhr;
@@ -269,6 +287,8 @@ export class HttpRequest {
             }
         }
 
+        HttpRequest.xhrs.push(this);
+
         xhr.open(this._method, url, this._async);
 
         for (const header in headers) {
@@ -292,7 +312,7 @@ export class HttpRequest {
         if ("onabort" in xhr) {
             if (this._onError) {
                 xhr.onabort = (e: ProgressEvent) => {
-                    this._onError!();
+                    this._onError!(e);
                 };
             }
         }
@@ -306,6 +326,7 @@ export class HttpRequest {
         if (this._async) {
             if ("onload" in xhr) {
                 xhr.onload = (e: ProgressEvent) => {
+                    (HttpRequest as any).xhrs = HttpRequest.xhrs.filter(x => this !== x);
                     if (xhr.status >= 200 && xhr.status < 300) {
                         if (this._onResponse) {
                             this._onResponse(new HttpResponse(xhr));
@@ -320,12 +341,18 @@ export class HttpRequest {
                 // legacy
                 (xhr as any).onreadystatechange = (e: Event) => {
                     switch ((xhr as any).readyState) {
+                        // 0 UNSENT            Client has been created. open() not called yet.
+                        // 1 OPENED            open() has been called.
+                        // 2 HEADERS_RECEIVED  send() has been called, and headers and status are available.
+                        // 3 LOADING           Downloading; responseText holds partial data.
+                        // 4 DONE              The operation is complete.
                         // case 3: // loading
                         //    if (this._onProgress) {
                         //        this._onProgress(new HttpResponse(httpRequest));
                         //    }
                         //    break;
                         case 4: // done
+                            (HttpRequest as any).xhrs = HttpRequest.xhrs.filter(x => this !== x);
                             // const httpStatusOk = xhr.status >= 200 && xhr.status < 300;
                             // schemes other than http/https (file, ftp)
                             // const fileFtpStatusOk = xhr.status === 0 && !this._url.match(/^https?:\/\//);
