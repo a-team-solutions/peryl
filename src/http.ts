@@ -116,6 +116,10 @@ export type HttpResponseType =
     | "json"
     | "text";
 
+export const authBasic = (login: string, password: string) => (req: HttpRequest) => {
+    req.headers({ "Authorization": "Basic " + btoa(login + ":" + password) });
+};
+
 export class HttpRequest {
 
     static readonly xhrs: HttpRequest[] = [];
@@ -190,8 +194,8 @@ export class HttpRequest {
         return this;
     }
 
-    auth(login: string, password: string): this {
-        this._headers["Authorization"] = "Basic " + btoa(login + ":" + password);
+    use(middleware: (req: HttpRequest) => void): this {
+        middleware(this);
         return this;
     }
 

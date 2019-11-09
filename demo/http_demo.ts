@@ -1,6 +1,7 @@
-import { get } from "../src/http";
+import { get, authBasic } from "../src/http";
 
 get("http_demo.json")
+    .use(authBasic("login", "passwd"))
     .onProgress(progress => {
         console.log("progress: ", progress);
     })
