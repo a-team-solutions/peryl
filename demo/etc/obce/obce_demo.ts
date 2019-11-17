@@ -6,7 +6,7 @@
 
 // zdroj: https://data.gov.sk/dataset/register-adries-register-obci/resource/15262453-4a0f-4cce-a9e4-7709e135e4b8
 
-import { HttpRequest } from "../../../src/http";
+import { get } from "../../../src/http";
 import { html, select } from "../../../src/dom";
 
 // "https://data.gov.sk/api/action/datastore_search?resource_id=15262453-4a0f-4cce-a9e4-7709e135e4b8&q=rajec"
@@ -36,11 +36,12 @@ import { html, select } from "../../../src/dom";
 const ol = html(`<ol></ol>`);
 select("#obce")!.appendChild(ol);
 
-new HttpRequest()
-    .get("https://data.gov.sk/api/action/datastore_search", {
+get("https://data.gov.sk/api/action/datastore_search",
+    {
         resource_id: "15262453-4a0f-4cce-a9e4-7709e135e4b8", // obce
         limit: 5000
     })
+    .onProgress(p => console.log("progress", p))
     .onResponse(r => {
         console.log(r.getJson().result.records.length);
         r.getJson().result.records.forEach((i: any) => {
@@ -58,20 +59,38 @@ new HttpRequest()
     .onError(e => console.error(e))
     .send();
 
+// get("https://data.gov.sk/api/action/datastore_search",
+//     {
+//         resource_id: "cc20ba54-79e5-4232-a129-6af5e75e3d85", // casti obci
+//         // q: "29.augusta",
+//         // q: "*:3004", // stare mesto
+//         limit: 10000
+//     })
+//     .onProgress(p => console.log("progress", p))
+//     .onResponse(r => {
+//         console.log(r.getJson().result.records.length);
+//         r.getJson().result.records.forEach((i: any) => {
+//             console.log(i.districtCode, i.districtName);
+//             // console.log(i);
+//         });
+//     })
+//     .onError(e => console.error(e))
+//     .send();
 
-new HttpRequest()
-    .get("https://data.gov.sk/api/action/datastore_search", {
-        resource_id: "47f0e853-3a67-487e-b45f-3f5d099105cf", // ulice
-        // q: "29.augusta",
-        q: "*:3004", // stare mesto
-        limit: 100
-    })
-    .onResponse(r => {
-        console.log(r.getJson().result.records.length);
-        r.getJson().result.records.forEach((i: any) => {
-            console.log(i.municipalityIdentifiers, i.streetName);
-            // console.log(i);
-        });
-    })
-    .onError(e => console.error(e))
-    .send();
+// get("https://data.gov.sk/api/action/datastore_search",
+//     {
+//         resource_id: "0e9caa22-f5c0-4513-b6ce-88198b664b14", // ulice
+//         // q: "29.augusta",
+//         // q: "*:3004", // stare mesto
+//         limit: 100
+//     })
+//     .onProgress(p => console.log("progress", p))
+//     .onResponse(r => {
+//         console.log(r.getJson().result.records.length);
+//         r.getJson().result.records.forEach((i: any) => {
+//             console.log(i.municipalityIdentifiers, i.streetName);
+//             // console.log(i);
+//         });
+//     })
+//     .onError(e => console.error(e))
+//     .send();
