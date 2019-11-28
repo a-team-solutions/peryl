@@ -17,9 +17,12 @@ export type Class<T = object> = new (...args: any[]) => T;
 
 export function app<State extends MergebleState>(state: State,
                                                  view: View<State>,
-                                                 actions: Actions<State>,
+                                                 actions?: Actions<State>,
                                                  element?: string | Element | null) {
-    return new App<State>(state, view, actions).mount(element);
+    return new App<State>(state,
+                          view,
+                          actions || ((a, d, e) => console.log(a, d, e)))
+        .mount(element);
 }
 
 export enum AppAction {
