@@ -19,10 +19,7 @@ export function app<State extends MergebleState>(state: State,
                                                  view: View<State>,
                                                  actions?: Actions<State>,
                                                  element?: string | Element | null) {
-    return new App<State>(state,
-                          view,
-                          actions || ((a, d, e) => console.log(a, d, e)))
-        .mount(element);
+    return new App<State>(state, view, actions).mount(element);
 }
 
 export enum AppAction {
@@ -57,10 +54,10 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
 
     private _updateSched?: number;
 
-    constructor(state: State, view: View<State>, actions: Actions<State>) {
+    constructor(state: State, view: View<State>, actions?: Actions<State>) {
         this.state = state;
         this.view = view;
-        this.actions = actions;
+        this.actions = actions || ((_, a, d) => console.log("action:", a, d));
         this.action(AppAction._init);
     }
 
