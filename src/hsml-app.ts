@@ -200,10 +200,20 @@ function inputEventData(e: Event): { [k: string]: string } {
             const iel = (el as HTMLInputElement);
             switch (iel.type) {
                 case "text":
-                case "radio":
-                    value[iel.name] = iel.value;
-                    break;
+                case "password":
+                case "email":
                 case "number":
+                case "search":
+                case "url":
+                case "tel":
+                case "color":
+                case "date":
+                case "datetime-local":
+                case "month":
+                case "range":
+                case "time":
+                case "week":
+                case "radio":
                     value[iel.name] = iel.value;
                     break;
                 case "checkbox":
