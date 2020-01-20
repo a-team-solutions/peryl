@@ -11,6 +11,7 @@ enum Action {
     dec,
     inc,
     clear,
+    form,
     xXx
 }
 
@@ -22,18 +23,27 @@ const state: State = {
 const view: View<State> = (state: State): HsmlFragment => [
     ["h2", [state.title]],
     ["p", [
-        "Title: ",
-        ["input",
-            {
-                type: "text",
-                name: "title",
-                value: new String(state.title),
-                on: ["input", Action.title]
-            }
-        ], " ",
-        ["button.w3-button.w3-blue",
-            { on: ["click", Action.clear] },
-            ["Clear title"]
+        ["form",
+            { on: ["submit", Action.form] },
+            [
+                "Title: ",
+                ["input",
+                    {
+                        type: "text",
+                        name: "title",
+                        value: new String(state.title),
+                        on: ["input", Action.title]
+                    }
+                ], " ",
+                ["button.w3-button.w3-blue",
+                    {
+                        type: "button",
+                        name: "clear",
+                        on: ["click", Action.clear]
+                    },
+                    ["Clear title"]
+                ]
+            ]
         ]
     ]],
     ["p", [
@@ -62,6 +72,8 @@ const actions: Actions<State> = (app, action, data, event): void => {
             break;
         case Action.clear:
             app.update({ title: "" });
+            break;
+        case Action.form:
             break;
         default:
             console.warn("action unhandled:", action, data, event);

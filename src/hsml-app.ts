@@ -33,7 +33,7 @@ const schedule = window.requestAnimationFrame ||
     // (window as any).mozRequestAnimationFrame ||
     // (window as any).oRequestAnimationFrame ||
     // (window as any).msRequestAnimationFrame ||
-    function (callback) { window.setTimeout(callback, 1000 / 60); };
+    function (callback: Function) { window.setTimeout(callback, 1000 / 60); };
 
 const unschedule = window.cancelAnimationFrame ||
     // window.webkitCancelAnimationFrame ||
@@ -72,7 +72,7 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
             ? (data as HsmlAttrOnDataFnc)(event)
             : data;
         if (data === undefined && event) {
-            data = inputEventData(event);
+            data = formInputData(event);
         }
         this.action(action, data, event);
     }
@@ -192,12 +192,20 @@ const isMergeble = (item: object): boolean => {
     return isObject(item) && !Array.isArray(item);
 };
 
-function inputEventData(e: Event): { [k: string]: string } {
+function formInputData(e: Event | Element): { [k: string]: string } {
+    const el = e instanceof Event ? e.target as HTMLElement : e;
     const value = {} as { [k: string]: string };
-    const el = (e.target as HTMLElement);
     switch (el.nodeName) {
+        case "FORM":
+            (e as Event).preventDefault();
+            const els = (el as HTMLFormElement).elements;
+            for (let i = 0; i < els.length; i++) {
+                const v = formInputData(els[i]);
+                Object.assign(value, v);
+            }
+            break;
         case "INPUT":
-            const iel = (el as HTMLInputElement);
+            const iel = el as HTMLInputElement;
             switch (iel.type) {
                 case "text":
                 case "password":
@@ -222,15 +230,15 @@ function inputEventData(e: Event): { [k: string]: string } {
             }
             break;
         case "SELECT":
-            const sel = (el as HTMLSelectElement);
+            const sel = el as HTMLSelectElement;
             value[sel.name] = sel.value;
             break;
         case "TEXTAREA":
-            const tel = (el as HTMLTextAreaElement);
+            const tel = el as HTMLTextAreaElement;
             value[tel.name] = tel.innerText;
             break;
         case "BUTTON":
-            const bel = (el as HTMLButtonElement);
+            const bel = el as HTMLButtonElement;
             value[bel.name] = bel.value;
             break;
     }
