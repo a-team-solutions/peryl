@@ -38,7 +38,6 @@ const view: View<State> = (state: State): HsmlFragment => [
                 ["button.w3-button.w3-blue",
                     {
                         type: "button",
-                        name: "clear",
                         on: ["click", Action.clear]
                     },
                     ["Clear title"]

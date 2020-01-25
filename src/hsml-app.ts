@@ -222,24 +222,24 @@ function formInputData(e: Event | Element): { [k: string]: string } {
                 case "time":
                 case "week":
                 case "radio":
-                    value[iel.name] = iel.value;
+                    iel.name && (value[iel.name] = iel.value);
                     break;
                 case "checkbox":
-                    value[iel.name] = "" + iel.checked;
+                    iel.name && (value[iel.name] = "" + iel.checked);
                     break;
             }
             break;
         case "SELECT":
             const sel = el as HTMLSelectElement;
-            value[sel.name] = sel.value;
+            sel.name && (value[sel.name] = sel.value);
             break;
         case "TEXTAREA":
             const tel = el as HTMLTextAreaElement;
-            value[tel.name] = tel.innerText;
+            tel.name && (value[tel.name] = tel.innerText);
             break;
         case "BUTTON":
             const bel = el as HTMLButtonElement;
-            value[bel.name] = bel.value;
+            bel.name && (value[bel.name] = bel.value);
             break;
     }
     return value;
