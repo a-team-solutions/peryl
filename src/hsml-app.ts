@@ -72,7 +72,7 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
             ? (data as HsmlAttrOnDataFnc)(event)
             : data;
         if (data === undefined && event) {
-            data = formInputData(event);
+            data = formData(event);
         }
         this.action(action, data, event);
     }
@@ -192,18 +192,42 @@ const isMergeble = (item: object): boolean => {
     return isObject(item) && !Array.isArray(item);
 };
 
-function formInputData(e: Event | Element): { [k: string]: string } {
-    const el = e instanceof Event ? e.target as HTMLElement : e;
-    const value = {} as { [k: string]: string };
+function formData(e: Event): { [k: string]: string | null | Array<string | null> } {
+    const el = e.target as HTMLElement;
+    const data = {} as { [k: string]: string | null | Array<string | null> };
     switch (el.nodeName) {
         case "FORM":
             (e as Event).preventDefault();
             const els = (el as HTMLFormElement).elements;
             for (let i = 0; i < els.length; i++) {
-                const v = formInputData(els[i]);
-                Object.assign(value, v);
+                const d = formInputData(els[i]);
+                const names = Object.keys(d);
+                if (names.length) {
+                    const name = names[0];
+                    const value = d[name];
+                    if (data[name] === undefined) {
+                        data[name] = value;
+                    } else if (typeof data[name] === "string" || data[name] instanceof String) {
+                        data[name] = [data[name] as string, value];
+                    } else if (data[name] instanceof Array) {
+                        (data[name] as Array<string | null>).push(value);
+                    } else {
+                        data[name] = [data[name] as string, value];
+                    }
+                }
             }
             break;
+        default:
+            const d = formInputData(el);
+            Object.assign(data, d);
+            break;
+    }
+    return data;
+}
+
+function formInputData(el: Element): { [k: string]: string | null } {
+    const data = {} as { [k: string]: string | null };
+    switch (el.nodeName) {
         case "INPUT":
             const iel = el as HTMLInputElement;
             switch (iel.type) {
@@ -222,27 +246,35 @@ function formInputData(e: Event | Element): { [k: string]: string } {
                 case "time":
                 case "week":
                 case "radio":
-                    iel.name && (value[iel.name] = iel.value);
+                    iel.name && (data[iel.name] = iel.value);
                     break;
                 case "checkbox":
-                    iel.name && (value[iel.name] = "" + iel.checked);
+                    if (iel.name) {
+                        if (iel.value === "on") { // value not set in element
+                            data[iel.name] = String(iel.checked);
+                        } else {
+                            data[iel.name] = iel.checked
+                                ? String(iel.value)
+                                : null;
+                        }
+                    }
                     break;
             }
             break;
         case "SELECT":
             const sel = el as HTMLSelectElement;
-            sel.name && (value[sel.name] = sel.value);
+            sel.name && (data[sel.name] = sel.value);
             break;
         case "TEXTAREA":
             const tel = el as HTMLTextAreaElement;
-            tel.name && (value[tel.name] = tel.innerText);
+            tel.name && (data[tel.name] = tel.innerText);
             break;
         case "BUTTON":
             const bel = el as HTMLButtonElement;
-            bel.name && (value[bel.name] = bel.value);
+            bel.name && (data[bel.name] = bel.value);
             break;
     }
-    return value;
+    return data;
 }
 
 // export const formInputData = <State>(actions: Actions<State>): Actions<State> =>

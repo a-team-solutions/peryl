@@ -23,26 +23,21 @@ const state: State = {
 const view: View<State> = (state: State): HsmlFragment => [
     ["h2", [state.title]],
     ["p", [
-        ["form",
-            { on: ["submit", Action.form] },
-            [
-                "Title: ",
-                ["input",
-                    {
-                        type: "text",
-                        name: "title",
-                        value: new String(state.title),
-                        on: ["input", Action.title]
-                    }
-                ], " ",
-                ["button.w3-button.w3-blue",
-                    {
-                        type: "button",
-                        on: ["click", Action.clear]
-                    },
-                    ["Clear title"]
-                ]
-            ]
+        "Title: ",
+        ["input",
+            {
+                type: "text",
+                name: "title",
+                value: new String(state.title),
+                on: ["input", Action.title]
+            }
+        ], " ",
+        ["button.w3-button.w3-blue",
+            {
+                type: "button",
+                on: ["click", Action.clear]
+            },
+            ["Clear title"]
         ]
     ]],
     ["p", [
@@ -53,7 +48,46 @@ const view: View<State> = (state: State): HsmlFragment => [
     ]],
     ["p", [
         ["button", { on: ["click", Action.xXx] }, ["xXx"]]
-    ]]
+    ]],
+    ["h2", ["Form"]],
+    ["form",
+        { on: ["submit", Action.form] },
+        [
+            "xy ",
+            ["input",
+                {
+                    type: "text",
+                    name: "xy",
+                    value: "x"
+                }
+            ],
+            ["input",
+                {
+                    type: "text",
+                    name: "xy",
+                    value: "y"
+                }
+            ],
+            ["br"],
+            "a ",
+            ["input", {type: "checkbox", name: "a"}],
+            ["br"],
+            "b ",
+            ["input", {type: "checkbox", name: "b", value: "b"}],
+            ["br"],
+            "c ",
+            ["input", {type: "checkbox", name: "c"}],
+            ["input", {type: "checkbox", name: "c"}],
+            ["br"],
+            "d ",
+            ["input", {type: "checkbox", name: "d", value: "d1"}],
+            ["input", {type: "checkbox", name: "d", value: "d2"}],
+            ["br"],
+            ["button.w3-button.w3-blue",
+                ["submit"]
+            ]
+        ]
+    ]
 ];
 
 const actions: Actions<State> = (app, action, data, event): void => {
