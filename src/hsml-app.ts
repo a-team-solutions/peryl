@@ -214,6 +214,15 @@ function formData(e: Event): { [k: string]: string | null | Array<string | null>
                     } else {
                         data[name] = [data[name] as string, value];
                     }
+                    if (data[name] instanceof Array) {
+                        data[name] = (data[name] as Array<string | null>)
+                            .filter(d => d !== null);
+                        if ((els[i] as HTMLInputElement).type === "radio") {
+                            data[name] = (data[name] as Array<string | null>).length
+                                ? (data[name] as Array<string | null>)[0]
+                                : null;
+                        }
+                    }
                 }
             }
             break;
@@ -246,7 +255,7 @@ function formInputData(el: Element): { [k: string]: string | null } {
                 case "time":
                 case "week":
                 case "radio":
-                    iel.name && (data[iel.name] = iel.value);
+                    iel.name && (data[iel.name] = iel.checked ? iel.value : null);
                     break;
                 case "checkbox":
                     if (iel.name) {

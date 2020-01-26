@@ -83,6 +83,10 @@ const view: View<State> = (state: State): HsmlFragment => [
             ["input", {type: "checkbox", name: "d", value: "d1"}],
             ["input", {type: "checkbox", name: "d", value: "d2"}],
             ["br"],
+            "r ",
+            ["input", {type: "radio", name: "r", value: "r1"}],
+            ["input", {type: "radio", name: "r", value: "r2"}],
+            ["br"],
             ["button.w3-button.w3-blue",
                 ["submit"]
             ]
