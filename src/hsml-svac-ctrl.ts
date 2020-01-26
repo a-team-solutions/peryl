@@ -47,7 +47,7 @@ const schedule = window.requestAnimationFrame ||
     // (window as any).mozRequestAnimationFrame ||
     // (window as any).oRequestAnimationFrame ||
     // (window as any).msRequestAnimationFrame ||
-    function (handler) { window.setTimeout(handler, 1000 / 60); };
+    function (handler: Function) { window.setTimeout(handler, 1000 / 60); };
 
 const unschedule = window.cancelAnimationFrame ||
     // window.webkitCancelAnimationFrame ||
