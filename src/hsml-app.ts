@@ -208,11 +208,23 @@ function formData(e: Event): { [k: string]: string | null | Array<string | null>
                     if (data[name] === undefined) {
                         data[name] = value;
                     } else if (typeof data[name] === "string" || data[name] instanceof String) {
-                        data[name] = [data[name] as string, value];
+                        if (value instanceof Array) {
+                            data[name] = [data[name] as string, ...value];
+                        } else {
+                            data[name] = [data[name] as string, value as string];
+                        }
                     } else if (data[name] instanceof Array) {
-                        (data[name] as Array<string | null>).push(value);
+                        if (value instanceof Array) {
+                            (data[name] as Array<string | null>).concat(value);
+                        } else {
+                            (data[name] as Array<string | null>).push(value);
+                        }
                     } else {
-                        data[name] = [data[name] as string, value];
+                        if (value instanceof Array) {
+                            data[name] = [data[name] as string, ...value];
+                        } else {
+                            data[name] = [data[name] as string, value];
+                        }
                     }
                     if (data[name] instanceof Array) {
                         data[name] = (data[name] as Array<string | null>)
@@ -234,8 +246,8 @@ function formData(e: Event): { [k: string]: string | null | Array<string | null>
     return data;
 }
 
-function formInputData(el: Element): { [k: string]: string | null } {
-    const data = {} as { [k: string]: string | null };
+function formInputData(el: Element): { [k: string]: string | null | string[] } {
+    const data = {} as { [k: string]: string | null | string[] };
     switch (el.nodeName) {
         case "INPUT":
             const iel = el as HTMLInputElement;
@@ -274,7 +286,12 @@ function formInputData(el: Element): { [k: string]: string | null } {
             break;
         case "SELECT":
             const sel = el as HTMLSelectElement;
-            sel.name && (data[sel.name] = sel.value);
+            if (sel.multiple) {
+                const values = Array.from(sel.selectedOptions).map(o => o.value);
+                sel.name && (data[sel.name] = values);
+            } else {
+                sel.name && (data[sel.name] = sel.value);
+            }
             break;
         case "TEXTAREA":
             const tel = el as HTMLTextAreaElement;

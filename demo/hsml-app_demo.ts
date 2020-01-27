@@ -1,5 +1,5 @@
 import { View, Actions, App } from "../src/hsml-app";
-import { HsmlFragment } from "../src/hsml";
+import { HsmlFragment, HsmlElement } from "../src/hsml";
 
 interface State {
     title: string;
@@ -86,6 +86,18 @@ const view: View<State> = (state: State): HsmlFragment => [
             "r ",
             ["input", {type: "radio", name: "r", value: "r1"}],
             ["input", {type: "radio", name: "r", value: "r2"}],
+            ["br"],
+            "s ",
+            ["select", { name: "s" },
+                ["s1", "s2", "s3"]
+                    .map<HsmlElement>(l => ["option", { value: l }, [l]])
+            ],
+            ["br"],
+            "sm ",
+            ["select", { name: "sm", multiple: true },
+                ["sm1", "sm2", "sm3"]
+                    .map<HsmlElement>(l => ["option", { value: l }, [l]])
+            ],
             ["br"],
             ["button.w3-button.w3-blue",
                 ["submit"]
