@@ -215,7 +215,7 @@ function formData(e: Event): { [k: string]: string | null | Array<string | null>
                         }
                     } else if (data[name] instanceof Array) {
                         if (value instanceof Array) {
-                            (data[name] as Array<string | null>).concat(value);
+                            data[name] = (data[name] as Array<string | null>).concat(value);
                         } else {
                             (data[name] as Array<string | null>).push(value);
                         }
