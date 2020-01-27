@@ -254,6 +254,8 @@ function formInputData(el: Element): { [k: string]: string | null } {
                 case "range":
                 case "time":
                 case "week":
+                    iel.name && (data[iel.name] = iel.value);
+                    break;
                 case "radio":
                     iel.name && (data[iel.name] = iel.checked ? iel.value : null);
                     break;
