@@ -34,8 +34,11 @@ export interface HsmlAttrs {
         | string
         | String
         | string[]
+        | String[]
         | number
+        | Number
         | boolean
+        | Boolean
         | HsmlAttrClasses
         | HsmlAttrStyles
         // | HsmlAttrData

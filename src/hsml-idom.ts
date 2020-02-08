@@ -19,6 +19,42 @@ import {
 } from "./hsml";
 import * as idom from "incremental-dom";
 
+idom.attributes.checked = (el: any, attr: string, value: any) => {
+    // console.log("idom.attributes.checked", attr, value, typeof value);
+    if (typeof value === "string") {
+        let b;
+        switch (value) {
+            case "true":
+            case "1":
+            case "on":
+            case "yes":
+                b = true;
+                break;
+            default:
+                b = false;
+        }
+        if (b) {
+            el.setAttribute(attr, value);
+        } else {
+            el.removeAttribute(attr);
+        }
+        el[attr] = b;
+    } else if (typeof value === "boolean") {
+        if (value) {
+            el.setAttribute(attr, "");
+        } else {
+            el.removeAttribute(attr);
+        }
+        el[attr] = value;
+    } else {
+        if (value) {
+            el.setAttribute(attr, value ? value : "");
+        } else {
+            el.removeAttribute(attr);
+        }
+    }
+};
+
 class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
 
     open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragment, ctx?: HsmlHandlerCtx): boolean {
@@ -103,8 +139,8 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                     default:
                         if (typeof attrs[a] === "function") {
                             props.push("on" + a, attrs[a]);
-                        } else if (typeof attrs[a] === "boolean") {
-                            attrs[a] && props.push(a, "");
+                        // } else if (typeof attrs[a] === "boolean") {
+                        //     attrs[a] && props.push(a, "");
                         } else {
                             props.push(a, attrs[a]);
                         }
