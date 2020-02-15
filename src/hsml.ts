@@ -82,9 +82,6 @@ export interface HsmlHandler<C extends HsmlHandlerCtx> {
 
 export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHandler<C>, ctx?: C): void {
     // console.log("hsml", hsml);
-    if (hml === undefined) {
-        return;
-    }
     switch (hml.constructor) {
         case Array:
             // const tag = hml as HsmlTag;

@@ -232,12 +232,12 @@ function hsmls2idom(hmls: HsmlFragment, ctx?: HsmlHandlerCtx): void {
 }
 
 
-export function hsml2idomPatch(node: Element, hml: HsmlElement, ctx?: HsmlHandlerCtx): void {
+export function hsml2idomPatch(node: Element, hsmlEl: HsmlElement, ctx?: HsmlHandlerCtx): void {
     idom.patch(node,
-        (data: HsmlElement) => hsml2idom(data, ctx), hml);
+        (data?: HsmlElement) => (data && hsml2idom(data, ctx)), hsmlEl);
 }
 
-export function hsmls2idomPatch(node: Element, hmls: HsmlFragment, ctx?: HsmlHandlerCtx): void {
+export function hsmls2idomPatch(node: Element, hsmlFr: HsmlFragment, ctx?: HsmlHandlerCtx): void {
     idom.patch(node,
-        (data: HsmlFragment) => hsmls2idom(data, ctx), hmls);
+        (data?: HsmlFragment) => (data && hsmls2idom(data, ctx)), hsmlFr);
 }
