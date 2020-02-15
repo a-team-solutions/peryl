@@ -266,6 +266,8 @@ function formInputData(el: Element): { [k: string]: string | null | string[] } {
                 case "range":
                 case "time":
                 case "week":
+                case "submit":
+                case "button":
                     iel.name && (data[iel.name] = iel.value);
                     break;
                 case "radio":
