@@ -1,0 +1,40 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "lib": [
+            "esnext",
+            "dom"
+        ],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        // "esModuleInterop": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "noFallthroughCasesInSwitch": true,
+        "experimentalDecorators": true,
+        "allowUnreachableCode": false,
+        "strict": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "declaration": false,
+        "sourceMap": true,
+        "inlineSourceMap": false,
+        "removeComments": true,
+        "allowSyntheticDefaultImports": false,
+        "allowJs": false
+        // "preserveConstEnums": true,
+        // "pretty": true,
+        // "outDir": "dist"
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "build",
+        "dist"
+    ]
+}

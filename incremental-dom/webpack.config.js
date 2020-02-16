@@ -1,18 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
-const glob = require("glob");
 const { CheckerPlugin } = require("awesome-typescript-loader");
 const pkg = require('./package.json');
-
-const entries = {
-    ...glob.sync('./src/**/*.ts')
-        .reduce(
-            (entries, entry) =>
-                Object.assign(entries,
-                    { [entry.replace('./src/', '').replace('.ts', '')]: entry }),
-            {})
-};
-console.log("entries:", entries);
 
 /*
  * SplitChunksPlugin is enabled by default and replaced
@@ -42,10 +31,10 @@ const conf = {
     // devtool: "hidden-source-map",
     // devtool: "nosources-source-map",
 
-    // entry: {
-    //     index: "./src/index.ts"
-    // },
-    entry: entries,
+    entry: {
+        index: './' + pkg.typescript.main
+    },
+    // entry: entries,
 
     optimization: {
         splitChunks: {
@@ -63,11 +52,14 @@ const conf = {
     },
 
     output: {
-        library: pkg.name,
+        library: pkg.library,
         // libraryTarget: 'global',
         libraryTarget: 'umd',
+        // libraryTarget: 'var',
+        // libraryTarget: 'window',
         // filename: '[name].[chunkhash].js',
-        filename: '[name].js',
+        // filename: '[name].js',
+        filename: pkg.name + '.js',
         path: path.resolve(__dirname, 'dist/umd')
     },
 
@@ -77,9 +69,6 @@ const conf = {
     },
 
     externals: {
-        'incremental-dom': 'IncrementalDOM',
-        'numeral': 'numeral',
-        'moment': 'moment'
     },
 
     module: {

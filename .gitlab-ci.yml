@@ -28,6 +28,7 @@ pages:
     - npm run dist
     - npx cpx 'dist/**/' 'public/dist/' -u -v
     # - npx cpx 'dist/**/!(*.map)' 'public/dist/' -u -v
+    - npx cpx 'incremental-dom/**/' 'public/incremental-dom/' -u -v
     - npm run build
     - npx cpx 'build/**/' 'public/build/' -u -v
     - npx cpx 'demo/**/' 'public/demo/' -u -v
