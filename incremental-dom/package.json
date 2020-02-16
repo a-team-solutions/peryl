@@ -1,0 +1,82 @@
+{
+  "name": "incremental-dom",
+  "version": "0.7.1",
+  "description": "Incremental DOM",
+  "keywords": [
+    "PeRyL",
+    "incremental-dom"
+  ],
+  "license": "GPL-3.0",
+  "author": {
+    "name": "Peter Rybar",
+    "email": "pr.rybar@gmail.com",
+    "url": "https://gitlab.com/peter-rybar"
+  },
+  "homepage": "https://gitlab.com/peter-rybar/peryl",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/peter-rybar/peryl.git"
+  },
+  "bugs": {
+    "url": "https://gitlab.com/peter-rybar/peryl/issues"
+  },
+  "private": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typescript": {
+    "main": "src/index.ts"
+  },
+  "library": "IncrementalDOM",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "clean:all": "npm run clean; rm -rf node_modules",
+    "tslint": "tslint --project tsconfig.json",
+    "dist:es6": "tsc --declaration --outDir dist",
+    "dist:es5": "webpack",
+    "dist": "run-s clean dist:es6 dist:es5",
+    "test": "npm run tslint",
+    "start": "npm run dist"
+  },
+  "devDependencies": {
+    "@types/incremental-dom": "^0.5.0",
+    "@types/jasmine": "^3.5.4",
+    "@types/numeral": "0.0.22",
+    "awesome-typescript-loader": "^5.2.1",
+    "glob": "^7.1.6",
+    "incremental-dom": "^0.7.0",
+    "npm-run-all": "^4.1.5",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
+  },
+  "pre-commit": [
+    "test",
+    "dist",
+    "build"
+  ],
+  "pre-push": [],
+  "prettier": {
+    "tabWidth": 4,
+    "printWidth": 80,
+    "overrides": [
+      {
+        "files": "package.json",
+        "options": {
+          "tabWidth": 2
+        }
+      },
+      {
+        "files": "*.yaml",
+        "options": {
+          "tabWidth": 2
+        }
+      }
+    ]
+  },
+  "files": [
+    "src/**/*",
+    "dist/**/*"
+  ],
+  "dependencies": {}
+}

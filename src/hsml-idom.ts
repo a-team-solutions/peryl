@@ -19,48 +19,50 @@ import {
 } from "./hsml";
 import * as idom from "incremental-dom";
 
-function setBoolAttrProp(el: any, attr: string, value: any) {
-    // console.log("idom.attributes", attr, value, typeof value);
-    if (typeof value === "string") {
-        let b;
-        switch (value) {
-            case "true":
-            case "1":
-            case "on":
-            case "yes":
-                b = true;
-                break;
-            default:
-                b = false;
-        }
-        if (b) {
-            el.setAttribute(attr, value);
-        } else {
-            el.removeAttribute(attr);
-        }
-        el[attr] = b;
-    } else if (typeof value === "boolean") {
-        if (value) {
-            el.setAttribute(attr, "");
-        } else {
-            el.removeAttribute(attr);
-        }
-        el[attr] = value;
-    } else {
-        if (value) {
-            el.setAttribute(attr, value ? value : "");
-        } else {
-            el.removeAttribute(attr);
-        }
-    }
-}
+// function setBoolAttrProp(el: any, attr: string, value: any) {
+//     // console.log("idom.attributes", attr, value, typeof value, el);
+//     if (typeof value === "string") {
+//         let b;
+//         switch (value) {
+//             case "true":
+//             case "1":
+//             case "on":
+//             case "yes":
+//                 b = true;
+//                 break;
+//             default:
+//                 b = false;
+//         }
+//         if (b) {
+//             el.setAttribute(attr, value);
+//         } else {
+//             el.removeAttribute(attr);
+//         }
+//         el[attr] = b;
+//     } else if (typeof value === "boolean") {
+//         if (value) {
+//             el.setAttribute(attr, "");
+//         } else {
+//             el.removeAttribute(attr);
+//         }
+//         el[attr] = value;
+//     } else {
+//         if (value) {
+//             el.setAttribute(attr, value ? value : "");
+//         } else {
+//             el.removeAttribute(attr);
+//         }
+//     }
+// }
 
-const boolAttrProps = [
-    "checked",
-    "disabled"
-];
+// const boolAttrProps = [
+//     "readonly",
+//     "disabled",
+//     "checked",
+//     "value"
+// ];
 
-boolAttrProps.forEach(a => idom.attributes[a] = setBoolAttrProp);
+// boolAttrProps.forEach(a => idom.attributes[a] = setBoolAttrProp);
 
 class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
 
@@ -149,19 +151,22 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                             case "function":
                                 props.push("on" + a, attrs[a]);
                                 break;
-                            // case "object":
-                            //     console.log("---", a, typeof attrs[a], attrs[a]);
-                            //     console.log("---String ", attrs[a] instanceof String);
-                            //     console.log("---Boolean", attrs[a] instanceof Boolean);
-                            //     console.log("---Number ", attrs[a] instanceof Number);
-                            //     props.push(a, attrs[a]);
+                            case "object":
+                                // console.log("---", a, typeof attrs[a], attrs[a]);
+                                // console.log("---String ", attrs[a] instanceof String);
+                                // console.log("---Boolean", attrs[a] instanceof Boolean);
+                                // console.log("---Number ", attrs[a] instanceof Number);
+                                props.push(a, attrs[a]);
+                                break;
+                            // case "boolean":
+                            //     if (boolAttrProps.includes(a)) {
+                            //         props.push(a, attrs[a]);
+                            //     } else {
+                            //         attrs[a] && props.push(a, "");
+                            //     }
                             //     break;
                             case "boolean":
-                                if (boolAttrProps.includes(a)) {
-                                    props.push(a, attrs[a]);
-                                } else {
-                                    attrs[a] && props.push(a, "");
-                                }
+                                attrs[a] && props.push(a, "");
                                 break;
                             default:
                                 props.push(a, attrs[a]);

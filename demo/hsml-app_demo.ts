@@ -4,6 +4,7 @@ import { HsmlFragment, HsmlElement } from "../src/hsml";
 interface State {
     title: string;
     count: number;
+    x?: boolean | Boolean;
 }
 
 enum Action {
@@ -103,11 +104,15 @@ const view: View<State> = (state: State): HsmlFragment => [
                 ["submit"]
             ]
         ]
-    ]
+    ],
+    ["h2", ["Props update"]],
+    ["input", { type: "checkbox", name: "x", on: ["change", "x"] }],
+    ["input", {type: "checkbox", name: "xxxx", checked: state.x }],
+    ["input", { type: "button", value: "x", disabled: state.x }]
 ];
 
 const actions: Actions<State> = (app, action, data, event): void => {
-    console.log("action:", Action[action as number], data, event);
+    console.log("action:", Action[action as number], data);
     switch (action) {
         case Action.title:
             app.update(data);
@@ -123,6 +128,17 @@ const actions: Actions<State> = (app, action, data, event): void => {
             app.update({ title: "" });
             break;
         case Action.form:
+            break;
+        case "x":
+            console.log("data.x", typeof data.x, data.x);
+            app.state.x = new Boolean(data.x === "true");
+            // app.state.x = data.x === "true";
+            // app.state.x = data.x;
+            app.update();
+            // app.update({ x: new Boolean(data.x === "true") });
+            // app.update({ x: data.x === "true" });
+            // app.update({ x: data.x });
+            console.log(app.state.x);
             break;
         default:
             console.warn("action unhandled:", action, data, event);
