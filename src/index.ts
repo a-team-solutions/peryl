@@ -19,6 +19,7 @@ import * as http from "./http";
 import * as load from "./load";
 import * as objpaths from "./objpaths";
 import * as router from "./router";
+import * as settings from "./settings";
 import * as signal from "./signal";
 import * as template from "./template";
 import * as tmpl from "./tmpl";
@@ -46,6 +47,7 @@ export {
     load,
     objpaths,
     router,
+    settings,
     signal,
     template,
     tmpl,
