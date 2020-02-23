@@ -222,9 +222,11 @@ function hsml2idom(hml: HsmlElement, ctx?: HsmlHandlerCtx): void {
     hsml(hml, new HsmlIDomHandler(), ctx);
 }
 
-
 function hsmls2idom(hmls: HsmlFragment, ctx?: HsmlHandlerCtx): void {
     for (const hml of hmls) {
+        if (hml === undefined || hml === null) {
+            continue;
+        }
         if (hml.constructor === String) {
             idom.text(hml as string);
         } else if ("toHsml" in (hml as any)) {
@@ -235,7 +237,6 @@ function hsmls2idom(hmls: HsmlFragment, ctx?: HsmlHandlerCtx): void {
         }
     }
 }
-
 
 export function hsml2idomPatch(node: Element, hsmlEl: HsmlElement, ctx?: HsmlHandlerCtx): void {
     idom.patch(node,

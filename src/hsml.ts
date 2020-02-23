@@ -65,7 +65,7 @@ export type HsmlTagAttr = [HsmlHead, HsmlAttrs, HsmlChildren?];
 export type HsmlTag = HsmlTagNoAttr | HsmlTagAttr;
 // export type HsmlTag = [HsmlTagHead, (HsmlTagAttrs | HsmlTagChildren)?, HsmlTagChildren?];
 
-export type HsmlElement = string | boolean | number | Date | HsmlFnc | HsmlObj | HsmlTag;
+export type HsmlElement = string | boolean | number | Date | HsmlFnc | HsmlObj | HsmlTag | undefined | null;
 
 export interface HsmlHandlerCtx extends HsmlObj {
     refs: { [name: string]: Element };
@@ -82,6 +82,9 @@ export interface HsmlHandler<C extends HsmlHandlerCtx> {
 
 export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHandler<C>, ctx?: C): void {
     // console.log("hsml", hsml);
+    if (hml === undefined || hml === null) {
+        return;
+    }
     switch (hml.constructor) {
         case Array:
             // const tag = hml as HsmlTag;

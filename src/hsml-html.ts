@@ -129,14 +129,17 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         this._onHtml(html);
         if (hsmlObj && "render" in hsmlObj && hsmlObj.render.constructor === Function) {
             const hsmls = hsmlObj.render() as HsmlFragment;
-            for (const jml of hsmls) {
-                if (jml.constructor === String) {
-                    this._onHtml(jml + (this._pretty ? "\n" : ""));
-                } else if ("toHsml" in (jml as any)) {
-                    const obj = jml as HsmlObj;
+            for (const hml of hsmls) {
+                if (hml === undefined || hml === null) {
+                    continue;
+                }
+                if (hml.constructor === String) {
+                    this._onHtml(hml + (this._pretty ? "\n" : ""));
+                } else if ("toHsml" in (hml as any)) {
+                    const obj = hml as HsmlObj;
                     obj.toHsml && hsml(obj.toHsml(), this);
                 } else {
-                    hsml(jml as HsmlElement, this);
+                    hsml(hml as HsmlElement, this);
                 }
             }
         }
@@ -200,14 +203,17 @@ export function hsml2html(hsmlEl: HsmlElement, onHtml: (html: string) => void, p
 }
 
 export function hsmls2html(hsmls: HsmlFragment, onHtml: (html: string) => void, pretty = false): void {
-    for (const jml of hsmls) {
-        if (jml.constructor === String) {
-            onHtml(jml + (pretty ? "\n" : ""));
-        } else if ("toHsml" in (jml as any)) {
-            const obj = jml as HsmlObj;
+    for (const hml of hsmls) {
+        if (hml === undefined || hml === null) {
+            continue;
+        }
+        if (hml.constructor === String) {
+            onHtml(hml + (pretty ? "\n" : ""));
+        } else if ("toHsml" in (hml as any)) {
+            const obj = hml as HsmlObj;
             obj.toHsml && hsml2html(obj.toHsml(), onHtml, pretty);
         } else {
-            hsml2html(jml as HsmlElement, onHtml, pretty);
+            hsml2html(hml as HsmlElement, onHtml, pretty);
         }
     }
 }

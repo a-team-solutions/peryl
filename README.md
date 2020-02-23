@@ -7,7 +7,7 @@ TypeScript library and tools for rapid web development.
 - HSML - hyper script markup language
 - SPA - single page web app
 
-Try HSML SPA [demo](https://peter-rybar.gitlab.io/peryl/demo/hsml-app-js_demo.html).
+Try HSML SPA [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
 
 ```javascript
 const state = {

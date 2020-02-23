@@ -174,6 +174,9 @@ export function hsml2dom(hml: HsmlElement, ctx?: HsmlHandlerCtx): HTMLElement | 
 export function hsmls2dom(hmls: HsmlFragment, ctx?: HsmlHandlerCtx): Node[] {
     const elems: Node[] = [];
     for (const hml of hmls) {
+        if (hml === undefined || hml === null) {
+            continue;
+        }
         if (hml.constructor === String) {
             elems.push(document.createTextNode(hml as string));
         } else if ("toHsml" in (hml as object)) {
