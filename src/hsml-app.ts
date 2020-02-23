@@ -1,6 +1,5 @@
 import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
-import * as idom from "incremental-dom";
 
 export type MergebleState = { [k: string]: any };
 
@@ -9,16 +8,16 @@ export type View<State extends MergebleState> = (state: State) => HsmlFragment;
 export type Action = (action: string | number, data?: any, event?: Event) => void;
 
 export type Actions<State extends MergebleState> = (app: App<State>,
-                                                    action: string | number,
-                                                    data?: any,
-                                                    event?: Event) => void;
+    action: string | number,
+    data?: any,
+    event?: Event) => void;
 
 export type Class<T = object> = new (...args: any[]) => T;
 
 export function app<State extends MergebleState>(state: State,
-                                                 view: View<State>,
-                                                 actions?: Actions<State>,
-                                                 element?: string | Element | null) {
+    view: View<State>,
+    actions?: Actions<State>,
+    element?: string | Element | null) {
     return new App<State>(state, view, actions).mount(element);
 }
 
@@ -28,14 +27,14 @@ export enum AppAction {
     _umount = "_umount",
 }
 
-const schedule = window.requestAnimationFrame ||
+const scheduleUpdate = window.requestAnimationFrame ||
     // window.webkitRequestAnimationFrame ||
     // (window as any).mozRequestAnimationFrame ||
     // (window as any).oRequestAnimationFrame ||
     // (window as any).msRequestAnimationFrame ||
     function (callback: Function) { window.setTimeout(callback, 1000 / 60); };
 
-const unschedule = window.cancelAnimationFrame ||
+const unscheduleUpdate = window.cancelAnimationFrame ||
     // window.webkitCancelAnimationFrame ||
     // (window as any).mozCancelAnimationFrame ||
     // (window as any).oCancelAnimationFrame ||
@@ -49,10 +48,10 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
     readonly view: View<State>;
     readonly actions: Actions<State>;
 
-    readonly dom?: Element;
+    readonly dom?: Element; // why is this readonly even if we're assinging a value it to ? setter/getter?
     readonly refs: { [key: string]: HTMLElement } = {};
 
-    private _updateSched?: number;
+    private _updateScheduler?: number;
 
     constructor(state: State, view: View<State>, actions?: Actions<State>) {
         this.state = state;
@@ -78,14 +77,16 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
     }
 
     mount = (e?: string | Element | null): this => {
-        const el = typeof e === "string"
+        const el = (typeof e === "string")
             ? document.getElementById(e) || document.body
             : e || document.body;
         if ((el as any).app) {
+            // Remount
             const a = (el as any).app as App<State>;
-            a && a.umount();
+            a.umount();
         }
         if (!this.dom) {
+            // as any is obsolute if we remove `readonly` from .app
             (this as any).dom = el;
             (el as any).app = this;
             const hsmls = (this as any).render();
@@ -97,44 +98,37 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
 
     umount = (): this => {
         if (this.dom) {
+            // App will unmount
             this.action(AppAction._umount, this.dom);
-            if (this.dom.hasAttribute("app")) {
-                this.dom.removeAttribute("app");
-            }
-            const aNodes = this.dom.querySelectorAll("[app]");
-            for (let i = 0; i < aNodes.length; i++) {
-                const a = (aNodes[i] as any).app as App<State>;
-                a && a.umount();
-            }
             while (this.dom.firstChild /*.hasChildNodes()*/) {
                 this.dom.removeChild(this.dom.firstChild);
             }
-            delete (this.dom as any).app;
-            (this as any).dom = undefined;
+            delete (this.dom as any).app; // Maybe we should extends Element type with .app attrbiute
+            (this as any).dom = undefined; // again, problem with readonly
+        } else {
+            // add warning
         }
         return this;
     }
 
-    update = (state?: Partial<State>): this => {
-        if (state) {
-            this.state = merge(this.state, state);
-        }
-        if (this.dom && !this._updateSched) {
-            this._updateSched = schedule(() => {
+    update = (): this => {
+        if (this.dom && !this._updateScheduler) {
+            this._updateScheduler = scheduleUpdate(() => {
                 if (this.dom) {
                     hsmls2idomPatch(this.dom, this.render(), this);
                 }
-                this._updateSched = undefined;
+                this._updateScheduler = undefined;
             });
         }
+        // if this.dom doesn't exists, maybe console.warn('');
         return this;
     }
 
     toHsml = (): HsmlElement => {
         if (this.dom) {
-            if (this._updateSched) {
-                unschedule(this._updateSched);
-                this._updateSched = undefined;
+            if (this._updateScheduler) {
+                unscheduleUpdate(this._updateScheduler);
+                this._updateScheduler = undefined;
             } else {
                 return ["div", { _skip: true }];
             }
@@ -157,40 +151,15 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
 
 }
 
-(idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
-    nodes.forEach(node => {
-        if (node.nodeType === 1 && "app" in node) {
-            const a = (node as any).app as App<any>;
-            a && a.umount();
-        }
-    });
-};
+// (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
+//     nodes.forEach(node => {
+//         if (node.nodeType === 1 && "app" in node) {
+//             const a = (node as any).app as App<any>;
+//             a && a.umount(); // Why could app be undefined|null ?
+//         }
+//     });
+// };
 
-const merge = <T extends MergebleState>(target: T, source: Partial<T>): T => {
-    if (isMergeble(target) && isMergeble(source)) {
-        Object.keys(source).forEach(key => {
-            if (isMergeble(source[key] as object)) {
-                if (!target[key]) {
-                    (target as any)[key] = {};
-                }
-                merge(target[key], source[key] as Partial<T>);
-            } else {
-                (target as any)[key] = source[key];
-            }
-        });
-    } else {
-        console.warn("unable merge", target, source);
-    }
-    return target;
-};
-
-const isObject = (item: any): boolean => {
-    return item !== null && typeof item === "object";
-};
-
-const isMergeble = (item: object): boolean => {
-    return isObject(item) && !Array.isArray(item);
-};
 
 function formData(e: Event): { [k: string]: string | null | Array<string | null> } {
     const el = e.target as HTMLElement;
@@ -288,11 +257,13 @@ function formInputData(el: Element): { [k: string]: string | null | string[] } {
             break;
         case "SELECT":
             const sel = el as HTMLSelectElement;
-            if (sel.multiple) {
-                const values = Array.from(sel.selectedOptions).map(o => o.value);
-                sel.name && (data[sel.name] = values);
-            } else {
-                sel.name && (data[sel.name] = sel.value);
+            if (sel.name) {
+                if (sel.multiple) {
+                    const values = Array.from(sel.selectedOptions).map(o => o.value);
+                    data[sel.name] = values;
+                } else {
+                    data[sel.name] = sel.value;
+                }
             }
             break;
         case "TEXTAREA":

@@ -115,17 +115,20 @@ const actions: Actions<State> = (app, action, data, event): void => {
     console.log("action:", Action[action as number], data);
     switch (action) {
         case Action.title:
-            app.update(data);
+            app.state = data;
+            app.update();
             break;
         case Action.inc:
-            app.update({ count: app.state.count + data as number });
+            app.state.count + data as number;
             setTimeout(() => app.action(Action.dec, 1), 1e3); // async call
             break;
         case Action.dec:
-            app.update({ count: app.state.count - data as number });
+            app.state.count - data as number;
+            app.update();
             break;
         case Action.clear:
-            app.update({ title: "" });
+            app.state.title = "";
+            app.update();
             break;
         case Action.form:
             break;
