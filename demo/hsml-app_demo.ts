@@ -1,4 +1,4 @@
-import { View, Actions, App } from "../src/hsml-app";
+import { View, Actions, App, AppAction } from "../src/hsml-app";
 import { HsmlFragment, HsmlElement } from "../src/hsml";
 
 interface State {
@@ -12,7 +12,8 @@ enum Action {
     dec,
     inc,
     clear,
-    form,
+    formSubmit,
+    formChange,
     xXx
 }
 
@@ -52,7 +53,12 @@ const view: View<State> = (state: State): HsmlFragment => [
     ]],
     ["h2", ["Form"]],
     ["form",
-        { on: ["submit", Action.form] },
+        {
+            on: [
+                ["submit", Action.formSubmit],
+                ["change", Action.formChange]
+            ]
+        },
         [
             "xy ",
             ["input",
@@ -112,8 +118,12 @@ const view: View<State> = (state: State): HsmlFragment => [
 ];
 
 const actions: Actions<State> = (app, action, data, event): void => {
-    console.log("action:", Action[action as number], data);
+    console.log("action:", Action[action as number] || action, data);
     switch (action) {
+        case AppAction._init:
+        case AppAction._mount:
+        case AppAction._umount:
+            break;
         case Action.title:
             app.update(data);
             break;
@@ -127,7 +137,8 @@ const actions: Actions<State> = (app, action, data, event): void => {
         case Action.clear:
             app.update({ title: "" });
             break;
-        case Action.form:
+        case Action.formSubmit:
+        case Action.formChange:
             break;
         case "x":
             console.log("data.x", typeof data.x, data.x);
@@ -150,5 +161,5 @@ const app = new App(state, view, actions).mount("app");
 (self as any).app = app;
 
 
-const html = app.toHtml();
-console.log(html);
+// const html = app.toHtml();
+// console.log(html);
