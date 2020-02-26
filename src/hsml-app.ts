@@ -81,12 +81,13 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
             ? document.getElementById(e) || document.body
             : e || document.body;
         if ((el as any).app) {
-            // Remount
+            // If app already exists on mounted element, previous peryl app (it could be itself)
+            // will be unmounted first (which will dispatch "_unmount" action)
+            // and then, on mounted, peryl will mount new app (with "_mount" action)
             const a = (el as any).app as App<State>;
             a.umount();
         }
         if (!this.dom) {
-            // as any is obsolute if we remove `readonly` from .app
             (this as any).dom = el;
             (el as any).app = this;
             const hsmls = (this as any).render();
@@ -98,15 +99,16 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
 
     umount = (): this => {
         if (this.dom) {
-            // App will unmount
+            // App will dispatch "_unmount" action first to let user free resources
+            // and then it removes all nodes from real dom
             this.action(AppAction._umount, this.dom);
             while (this.dom.firstChild /*.hasChildNodes()*/) {
                 this.dom.removeChild(this.dom.firstChild);
             }
-            delete (this.dom as any).app; // Maybe we should extends Element type with .app attrbiute
-            (this as any).dom = undefined; // again, problem with readonly
+            delete (this.dom as any).app;
+            (this as any).dom = undefined;
         } else {
-            // add warning
+            console.warn("[PERYL] You're trying to un-mount peryl app, which doesn't have mounting DOM element or 'mount' wasn't called.");
         }
         return this;
     }
@@ -119,8 +121,9 @@ export class App<State extends MergebleState> implements HsmlHandlerCtx {
                 }
                 this._updateScheduler = undefined;
             });
+        } else {
+            console.warn("[PERYL] You're trying to update peryll app, but it seems it wasn't mounted properly in first place. No updates will be displayed.");
         }
-        // if this.dom doesn't exists, maybe console.warn('');
         return this;
     }
 
