@@ -71,7 +71,12 @@
 
         function actions(app, action, data, event) {
             console.log("action:", action, data, event);
+
             switch (action) {
+                case peryl.AppAction._init:
+                case peryl.AppAction._mount:
+                case peryl.AppAction._umount:
+                    break;
 
                 case Action.title:
                     app.update(data);
