@@ -32,7 +32,6 @@ pages:
         - npm run build
         - npx cpx 'build/**/' 'public/build/' -u -v
         - npx cpx 'demo/**/' 'public/demo/' -u -v
-        - chmod +x ./index_files.sh
         - ./mkindex.sh ./public
 
     artifacts:
