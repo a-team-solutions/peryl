@@ -1,24 +1,24 @@
-import { Mount, Action, View, Component as SvacComponent, MergebleState } from "./hsml-svac";
-import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlAttrOnDataFnc, HsmlHandlerCtx, HsmlFnc } from "./hsml";
+import { HMount, HAction, HView, HComponent as SvacComponent } from "./hsml-svac";
+import { HElement, HElements, HAttrOnData, HAttrOnDataFnc, HHandlerCtx, HFnc } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export interface Component<State extends MergebleState> extends SvacComponent<State> {
-    actions?: Actions<State>;
+export interface HComponent<State> extends SvacComponent<State> {
+    actions?: HActions<State>;
 }
 
-export type Actions<State extends MergebleState> = (ctrl: Ctrl<State>,
-                                                    action: string | number,
-                                                    data?: any,
-                                                    event?: Event) => void;
+export type HActions<State> = (ctrl: HCtrl<State>,
+                               action: string | number,
+                               data?: any,
+                               event?: Event) => void;
 
-const mount: Mount = <State extends MergebleState>(
-    component: Component<State>,
+const mount: HMount = <State>(
+    component: HComponent<State>,
     state?: State,
-    action?: Action): HsmlFnc | HsmlFragment =>
+    action?: HAction): HFnc | HElements =>
     (e: Element) => {
         if ((e as any).ctrl) {
-            const c = (e as any).ctrl as Ctrl<State>;
+            const c = (e as any).ctrl as HCtrl<State>;
             if (c.view === component.view) {
                 if (state !== undefined) {
                     c.state = state;
@@ -26,14 +26,14 @@ const mount: Mount = <State extends MergebleState>(
                 c.update();
             } else {
                 c.umount();
-                const c1 = new Ctrl<State>(component, action);
+                const c1 = new HCtrl<State>(component, action);
                 if (state !== undefined) {
                     c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new Ctrl<State>(component, action);
+            const c = new HCtrl<State>(component, action);
             if (state !== undefined) {
                 c.state = state;
             }
@@ -58,31 +58,31 @@ const unschedule = window.cancelAnimationFrame ||
 
 const ctrlAttr = "ctrl";
 
-export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
+export class HCtrl<State> implements HHandlerCtx {
 
     static debug = false;
 
-    static appActions?: Actions<any>;
+    static appActions?: HActions<any>;
 
     private static _count = 0;
 
-    private static _ctrls: { [ctrl: string]: Ctrl<any> } = {};
+    private static _ctrls: { [ctrl: string]: HCtrl<any> } = {};
 
     readonly type: string = "Ctrl";
-    readonly id: string = this.type + "-" + Ctrl._count++;
+    readonly id: string = this.type + "-" + HCtrl._count++;
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
     state: State;
 
-    readonly view: View<State>;
+    readonly view: HView<State>;
 
-    private _actions?: Actions<State>;
-    private _extAction?: Action;
+    private _actions?: HActions<State>;
+    private _extAction?: HAction;
 
     private _updateSched?: number;
 
-    constructor(component: Component<State>, extAction?: Action) {
+    constructor(component: HComponent<State>, extAction?: HAction) {
         this.view = component.view;
         this.type = component.type;
         this.state = component.state;
@@ -92,36 +92,36 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
     }
 
     appAction = (action: string | number, data?: any, event?: Event): void => {
-        Ctrl.debug && console.log("appAction", this.type, action, data, event);
-        Ctrl.appActions && Ctrl.appActions(this, action, data, event);
+        HCtrl.debug && console.log("appAction", this.type, action, data, event);
+        HCtrl.appActions && HCtrl.appActions(this, action, data, event);
     }
 
-    appActions(actions: Actions<State>): this {
-        Ctrl.appActions = actions;
+    appActions(actions: HActions<State>): this {
+        HCtrl.appActions = actions;
         return this;
     }
 
     extAction = (action: string | number, data?: any, event?: Event): void => {
-        Ctrl.debug && console.log("extAction", this.type, action, data, event);
+        HCtrl.debug && console.log("extAction", this.type, action, data, event);
         this._extAction && this._extAction(action, data, event);
     }
 
     action = (action: string | number, data?: any, event?: Event): void => {
-        Ctrl.debug && console.log("action", this.type, action, data, event);
+        HCtrl.debug && console.log("action", this.type, action, data, event);
         this._actions && this._actions(this, action, data, event);
     }
 
-    appCtrls(): Ctrl<any>[] {
-        return Object.values(Ctrl._ctrls);
+    appCtrls(): HCtrl<any>[] {
+        return Object.values(HCtrl._ctrls);
     }
 
-    render = (): HsmlFragment => {
+    render = (): HElements => {
         return this.view(this.state, this.action, mount);
     }
 
-    onHsml = (action: string, data: HsmlAttrOnData, event: Event): void => {
+    onHsml = (action: string, data: HAttrOnData, event: Event): void => {
         data = (data && data.constructor === Function)
-            ? (data as HsmlAttrOnDataFnc)(event)
+            ? (data as HAttrOnDataFnc)(event)
             : data;
         if (data === undefined && event) {
             data = formInputData(event);
@@ -134,11 +134,11 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
             ? document.getElementById(e) || document.body
             : e || document.body;
         if ((el as any).ctrl) {
-            const c = (el as any).ctrl as Ctrl<State>;
+            const c = (el as any).ctrl as HCtrl<State>;
             c && c.umount();
         }
         if (!this.dom) {
-            Ctrl._ctrls[this.id] = this;
+            HCtrl._ctrls[this.id] = this;
             (this as any).dom = el;
             (el as any).ctrl = this;
             const hsmls = (this as any).render();
@@ -151,14 +151,14 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
 
     umount = (): this => {
         if (this.dom) {
-            delete Ctrl._ctrls[this.id];
+            delete HCtrl._ctrls[this.id];
             this.action("_umount", this.dom);
             if (this.dom.hasAttribute(ctrlAttr)) {
                 this.dom.removeAttribute(ctrlAttr);
             }
             const cNodes = this.dom.querySelectorAll(`[${ctrlAttr}]`);
             for (let i = 0; i < cNodes.length; i++) {
-                const c = (cNodes[i] as any).ctrl as Ctrl<State>;
+                const c = (cNodes[i] as any).ctrl as HCtrl<State>;
                 c && c.umount();
             }
             while (this.dom.firstChild) {
@@ -170,10 +170,7 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
         return this;
     }
 
-    update = (state?: Partial<State>): this => {
-        if (state) {
-            this.state = merge(this.state, state);
-        }
+    update = (): this => {
         if (this.dom && !this._updateSched) {
             this._updateSched = schedule(() => {
                 if (this.dom) {
@@ -185,7 +182,7 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
         return this;
     }
 
-    toHsml = (): HsmlElement => {
+    toHsml = (): HElement => {
         if (this.dom) {
             if (this._updateSched) {
                 unschedule(this._updateSched);
@@ -203,13 +200,13 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
                 );
             }
         }
-        const hsmls = this.render() as HsmlFragment;
+        const hsmls = this.render() as HElements;
         hsmls.push(
             (e: Element) => {
                 if (!this.dom) {
                     (this as any).dom = e;
                     (e as any).ctrl = this;
-                    Ctrl._ctrls[this.id] = this;
+                    HCtrl._ctrls[this.id] = this;
                     this.action("_mount", this.dom);
                 }
             });
@@ -234,36 +231,10 @@ export class Ctrl<State extends MergebleState> implements HsmlHandlerCtx {
 (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
     nodes.forEach(node => {
         if (node.nodeType === 1 && (node as any).ctrl) {
-            const c = (node as any).ctrl as Ctrl<any>;
+            const c = (node as any).ctrl as HCtrl<any>;
             c && c.umount();
         }
     });
-};
-
-const merge = <T extends MergebleState>(target: T, source: Partial<T>): T => {
-    if (isMergeble(target) && isMergeble(source)) {
-        Object.keys(source).forEach(key => {
-            if (isMergeble(source[key] as object)) {
-                if (!target[key]) {
-                    (target as any)[key] = {};
-                }
-                merge(target[key], source[key] as Partial<T>);
-            } else {
-                (target as any)[key] = source[key];
-            }
-        });
-    } else {
-        console.warn("unable merge", target, source);
-    }
-    return target;
-};
-
-const isObject = (item: any): boolean => {
-    return item !== null && typeof item === "object";
-};
-
-const isMergeble = (item: object): boolean => {
-    return isObject(item) && !Array.isArray(item);
 };
 
 function formInputData(e: Event): { [k: string]: string } {

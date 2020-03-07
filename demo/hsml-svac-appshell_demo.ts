@@ -1,8 +1,8 @@
-import { Ctrl, Component } from "../src/hsml-svac-ctrl";
+import { HCtrl, HComponent } from "../src/hsml-svac-ctrl";
 import { AppShellState, AppShellActions, Content, Form, AppShell, FormActions } from "./hsml-svac-appshell-components_demo";
 import { Hash } from "../src/hash";
 
-const app = new Ctrl<AppShellState>(AppShell)
+const app = new HCtrl<AppShellState>(AppShell)
     .appActions((ctrl, action, data, event) => {
         console.log("app action", ctrl.type, action, data, event);
         switch (action) {
@@ -17,7 +17,7 @@ setTimeout(() => {
     app.action(AppShellActions.snackbar, "Message");
 }, 1e3);
 
-const components: { [k: string]: Component<any> } = {
+const components: { [k: string]: HComponent<any> } = {
     content: Content,
     form: Form
 };

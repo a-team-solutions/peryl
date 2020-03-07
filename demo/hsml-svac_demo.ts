@@ -1,6 +1,6 @@
-import { Action, Mount } from "../src/hsml-svac";
-import { HsmlFragment } from "../src/hsml";
-import { Component, Actions, Ctrl } from "../src/hsml-svac-ctrl";
+import { HAction, HMount } from "../src/hsml-svac";
+import { HElements } from "../src/hsml";
+import { HComponent, HActions, HCtrl } from "../src/hsml-svac-ctrl";
 
 interface AppState {
     title: string;
@@ -14,7 +14,7 @@ const enum AppActions {
     xXx = "xXx"
 }
 
-const App: Component<AppState> = {
+const App: HComponent<AppState> = {
 
     type: "App",
 
@@ -23,7 +23,7 @@ const App: Component<AppState> = {
         count: 77
     },
 
-    view: (state: AppState, action: Action, mount: Mount): HsmlFragment => [
+    view: (state: AppState, action: HAction, mount: HMount): HElements => [
         ["h2", [state.title]],
         ["p", [
             "Title: ",
@@ -48,18 +48,21 @@ const App: Component<AppState> = {
         ["p", state.title ? mount<AppState>(Sub, state, action) : []]
     ],
 
-    actions: (ctrl: Ctrl<AppState>, action: string | number, data?: any, event?: Event): void => {
+    actions: (ctrl: HCtrl<AppState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case AppActions.title:
-                ctrl.update(data);
+                ctrl.state = { ...ctrl.state, ...data };
+                ctrl.update();
                 break;
             case AppActions.inc:
-                ctrl.update({ count: ctrl.state.count + data as number });
+                ctrl.state.count = ctrl.state.count + data;
+                ctrl.update();
                 setTimeout(ctrl.action, 1e3, AppActions.dec, 1); // async call
                 break;
             case AppActions.dec:
-                ctrl.update({ count: ctrl.state.count - data as number });
+                ctrl.state.count = ctrl.state.count - data;
+                ctrl.update();
                 break;
             default:
                 ctrl.extAction(action, data, event);
@@ -71,13 +74,13 @@ const enum SubAppActions {
     xXx = "xXx"
 }
 
-const Sub: Component<AppState> = {
+const Sub: HComponent<AppState> = {
 
     type: "Sub",
 
     state: App.state,
 
-    view: (state: AppState, action: Action, mount: Mount): HsmlFragment => [
+    view: (state: AppState, action: HAction, mount: HMount): HElements => [
         ["h3", [state.title]],
         ["p", [
             ["em", ["Count"]], ": ", state.count,
@@ -86,7 +89,7 @@ const Sub: Component<AppState> = {
         ]]
     ],
 
-    actions: (ctrl: Ctrl<AppState>, action: string | number, data?: any, event?: Event): void => {
+    actions: (ctrl: HCtrl<AppState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case SubAppActions.xXx:
@@ -98,19 +101,20 @@ const Sub: Component<AppState> = {
     }
 };
 
-const appActions: Actions<AppState> =
-    (ctrl: Ctrl<AppState>, action: string | number, data: any, event?: Event) => {
+const appActions: HActions<AppState> =
+    (ctrl: HCtrl<AppState>, action: string | number, data: any, event?: Event) => {
         console.log(action, data);
         switch (action) {
             case "xXx":
-                ctrl.update({ title: "xXx" });
+                ctrl.state.title = "xXx";
+                ctrl.update();
                 break;
         }
     };
 
-Ctrl.debug = true;
+HCtrl.debug = true;
 
-const app = new Ctrl<AppState>(App)
+const app = new HCtrl<AppState>(App)
     .appActions(appActions)
     .mount(document.getElementById("app"));
 

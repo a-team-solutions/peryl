@@ -1,6 +1,6 @@
-import { HsmlFragment, HsmlElement } from "../src/hsml";
-import { Ctrl, Component } from "../src/hsml-svac-ctrl";
-import { Mount, Action } from "../src/hsml-svac";
+import { HElements, HElement } from "../src/hsml";
+import { HCtrl, HComponent } from "../src/hsml-svac-ctrl";
+import { HMount, HAction } from "../src/hsml-svac";
 
 const NBSP = "\u00A0";
 const CIRC = "\u25EF";
@@ -15,7 +15,7 @@ const enum TicTacToeActions {
     mark = "mark"
 }
 
-const TicTacToe: Component<TicTacToeState> = {
+const TicTacToe: HComponent<TicTacToeState> = {
 
     type: "TicTacToe",
 
@@ -28,13 +28,13 @@ const TicTacToe: Component<TicTacToeState> = {
         turn: 0
     },
 
-    view: (state: TicTacToeState, action: Action, mount: Mount): HsmlFragment => [
+    view: (state: TicTacToeState, action: HAction, mount: HMount): HElements => [
         ["h1", ["Tic-Tac-Toe Demo"]],
         ["p", [
             "Player: ", state.turn ? CROS : CIRC
         ]],
-        ["div", state.board.map<HsmlElement>((row, y) =>
-            ["div", row.map<HsmlElement>((col, x) =>
+        ["div", state.board.map<HElement>((row, y) =>
+            ["div", row.map<HElement>((col, x) =>
                 ["button",
                     {
                         styles: {
@@ -53,7 +53,7 @@ const TicTacToe: Component<TicTacToeState> = {
         ]
     ],
 
-    actions: (ctrl: Ctrl<TicTacToeState>, action: string | number, data?: any, event?: Event): void => {
+    actions: (ctrl: HCtrl<TicTacToeState>, action: string | number, data?: any, event?: Event): void => {
         console.log("action", action, data, event);
         switch (action) {
             case TicTacToeActions.mark:
@@ -70,7 +70,7 @@ const TicTacToe: Component<TicTacToeState> = {
     }
 };
 
-const app = new Ctrl<TicTacToeState>(TicTacToe)
+const app = new HCtrl<TicTacToeState>(TicTacToe)
     .mount(document.getElementById("app"));
 
 (self as any).app = app;

@@ -1,14 +1,13 @@
-import { HsmlElement } from "./hsml";
+import { HElement } from "./hsml";
 
-export function h(tag: string): HsmlElement;
-export function h(tag: string, text: string): HsmlElement;
-export function h(tag: string, attrs: {}): HsmlElement;
-export function h(tag: string, attrs: {}, text: string): HsmlElement;
-export function h(tag: string, attrs: {}, childs: HsmlElement[]): HsmlElement;
-export function h(tag: string, childs: HsmlElement[]): HsmlElement;
-export function h(tag: string, second?: string | {} | HsmlElement[], third?: string | {} | HsmlElement[]): HsmlElement {
+export function h(tag: string): HElement;
+export function h(tag: string, text: string): HElement;
+export function h(tag: string, attrs: {}): HElement;
+export function h(tag: string, attrs: {}, text: string): HElement;
+export function h(tag: string, attrs: {}, childs: HElement[]): HElement;
+export function h(tag: string, childs: HElement[]): HElement;
+export function h(tag: string, second?: string | {} | HElement[], third?: string | {} | HElement[]): HElement {
     const result: [string, ...any[]] = [tag];
-
     if (second) {
         if (typeof second === "string") {
             result.push([second]);
@@ -19,7 +18,6 @@ export function h(tag: string, second?: string | {} | HsmlElement[], third?: str
             result.push(second);
         }
     }
-
     if (third) {
         if (typeof third === "string") {
             result.push([third]);
@@ -27,6 +25,5 @@ export function h(tag: string, second?: string | {} | HsmlElement[], third?: str
             result.push(third);
         }
     }
-
-    return result as HsmlElement;
+    return result as HElement;
 }

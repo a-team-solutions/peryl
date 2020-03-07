@@ -1,19 +1,19 @@
 import {
     hsml,
-    HsmlElement,
-    HsmlFragment,
-    HsmlHead,
-    HsmlAttrs,
-    HsmlAttrClasses,
-    HsmlAttrData,
-    HsmlAttrStyles,
-    HsmlFnc,
-    HsmlObj,
-    HsmlHandler,
-    HsmlHandlerCtx
+    HElement,
+    HElements,
+    HHead,
+    HAttrs,
+    HAttrClasses,
+    HAttrData,
+    HAttrStyles,
+    HFnc,
+    HObj,
+    HHandler,
+    HHandlerCtx
 } from "./hsml";
 
-class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
+class HsmlHtmlHandler implements HHandler<HHandlerCtx> {
 
     private static _pairTags = [
         "script", "iframe",
@@ -36,11 +36,11 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         this._indent = indent;
     }
 
-    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragment, ctx?: HsmlHandlerCtx): boolean {
+    open(tag: HHead, attrs: HAttrs, children: HElements, ctx?: HHandlerCtx): boolean {
         const props: any[] = [];
         let id = attrs._id;
         let classes: string[] = attrs._classes ? attrs._classes : [];
-        let hsmlObj: any = attrs._hsmlObj;
+        let hObj: any = attrs._hObj;
         for (const a in attrs) {
             if (attrs.hasOwnProperty(a)) {
                 switch (a) {
@@ -49,13 +49,13 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
                     case "_ref":
                     case "_key":
                     case "_skip":
-                    case "_hsmlObj":
+                    case "_hObj":
                         break;
                     case "id":
                         id = attrs[a] as string;
                         break;
                     case "classes":
-                        const attrClasses = attrs[a] as HsmlAttrClasses;
+                        const attrClasses = attrs[a] as HAttrClasses;
                         classes = classes.concat(attrClasses
                             ? attrClasses
                                 .map(c =>
@@ -69,7 +69,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
                         classes = classes.concat((attrs[a] as string).split(" "));
                         break;
                     case "data":
-                        const attrData = attrs[a] as HsmlAttrData;
+                        const attrData = attrs[a] as HAttrData;
                         for (const d in attrData) {
                             if (attrData.hasOwnProperty(d)) {
                                 if (attrData[d].constructor === String) {
@@ -81,7 +81,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
                         }
                         break;
                     case "styles":
-                        const attrStyles = attrs[a] as HsmlAttrStyles;
+                        const attrStyles = attrs[a] as HAttrStyles;
                         let style = "";
                         for (const d in attrStyles) {
                             if (attrStyles.hasOwnProperty(d)) {
@@ -112,8 +112,8 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         if (id) {
             props.unshift(["id", id]);
         }
-        if (hsmlObj && "type" in hsmlObj) {
-            props.unshift(["hsmlObj", hsmlObj.type]);
+        if (hObj && "type" in hObj) {
+            props.unshift(["hObj", hObj.type]);
         }
         const args = props.map(p => `${p[0]}="${p[1]}"`).join(" ");
         let html = "";
@@ -127,8 +127,8 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
             html += "\n";
         }
         this._onHtml(html);
-        if (hsmlObj && "render" in hsmlObj && hsmlObj.render.constructor === Function) {
-            const hsmls = hsmlObj.render() as HsmlFragment;
+        if (hObj && "render" in hObj && hObj.render.constructor === Function) {
+            const hsmls = hObj.render() as HElements;
             for (const hml of hsmls) {
                 if (hml === undefined || hml === null) {
                     continue;
@@ -136,17 +136,17 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
                 if (hml.constructor === String) {
                     this._onHtml(hml + (this._pretty ? "\n" : ""));
                 } else if ("toHsml" in (hml as any)) {
-                    const obj = hml as HsmlObj;
+                    const obj = hml as HObj;
                     obj.toHsml && hsml(obj.toHsml(), this);
                 } else {
-                    hsml(hml as HsmlElement, this);
+                    hsml(hml as HElement, this);
                 }
             }
         }
         return false;
     }
 
-    close(tag: HsmlHead, children: HsmlFragment, ctx?: HsmlHandlerCtx): void {
+    close(tag: HHead, children: HElements, ctx?: HHandlerCtx): void {
         let html = "";
         const pairTag = (children.length || HsmlHtmlHandler._pairTags.indexOf(tag) !== -1);
         if (this._pretty) {
@@ -164,7 +164,7 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         }
     }
 
-    text(text: string, ctx?: HsmlHandlerCtx): void {
+    text(text: string, ctx?: HHandlerCtx): void {
         let html = "";
         if (this._pretty) {
             html += this._mkIndent(this._depth);
@@ -176,12 +176,12 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
         this._onHtml(html);
     }
 
-    fnc(fnc: HsmlFnc, ctx?: HsmlHandlerCtx): void {
+    fnc(fnc: HFnc, ctx?: HHandlerCtx): void {
     }
 
-    obj(obj: HsmlObj, ctx?: HsmlHandlerCtx): void {
+    obj(obj: HObj, ctx?: HHandlerCtx): void {
         if ("toHsml" in obj) {
-            obj.toHsml && hsml(obj.toHsml(), this, obj as HsmlHandlerCtx);
+            obj.toHsml && hsml(obj.toHsml(), this, obj as HHandlerCtx);
         } else {
             this.text("" + obj, ctx);
         }
@@ -197,12 +197,12 @@ class HsmlHtmlHandler implements HsmlHandler<HsmlHandlerCtx> {
 
 }
 
-export function hsml2html(hsmlEl: HsmlElement, onHtml: (html: string) => void, pretty = false): void {
+export function hsml2html(hsmlEl: HElement, onHtml: (html: string) => void, pretty = false): void {
     const handler = new HsmlHtmlHandler(onHtml, pretty);
     hsml(hsmlEl, handler);
 }
 
-export function hsmls2html(hsmls: HsmlFragment, onHtml: (html: string) => void, pretty = false): void {
+export function hsmls2html(hsmls: HElements, onHtml: (html: string) => void, pretty = false): void {
     for (const hml of hsmls) {
         if (hml === undefined || hml === null) {
             continue;
@@ -210,21 +210,21 @@ export function hsmls2html(hsmls: HsmlFragment, onHtml: (html: string) => void, 
         if (hml.constructor === String) {
             onHtml(hml + (pretty ? "\n" : ""));
         } else if ("toHsml" in (hml as any)) {
-            const obj = hml as HsmlObj;
+            const obj = hml as HObj;
             obj.toHsml && hsml2html(obj.toHsml(), onHtml, pretty);
         } else {
-            hsml2html(hml as HsmlElement, onHtml, pretty);
+            hsml2html(hml as HElement, onHtml, pretty);
         }
     }
 }
 
-export function hsml2htmls(hsml: HsmlElement, pretty = false): string[] {
+export function hsml2htmls(hsml: HElement, pretty = false): string[] {
     const htmls: string[] = [];
     hsml2html(hsml, html => htmls.push(html), pretty);
     return htmls;
 }
 
-export function hsmls2htmls(hsmls: HsmlFragment, pretty = false): string[] {
+export function hsmls2htmls(hsmls: HElements, pretty = false): string[] {
     const htmls: string[] = [];
     hsmls2html(hsmls, html => htmls.push(html), pretty);
     return htmls;

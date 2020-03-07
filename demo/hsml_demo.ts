@@ -1,7 +1,7 @@
 import { hsmls2idomPatch } from "../src/hsml-idom";
-import { HsmlFragment, HsmlElement } from "../src/hsml";
+import { HElements, HElement } from "../src/hsml";
 
-type View<State> = (state: State, dispatch: Dispatch) => HsmlFragment;
+type View<State> = (state: State, dispatch: Dispatch) => HElements;
 
 type Dispatch = (event: string, data?: any) => void;
 
@@ -32,7 +32,7 @@ const appState = {
 
 type AppState = typeof appState;
 
-function app(state: AppState, dispatch: Dispatch): HsmlFragment {
+function app(state: AppState, dispatch: Dispatch): HElements {
     return [
         ["h2", [state.title]],
         ["p", [
@@ -46,7 +46,7 @@ function app(state: AppState, dispatch: Dispatch): HsmlFragment {
     ];
 }
 
-function button(label: string, cb: (e: Event) => void): HsmlElement {
+function button(label: string, cb: (e: Event) => void): HElement {
     return ["button", { click: cb }, [label]];
 }
 

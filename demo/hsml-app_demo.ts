@@ -1,5 +1,5 @@
-import { View, Actions, App, AppAction } from "../src/hsml-app";
-import { HsmlFragment, HsmlElement } from "../src/hsml";
+import { HView, HActions, HApp, HAppAction } from "../src/hsml-app";
+import { HElements, HElement } from "../src/hsml";
 
 interface State {
     title: string;
@@ -22,7 +22,7 @@ const state: State = {
     count: 77
 };
 
-const view: View<State> = (state: State): HsmlFragment => [
+const view: HView<State> = (state: State): HElements => [
     ["h2", [state.title]],
     ["p", [
         "Title: ",
@@ -97,13 +97,13 @@ const view: View<State> = (state: State): HsmlFragment => [
             "s ",
             ["select", { name: "s" },
                 ["s1", "s2", "s3"]
-                    .map<HsmlElement>(l => ["option", { value: l }, [l]])
+                    .map<HElement>(l => ["option", { value: l }, [l]])
             ],
             ["br"],
             "sm ",
             ["select", { name: "sm", multiple: true },
                 ["sm1", "sm2", "sm3"]
-                    .map<HsmlElement>(l => ["option", { value: l }, [l]])
+                    .map<HElement>(l => ["option", { value: l }, [l]])
             ],
             ["br"],
             ["button.w3-button.w3-blue",
@@ -117,25 +117,29 @@ const view: View<State> = (state: State): HsmlFragment => [
     ["input", { type: "button", value: "x", disabled: state.x }]
 ];
 
-const actions: Actions<State> = (app, action, data, event): void => {
+const actions: HActions<State> = (app, action, data, event): void => {
     console.log("action:", Action[action as number] || action, data);
     switch (action) {
-        case AppAction._init:
-        case AppAction._mount:
-        case AppAction._umount:
+        case HAppAction._init:
+        case HAppAction._mount:
+        case HAppAction._umount:
             break;
         case Action.title:
-            app.update(data);
+            app.state = data;
+            app.update();
             break;
         case Action.inc:
-            app.update({ count: app.state.count + data as number });
+            app.state.count = app.state.count + data as number;
+            app.update();
             setTimeout(() => app.action(Action.dec, 1), 1e3); // async call
             break;
         case Action.dec:
-            app.update({ count: app.state.count - data as number });
+            app.state.count = app.state.count - data as number;
+            app.update();
             break;
         case Action.clear:
-            app.update({ title: "" });
+            app.state.title = "";
+            app.update();
             break;
         case Action.formSubmit:
         case Action.formChange:
@@ -146,17 +150,13 @@ const actions: Actions<State> = (app, action, data, event): void => {
             // app.state.x = data.x === "true";
             // app.state.x = data.x;
             app.update();
-            // app.update({ x: new Boolean(data.x === "true") });
-            // app.update({ x: data.x === "true" });
-            // app.update({ x: data.x });
-            console.log(app.state.x);
             break;
         default:
             console.warn("action unhandled:", action, data, event);
     }
 };
 
-const app = new App(state, view, actions).mount("app");
+const app = new HApp(state, view, actions).mount(document.getElementById("app"));
 
 (self as any).app = app;
 

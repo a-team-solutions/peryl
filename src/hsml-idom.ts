@@ -1,21 +1,21 @@
 import {
     hsml,
-    HsmlElement,
-    HsmlFragment,
-    HsmlHead,
-    HsmlAttrs,
-    HsmlAttrClasses,
-    HsmlAttrData,
-    HsmlAttrStyles,
-    HsmlAttrOn,
-    HsmlAttrOnCb,
-    HsmlAttrOnAct,
-    HsmlAttrOnAction,
-    HsmlAttrOnData,
-    HsmlFnc,
-    HsmlObj,
-    HsmlHandler,
-    HsmlHandlerCtx
+    HElement,
+    HElements,
+    HHead,
+    HAttrs,
+    HAttrClasses,
+    HAttrData,
+    HAttrStyles,
+    HAttrOn,
+    HAttrOnCb,
+    HAttrOnAct,
+    HAttrOnAction,
+    HAttrOnData,
+    HFnc,
+    HObj,
+    HHandler,
+    HHandlerCtx
 } from "./hsml";
 import * as idom from "incremental-dom";
 
@@ -64,14 +64,14 @@ import * as idom from "incremental-dom";
 
 // boolAttrProps.forEach(a => idom.attributes[a] = setBoolAttrProp);
 
-class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
+class HsmlIDomHandler implements HHandler<HHandlerCtx> {
 
-    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragment, ctx?: HsmlHandlerCtx): boolean {
+    open(tag: HHead, attrs: HAttrs, children: HElements, ctx?: HHandlerCtx): boolean {
         const props: any[] = [];
         let id = attrs._id;
         let classes: string[] = attrs._classes ? attrs._classes : [];
         let ref = attrs._ref;
-        let hsmlObj: any = attrs._hsmlObj;
+        let hObj: any = attrs._hObj;
         for (const a in attrs) {
             if (attrs.hasOwnProperty(a)) {
                 switch (a) {
@@ -80,13 +80,13 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                     case "_ref":
                     case "_key":
                     case "_skip":
-                    case "_hsmlObj":
+                    case "_hObj":
                         break;
                     case "id":
                         id = attrs[a] as string;
                         break;
                     case "classes":
-                        const attrClasses = attrs[a] as HsmlAttrClasses;
+                        const attrClasses = attrs[a] as HAttrClasses;
                         classes = classes.concat(attrClasses
                             ? attrClasses
                                 .map(c =>
@@ -100,7 +100,7 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                         classes = classes.concat((attrs[a] as string).split(" "));
                         break;
                     case "data":
-                        const attrData = attrs[a] as HsmlAttrData;
+                        const attrData = attrs[a] as HAttrData;
                         for (const d in attrData) {
                             if (attrData.hasOwnProperty(d)) {
                                 if (attrData[d].constructor === String) {
@@ -112,10 +112,10 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                         }
                         break;
                     case "styles":
-                        props.push("style", attrs[a] as HsmlAttrStyles);
+                        props.push("style", attrs[a] as HAttrStyles);
                         break;
                     case "on":
-                        const attrOn = attrs[a] as HsmlAttrOn;
+                        const attrOn = attrs[a] as HAttrOn;
                         if (typeof attrOn[0] === "string") {
                             if (typeof attrOn[1] === "function") {
                                 props.push("on" + attrOn[0], attrOn[1]);
@@ -123,13 +123,13 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                                 props.push("on" + attrOn[0], (e: Event) => {
                                     ctx && ctx.onHsml &&
                                     typeof ctx.onHsml === "function" &&
-                                    ctx.onHsml(attrOn[1] as HsmlAttrOnAction,
-                                            attrOn[2] as HsmlAttrOnData,
+                                    ctx.onHsml(attrOn[1] as HAttrOnAction,
+                                            attrOn[2] as HAttrOnData,
                                             e);
                                 });
                             }
                         } else {
-                            (attrOn as Array<HsmlAttrOnCb | HsmlAttrOnAct>)
+                            (attrOn as Array<HAttrOnCb | HAttrOnAct>)
                                 .forEach(attr => {
                                     if (typeof attr[1] === "function") {
                                         props.push("on" + attr[0], attr[1]);
@@ -137,8 +137,8 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
                                         props.push("on" + attr[0], (e: Event) => {
                                             ctx && ctx.onHsml &&
                                             typeof ctx.onHsml === "function" &&
-                                            ctx.onHsml(attr[1] as HsmlAttrOnAction,
-                                                    attr[2] as HsmlAttrOnData,
+                                            ctx.onHsml(attr[1] as HAttrOnAction,
+                                                    attr[2] as HAttrOnData,
                                                     e);
                                         });
                                     }
@@ -188,29 +188,29 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
         if (ctx && ref) {
             ctx.refs[ref] = idom.currentElement();
         }
-        if (hsmlObj && hsmlObj.mount && hsmlObj.mount.constructor === Function) {
-            hsmlObj.mount(idom.currentElement());
+        if (hObj && hObj.mount && hObj.mount.constructor === Function) {
+            hObj.mount(idom.currentElement());
             idom.skip();
         }
         return attrs._skip ? true : false;
     }
 
-    close(tag: HsmlHead, children: HsmlFragment, ctx?: HsmlHandlerCtx): void {
+    close(tag: HHead, children: HElements, ctx?: HHandlerCtx): void {
         idom.elementClose(tag);
     }
 
-    text(text: string, ctx?: HsmlHandlerCtx): void {
+    text(text: string, ctx?: HHandlerCtx): void {
         idom.text(text);
     }
 
-    fnc(fnc: HsmlFnc, ctx?: HsmlHandlerCtx): void {
+    fnc(fnc: HFnc, ctx?: HHandlerCtx): void {
         const skip = fnc(idom.currentElement());
         skip && idom.skip();
     }
 
-    obj(obj: HsmlObj, ctx?: HsmlHandlerCtx): void {
+    obj(obj: HObj, ctx?: HHandlerCtx): void {
         if ("toHsml" in obj) {
-            obj.toHsml && hsml(obj.toHsml(), this, obj as HsmlHandlerCtx);
+            obj.toHsml && hsml(obj.toHsml(), this, obj as HHandlerCtx);
         } else {
             this.text("" + obj, ctx);
         }
@@ -218,11 +218,11 @@ class HsmlIDomHandler implements HsmlHandler<HsmlHandlerCtx> {
 
 }
 
-function hsml2idom(hml: HsmlElement, ctx?: HsmlHandlerCtx): void {
+function hsml2idom(hml: HElement, ctx?: HHandlerCtx): void {
     hsml(hml, new HsmlIDomHandler(), ctx);
 }
 
-function hsmls2idom(hmls: HsmlFragment, ctx?: HsmlHandlerCtx): void {
+function hsmls2idom(hmls: HElements, ctx?: HHandlerCtx): void {
     for (const hml of hmls) {
         if (hml === undefined || hml === null) {
             continue;
@@ -230,20 +230,20 @@ function hsmls2idom(hmls: HsmlFragment, ctx?: HsmlHandlerCtx): void {
         if (hml.constructor === String) {
             idom.text(hml as string);
         } else if ("toHsml" in (hml as any)) {
-            const obj = hml as HsmlHandlerCtx;
+            const obj = hml as HHandlerCtx;
             obj.toHsml && hsml2idom(obj.toHsml(), obj);
         } else {
-            hsml2idom(hml as HsmlElement, ctx);
+            hsml2idom(hml as HElement, ctx);
         }
     }
 }
 
-export function hsml2idomPatch(node: Element, hsmlEl: HsmlElement, ctx?: HsmlHandlerCtx): void {
+export function hsml2idomPatch(node: Element, hsmlEl: HElement, ctx?: HHandlerCtx): void {
     idom.patch(node,
-        (data?: HsmlElement) => (data && hsml2idom(data, ctx)), hsmlEl);
+        (data?: HElement) => (data && hsml2idom(data, ctx)), hsmlEl);
 }
 
-export function hsmls2idomPatch(node: Element, hsmlFr: HsmlFragment, ctx?: HsmlHandlerCtx): void {
+export function hsmls2idomPatch(node: Element, hsmlFr: HElements, ctx?: HHandlerCtx): void {
     idom.patch(node,
-        (data?: HsmlFragment) => (data && hsmls2idom(data, ctx)), hsmlFr);
+        (data?: HElements) => (data && hsmls2idom(data, ctx)), hsmlFr);
 }

@@ -22,7 +22,6 @@ export function decodeUrlQuery(queryStr: string): { [key: string]: string } {
 
 export function encodeUrlQuery(query: any): string {
     const key_value_pairs: any[] = [];
-
     for (const key in query) {
         if (query.hasOwnProperty(key)) {
             const value = query[key];
@@ -41,11 +40,9 @@ export function encodeUrlQuery(query: any): string {
             }
         }
     }
-
     for (let j = 0, pair: any; pair = key_value_pairs[j++];) {
         key_value_pairs[j - 1] = `${encodeURIComponent(pair[0])}=${encodeURIComponent(pair[1])}`;
     }
-
     return key_value_pairs.join("&");
 }
 
