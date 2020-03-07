@@ -19,27 +19,25 @@ image: node:9
 pages:
     cache:
         paths:
-        - node_modules/
+            - node_modules/
 
     script:
-    - pwd
-    - ls -lah
-    - npm install
-    - npm run dist
-    - npx cpx 'dist/**/' 'public/dist/' -u -v
-    # - npx cpx 'dist/**/!(*.map)' 'public/dist/' -u -v
-    - npx cpx 'incremental-dom/**/' 'public/incremental-dom/' -u -v
-    - npm run build
-    - npx cpx 'build/**/' 'public/build/' -u -v
-    - npx cpx 'demo/**/' 'public/demo/' -u -v
-    - cd public/;
-      echo "<html><body><h1>Demo</h1><p>" >> index.html;
-      for i in $(ls -1 demo/*.html); do echo "<a href=\"$i\">$i</a><br>" >> index.html; done;
-      echo "</p></body></html>" >> index.html;
+        - pwd
+        - ls -lah
+        - npm install
+        - npm run dist
+        - npx cpx 'dist/**/' 'public/dist/' -u -v
+        # - npx cpx 'dist/**/!(*.map)' 'public/dist/' -u -v
+        - npx cpx 'incremental-dom/**/' 'public/incremental-dom/' -u -v
+        - npm run build
+        - npx cpx 'build/**/' 'public/build/' -u -v
+        - npx cpx 'demo/**/' 'public/demo/' -u -v
+        - chmod +x ./index_files.sh
+        - ./mkindex.sh ./public
 
     artifacts:
         paths:
-        - public
+            - public
 
     only:
-    - master
+        - master
