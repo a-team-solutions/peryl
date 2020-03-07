@@ -1,6 +1,6 @@
-import { Action, Mount } from "../src/hsml-svac";
-import { HsmlFragment, HsmlElement, join } from "../src/hsml";
-import { Ctrl, Component } from "../src/hsml-svac-ctrl";
+import { HAction, HMount } from "../src/hsml-svac";
+import { HElements, HElement, hjoin } from "../src/hsml";
+import { HCtrl, HComponent } from "../src/hsml-svac-ctrl";
 import { FormValidator, StringValidator, NumberValidator, SelectValidator, BooleanValidator, Str, Err } from "../src/validators";
 
 const nbsp = "\u00a0 ";
@@ -18,7 +18,7 @@ export const enum SidebarActions {
     title = "title",
 }
 
-export const Sidebar: Component<SidebarState> = {
+export const Sidebar: HComponent<SidebarState> = {
 
     type: "Sidebar",
 
@@ -31,11 +31,11 @@ export const Sidebar: Component<SidebarState> = {
         ]
     },
 
-    view: (state: SidebarState, action: Action, mount: Mount): HsmlFragment => [
+    view: (state: SidebarState, action: HAction, mount: HMount): HElements => [
         ["div.w3-container", [
             ["h2", [state.title]],
             ["div.w3-bar-block", {},
-                state.menu.map<HsmlElement>(m => (
+                state.menu.map<HElement>(m => (
                     ["a.w3-bar-item.w3-button.w3-padding",
                         {
                             href: m.url,
@@ -50,11 +50,12 @@ export const Sidebar: Component<SidebarState> = {
         ]]
     ],
 
-    actions: (ctrl: Ctrl<SidebarState>, action: string | number, data?: any, event?: Event): void => {
+    actions: (ctrl: HCtrl<SidebarState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case SidebarActions.title:
-                ctrl.update({ title: data as string });
+                ctrl.state.title = data;
+                ctrl.update();
                 break;
             default:
                 ctrl.appAction(action, data, event);
@@ -72,7 +73,7 @@ export const enum ContentActions {
     title = "title"
 }
 
-export const Content: Component<ContentState> = {
+export const Content: HComponent<ContentState> = {
 
     type: "Content",
 
@@ -81,16 +82,17 @@ export const Content: Component<ContentState> = {
         text: "text text text"
     },
 
-    view: (state: ContentState, action: Action, mount: Mount): HsmlFragment => [
+    view: (state: ContentState, action: HAction, mount: HMount): HElements => [
         ["h1", [state.title]],
         ["p", [state.text]]
     ],
 
-    actions: (ctrl: Ctrl<ContentState>, action: string | number, data: any, event?: Event): void => {
+    actions: (ctrl: HCtrl<ContentState>, action: string | number, data: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case ContentActions.title:
-                ctrl.update({ title: data as string });
+                ctrl.state.title = data;
+                ctrl.update();
                 break;
             default:
                 ctrl.appAction(action, data, event);
@@ -127,7 +129,7 @@ export const enum FormActions {
     cancel = "cancel"
 }
 
-export const Form: Component<FormState> = {
+export const Form: HComponent<FormState> = {
 
     type: "Form",
 
@@ -162,7 +164,7 @@ export const Form: Component<FormState> = {
         valid: false
     },
 
-    view: (state: FormState, action: Action, mount: Mount): HsmlFragment => [
+    view: (state: FormState, action: HAction, mount: HMount): HElements => [
         ["h1", [state.title]],
         ["form.w3-container", [
             ["p", [
@@ -201,8 +203,8 @@ export const Form: Component<FormState> = {
             ]],
             ["p",
                 [
-                    ...join(
-                        state.genders.map<HsmlElement>(g => (
+                    ...hjoin(
+                        state.genders.map<HElement>(g => (
                             ["label", [
                                 ["input.w3-radio", {
                                     type: "radio",
@@ -228,7 +230,7 @@ export const Form: Component<FormState> = {
                         { value: "", disabled: true, selected: true },
                         ["Sport"]
                     ],
-                    ...state.sports.map<HsmlElement>(s => (
+                    ...state.sports.map<HElement>(s => (
                         ["option",
                             { value: s, selected: s === state.str.sport },
                             [s]
@@ -256,10 +258,10 @@ export const Form: Component<FormState> = {
         ]]
     ],
 
-    actions: (ctrl: Ctrl<FormState>, action: string | number, data?: any, event?: Event): void => {
+    actions: (ctrl: HCtrl<FormState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
 
-        const ctx = ctrl as Ctrl<FormState>
+        const ctx = ctrl as HCtrl<FormState>
             & {
                 fv: FormValidator<FormModel>;
             };
@@ -307,11 +309,13 @@ export const Form: Component<FormState> = {
                             }))
                     .format(ctrl.state.obj);
                 ctx.fv = fv;
-                ctrl.update(fv.data());
+                ctrl.state = { ...ctrl.state, ...fv.data() };
+                ctrl.update();
                 break;
 
             case FormActions.title:
-                ctrl.update({ title: data as string });
+                ctrl.state.title = data;
+                ctrl.update();
                 break;
 
             case FormActions.data: {
@@ -319,7 +323,8 @@ export const Form: Component<FormState> = {
                     .validate({ ...ctrl.state.str, ...data })
                     .data();
                 console.log("obj:", JSON.stringify(formData, null, 4));
-                ctrl.update({ ...formData });
+                ctrl.state = { ...ctrl.state, ...formData };
+                ctrl.update();
                 break;
             }
 
@@ -346,9 +351,9 @@ export interface AppShellState {
     title: string;
     subtitle: string;
     menu: boolean;
-    sidebar: Component<any>;
-    content: Component<any>;
-    snackbar: string;
+    sidebar: HComponent<any>;
+    content: HComponent<any>;
+    snackbar?: string;
 }
 
 export const enum AppShellActions {
@@ -360,7 +365,7 @@ export const enum AppShellActions {
     snackbar = "snackbar"
 }
 
-export const AppShell: Component<AppShellState> = {
+export const AppShell: HComponent<AppShellState> = {
 
     type: "AppShell",
 
@@ -373,7 +378,7 @@ export const AppShell: Component<AppShellState> = {
         snackbar: ""
     },
 
-    view: (state: AppShellState, action: Action, mount: Mount): HsmlFragment => [
+    view: (state: AppShellState, action: HAction, mount: HMount): HElements => [
         // header
         ["div.w3-bar.w3-top.w3-large.w3-blue.w3-card", { style: "z-index:4" }, [
             ["button.w3-bar-item.w3-button.w3-hide-large.w3-hover-none.w3-hover-text-light-grey",
@@ -437,28 +442,36 @@ export const AppShell: Component<AppShellState> = {
         ]
     ],
 
-    actions: (ctrl: Ctrl<AppShellState>, action: string | number, data?: any, event?: Event): void => {
+    actions: (ctrl: HCtrl<AppShellState>, action: string | number, data?: any, event?: Event): void => {
         // console.log("action:", action, data, event);
         switch (action) {
             case AppShellActions.title:
-                ctrl.update({ title: data as string });
+                ctrl.state.title = data;
+                ctrl.update();
                 break;
             case AppShellActions.subtitle:
-                ctrl.update({ subtitle: data as string });
+                ctrl.state.subtitle = data;
+                ctrl.update();
                 break;
             case AppShellActions.menu:
-                ctrl.update({ menu: data === null ? !ctrl.state.menu : data });
+                ctrl.state.menu = data === null ? !ctrl.state.menu : data;
+                ctrl.update();
                 break;
             case AppShellActions.sidebar:
-                ctrl.update({ sidebar: data as any });
+                ctrl.state.sidebar = data;
+                ctrl.update();
                 break;
             case AppShellActions.content:
                 ctrl.state.content = data;
                 ctrl.update();
                 break;
             case AppShellActions.snackbar:
-                ctrl.update({ snackbar: data as string });
-                setTimeout(ctrl.update, 3e3, { snackbar: undefined });
+                ctrl.state.snackbar = data;
+                ctrl.update();
+                setTimeout(() => {
+                    ctrl.state.snackbar = undefined;
+                    ctrl.update();
+                }, 3e3);
                 break;
             default:
                 ctrl.appAction(action, data, event);

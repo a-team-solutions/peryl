@@ -73,27 +73,31 @@
             console.log("action:", action, data, event);
 
             switch (action) {
-                case peryl.AppAction._init:
-                case peryl.AppAction._mount:
-                case peryl.AppAction._umount:
+                case HAppAction._init:
+                case HAppAction._mount:
+                case HAppAction._umount:
                     break;
 
                 case Action.title:
+                    app.state.title = data.title;
                     app.update(data);
                     break;
 
                 case Action.inc:
-                    app.update({ count: app.state.count + data });
+                    app.state.count = app.state.count + data;
+                    app.update();
                     // async action call
                     setTimeout(() => app.action(Action.dec, 1), 1e3);
                     break;
 
                 case Action.dec:
-                    app.update({ count: app.state.count - data });
+                    app.state.count = app.state.count - data;
+                    app.update();
                     break;
 
                 case Action.clear:
-                    app.update({ title: "" });
+                    app.state.title = "";
+                    app.update();
                     break;
 
                 default:
@@ -101,7 +105,7 @@
             }
         };
 
-        peryl.app(state, view, actions, "app");
+        new HApp(state, view, actions).mount(document.getElementById("app"));
 
     </script>
 </body>

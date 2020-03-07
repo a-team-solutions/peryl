@@ -1,10 +1,10 @@
 import { hsmls2htmls } from "../src/hsml-html";
-import { HsmlFragment, HsmlElement } from "../src/hsml";
-import { Widget } from "../src/hsml-widget";
+import { HElements, HElement } from "../src/hsml";
+import { HWidget } from "../src/hsml-widget";
 import { Signal } from "../src/signal";
 
 
-class HelloWidget extends Widget {
+class HelloWidget extends HWidget {
 
     private _name: string;
 
@@ -31,7 +31,7 @@ class HelloWidget extends Widget {
         console.log("actions", action, data);
     }
 
-    render(): HsmlFragment {
+    render(): HElements {
         return [
             ["input~i",
                 { type: "text", value: this._name, input: this._onTextInput }
@@ -52,7 +52,7 @@ class HelloWidget extends Widget {
 }
 
 
-class TimerWidget extends Widget {
+class TimerWidget extends HWidget {
 
     private _interval?: number;
 
@@ -89,7 +89,7 @@ class TimerWidget extends Widget {
         this.toggle(false);
     }
 
-    render(): HsmlFragment {
+    render(): HElements {
         return [
             ["p", { style: this._interval ? "" : "color: lightgray;" }, [
                 "Time: ", new Date().toLocaleTimeString(), " ",
@@ -113,7 +113,7 @@ interface FormErrors {
     age: string;
 }
 
-class FormWidget extends Widget {
+class FormWidget extends HWidget {
 
     private _title: string = "Form";
     private _data: FormData = { name: undefined, age: undefined };
@@ -153,7 +153,7 @@ class FormWidget extends Widget {
         console.log("onUmount", this.type, this.id);
     }
 
-    render(): HsmlFragment {
+    render(): HElements {
         return [
             ["h2", [this._title]],
             ["form", { submit: this._onFormSubmit }, [
@@ -165,7 +165,7 @@ class FormWidget extends Widget {
                                 type: "text", size: 10, maxlength: 10,
                                 input: this._onNameInput
                             }
-                        ] as HsmlElement
+                        ] as HElement
                     ]], " ",
                     ["em.error", [this._errors.name]]
                 ]],
@@ -177,7 +177,7 @@ class FormWidget extends Widget {
                                 type: "number", min: "1", max: "120",
                                 input: this._onAgeInput
                             }
-                        ] as HsmlElement
+                        ] as HElement
                     ]], " ",
                     ["em.error", [this._errors.age]]
                 ]],
@@ -246,7 +246,7 @@ class FormWidget extends Widget {
 }
 
 
-class AppWidget extends Widget {
+class AppWidget extends HWidget {
 
     private _title: string = "App";
 
@@ -276,7 +276,7 @@ class AppWidget extends Widget {
         console.log("onUmount", this.type, this.id);
     }
 
-    render(): HsmlFragment {
+    render(): HElements {
         return [
             ["h1", [this._title]],
             ["fieldset", [
@@ -298,7 +298,7 @@ class AppWidget extends Widget {
             ]],
             ["fieldset", [
                 ["legend", ["Mount element"]],
-                ["div#wid.wclass", { _hsmlObj: new HelloWidget("hello mount") }]
+                ["div#wid.wclass", { _hObj: new HelloWidget("hello mount") }]
             ]]
         ];
     }

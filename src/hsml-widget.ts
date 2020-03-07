@@ -1,12 +1,12 @@
-import { HsmlElement, HsmlFragment, HsmlAttrOnData, HsmlHandlerCtx, HsmlAttrOnDataFnc, HsmlObj } from "./hsml";
+import { HElement, HElements, HAttrOnData, HHandlerCtx, HAttrOnDataFnc, HObj } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export interface IWidget {
-    render(): HsmlFragment;
+export interface IHWidget {
+    render(): HElements;
     onMount(): void;
     onUmount(): void;
-    actions(action: string, data?: HsmlAttrOnData): void;
+    actions(action: string, data?: HAttrOnData): void;
 }
 
 const schedule = window.requestAnimationFrame ||
@@ -23,14 +23,14 @@ const unschedule = window.cancelAnimationFrame ||
     // (window as any).msCancelAnimationFrame ||
     function (handle: number) { window.clearTimeout(handle); };
 
-export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
+export abstract class HWidget implements HObj, HHandlerCtx, IHWidget {
 
     private static _count = 0;
 
-    static readonly mounted: { [wid: string]: Widget } = {};
+    static readonly mounted: { [wid: string]: HWidget } = {};
 
     readonly type: string = this.constructor.name; // "Widget"
-    readonly id: string = this.type + "-" + Widget._count++;
+    readonly id: string = this.type + "-" + HWidget._count++;
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
@@ -42,7 +42,7 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
         }
     }
 
-    abstract render(): HsmlFragment;
+    abstract render(): HElements;
 
     onMount(): void {
         console.log("mount");
@@ -60,9 +60,9 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
         this.actions(action, data);
     }
 
-    onHsml(action: string, data: HsmlAttrOnData, e: Event) {
+    onHsml(action: string, data: HAttrOnData, e: Event) {
         data = (data && data.constructor === Function)
-            ? (data as HsmlAttrOnDataFnc)(e)
+            ? (data as HAttrOnDataFnc)(e)
             : data === undefined ? e : data;
         this.action(action, data);
     }
@@ -72,11 +72,11 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
             ? document.getElementById(e) || document.body
             : e || document.body;
         if ("widget" in el) {
-            const w = (el as any).widget as Widget;
+            const w = (el as any).widget as HWidget;
             w && w.umount();
         }
         if (!this.dom) {
-            Widget.mounted[this.id] = this;
+            HWidget.mounted[this.id] = this;
             (this as any).dom = el;
             (el as any).widget = this;
             const hsmls = this.render();
@@ -91,7 +91,7 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
 
     umount(): this {
         if (this.dom) {
-            delete Widget.mounted[this.id];
+            delete HWidget.mounted[this.id];
             if ((this as any).onUmount) {
                 (this as any).onUmount();
             }
@@ -100,7 +100,7 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
             }
             const wNodes = this.dom.querySelectorAll("[widget]");
             for (let i = 0; i < wNodes.length; i++) {
-                const w = (wNodes[i] as any).widget as Widget;
+                const w = (wNodes[i] as any).widget as HWidget;
                 w && w.umount();
             }
             while (this.dom.firstChild /*.hasChildNodes()*/) {
@@ -124,7 +124,7 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
         return this;
     }
 
-    toHsml(): HsmlElement {
+    toHsml(): HElement {
         if (this.dom) {
             if (this._updateSched) {
                 unschedule(this._updateSched);
@@ -142,7 +142,7 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
                 );
             }
         }
-        const hsmls = (this as any).render() as HsmlFragment;
+        const hsmls = (this as any).render() as HElements;
         hsmls.push(
             (e: Element) => {
                 if (!this.dom) {
@@ -174,7 +174,7 @@ export abstract class Widget implements HsmlObj, HsmlHandlerCtx, IWidget {
 (idom as any).notifications.nodesDeleted = (nodes: Node[]) => {
     nodes.forEach(node => {
         if (node.nodeType === 1 && "widget" in node) {
-            const w = (node as any).widget as Widget;
+            const w = (node as any).widget as HWidget;
             w && w.umount();
         }
     });

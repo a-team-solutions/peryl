@@ -63,7 +63,7 @@ const conf = {
     },
 
     output: {
-        library: pkg.name,
+        // library: pkg.name,
         // libraryTarget: 'global',
         libraryTarget: 'umd',
         // filename: '[name].[chunkhash].js',

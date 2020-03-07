@@ -1,35 +1,35 @@
 
-export type HsmlHead = string; // "tag#id.class1.class2~handler"
+export type HHead = string; // "tag#id.class1.class2~handler"
 
-export type HsmlAttrClasses = Array<string | [string, boolean]>;
+export type HAttrClasses = Array<string | [string, boolean]>;
 
-export type HsmlAttrStyles = { [key: string]: string };
+export type HAttrStyles = { [key: string]: string };
 
-export type HsmlAttrData = { [key: string]: string | number | Array<any> | Object };
+export type HAttrData = { [key: string]: string | number | Array<any> | Object };
 
-export type HsmlAttrOnAction = string | number;
+export type HAttrOnAction = string | number;
 
-export type HsmlAttrOnDataFnc = (e: Event) => any;
+export type HAttrOnDataFnc = (e: Event) => any;
 
-export type HsmlAttrOnData = string | number | Array<any> | Object | HsmlAttrOnDataFnc;
+export type HAttrOnData = string | number | Array<any> | Object | HAttrOnDataFnc;
 
-export type HsmlAttrOnCb = [keyof HTMLElementEventMap, EventListener];
+export type HAttrOnCb = [keyof HTMLElementEventMap, EventListener];
 
-export type HsmlAttrOnAct = [keyof HTMLElementEventMap, HsmlAttrOnAction, HsmlAttrOnData?];
+export type HAttrOnAct = [keyof HTMLElementEventMap, HAttrOnAction, HAttrOnData?];
 
-export type HsmlAttrOn = HsmlAttrOnCb | HsmlAttrOnAct | Array<HsmlAttrOnCb | HsmlAttrOnAct>;
+export type HAttrOn = HAttrOnCb | HAttrOnAct | Array<HAttrOnCb | HAttrOnAct>;
 
-export interface HsmlAttrs {
+export interface HAttrs {
     readonly _id?: string;
     readonly _classes?: string[];
     readonly _ref?: string;
     readonly _key?: string;
     readonly _skip?: boolean;
-    readonly _hsmlObj?: HsmlObj;
-    readonly classes?: HsmlAttrClasses;
-    readonly styles?: HsmlAttrStyles;
-    readonly data?: HsmlAttrData;
-    readonly on?: HsmlAttrOn;
+    readonly _hObj?: HObj;
+    readonly classes?: HAttrClasses;
+    readonly styles?: HAttrStyles;
+    readonly data?: HAttrData;
+    readonly on?: HAttrOn;
     readonly [key: string]:
         | string
         | String
@@ -39,55 +39,55 @@ export interface HsmlAttrs {
         | Number
         | boolean
         | Boolean
-        | HsmlAttrClasses
-        | HsmlAttrStyles
+        | HAttrClasses
+        | HAttrStyles
         // | HsmlAttrData
-        | HsmlAttrOn
+        | HAttrOn
         | EventListener
-        | HsmlObj
+        | HObj
         | undefined;
 }
 
-export type HsmlFnc = (e: Element) => boolean | void;
+export type HFnc = (e: Element) => boolean | void;
 
-export interface HsmlObj {
-    toHsml?(): HsmlElement;
+export interface HObj {
+    toHsml?(): HElement;
 }
 
-export interface HsmlFragment extends Array<HsmlElement> { }
+export interface HElements extends Array<HElement> { }
 
-export type HsmlChildren = HsmlFragment | HsmlFnc | HsmlObj;
-// export type HsmlChildren = Hsmls | HsmlFnc | HsmlObj | string | boolean | number | Date;
+export type HChildren = HElements | HFnc | HObj;
+// export type HChildren = Hs | HFnc | HObj | string | boolean | number | Date;
 
-export type HsmlTagNoAttr = [HsmlHead, HsmlChildren?];
-export type HsmlTagAttr = [HsmlHead, HsmlAttrs, HsmlChildren?];
+export type HTagNoAttr = [HHead, HChildren?];
+export type HTagAttr = [HHead, HAttrs, HChildren?];
 
-export type HsmlTag = HsmlTagNoAttr | HsmlTagAttr;
-// export type HsmlTag = [HsmlTagHead, (HsmlTagAttrs | HsmlTagChildren)?, HsmlTagChildren?];
+export type HTag = HTagNoAttr | HTagAttr;
+// export type HTag = [HTagHead, (HTagAttrs | HTagChildren)?, HTagChildren?];
 
-export type HsmlElement = string | boolean | number | Date | HsmlFnc | HsmlObj | HsmlTag | undefined | null;
+export type HElement = string | boolean | number | Date | HFnc | HObj | HTag | undefined | null;
 
-export interface HsmlHandlerCtx extends HsmlObj {
+export interface HHandlerCtx extends HObj {
     refs: { [name: string]: Element };
-    onHsml(action: HsmlAttrOnAction, data: HsmlAttrOnData, e: Event): void;
+    onHsml(action: HAttrOnAction, data: HAttrOnData, e: Event): void;
 }
 
-export interface HsmlHandler<C extends HsmlHandlerCtx> {
-    open(tag: HsmlHead, attrs: HsmlAttrs, children: HsmlFragment, ctx?: C): boolean;
-    close(tag: HsmlHead, children: HsmlFragment, ctx?: C): void;
+export interface HHandler<C extends HHandlerCtx> {
+    open(tag: HHead, attrs: HAttrs, children: HElements, ctx?: C): boolean;
+    close(tag: HHead, children: HElements, ctx?: C): void;
     text(text: string, ctx?: C): void;
-    fnc(fnc: HsmlFnc, ctx?: C): void;
-    obj(obj: HsmlObj, ctx?: C): void;
+    fnc(fnc: HFnc, ctx?: C): void;
+    obj(obj: HObj, ctx?: C): void;
 }
 
-export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHandler<C>, ctx?: C): void {
+export function hsml<C extends HHandlerCtx>(hml: HElement, handler: HHandler<C>, ctx?: C): void {
     // console.log("hsml", hsml);
     if (hml === undefined || hml === null) {
         return;
     }
     switch (hml.constructor) {
         case Array:
-            // const tag = hml as HsmlTag;
+            // const tag = hml as HTag;
             // if (
             //     (
             //         tag.length === 1 &&
@@ -111,16 +111,16 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
             //         tag[2]!.constructor === Array
             //     )
             // ) {
-            //     hsmlTag(hml as HsmlTag, handler, ctx);
+            //     hsmlTag(hml as HTag, handler, ctx);
             // } else {
             //     console.error("hsml parse error:", hml);
             //     // console.error("hsml parse error:", JSON.stringify(hml, null, 4));
             //     // throw Error(`hsml parse error: ${JSON.stringify(hml)}`);
             // }
-            hsmlTag(hml as HsmlTag, handler, ctx);
+            hsmlTag(hml as HTag, handler, ctx);
             break;
         case Function:
-            handler.fnc(hml as HsmlFnc, ctx);
+            handler.fnc(hml as HFnc, ctx);
             break;
         case String:
             handler.text(hml as string, ctx);
@@ -139,10 +139,10 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
             handler.text(ds, ctx);
             break;
         default:
-            handler.obj(hml as HsmlObj, ctx);
+            handler.obj(hml as HObj, ctx);
     }
 
-    function hsmlTag(hmlTag: HsmlTag, handler: HsmlHandler<C>, ctx?: C): void {
+    function hsmlTag(hmlTag: HTag, handler: HHandler<C>, ctx?: C): void {
         // console.log("hsml tag", hmlTag);
 
         if (typeof hmlTag[0] !== "string") {
@@ -150,22 +150,22 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
             return;
         }
 
-        const head = hmlTag[0] as HsmlHead;
+        const head = hmlTag[0] as HHead;
         const attrsObj = hmlTag[1] as any;
         const hasAttrs = attrsObj && attrsObj.constructor === Object;
         const childIdx = hasAttrs ? 2 : 1;
 
-        let children: HsmlFragment = [];
-        let hsmlFnc: HsmlFnc | undefined;
-        let hsmlObj: HsmlObj | undefined;
+        let children: HElements = [];
+        let hFnc: HFnc | undefined;
+        let hObj: HObj | undefined;
 
         const htc = hmlTag[childIdx];
         switch (htc && htc.constructor) {
             case Array:
-                children = htc as HsmlFragment;
+                children = htc as HElements;
                 break;
             case Function:
-                hsmlFnc = htc as HsmlFnc;
+                hFnc = htc as HFnc;
                 break;
             // case String:
             // case Boolean:
@@ -173,8 +173,8 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
             // case Date:
             //     children = [htc as Hsml];
             //     break;
-            default: // HsmlObj
-                hsmlObj = htc as HsmlObj;
+            default: // HObj
+                hObj = htc as HObj;
                 break;
         }
 
@@ -186,11 +186,11 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
         const id = hashSplit[1];
         const classes = dotSplit.slice(1);
 
-        let attrs: HsmlAttrs;
+        let attrs: HAttrs;
         if (hasAttrs) {
-            attrs = attrsObj as HsmlAttrs;
+            attrs = attrsObj as HAttrs;
         } else {
-            attrs = {} as HsmlAttrs;
+            attrs = {} as HAttrs;
         }
 
         if (id) {
@@ -202,14 +202,14 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
         if (ref) {
             (attrs as any)._ref = ref;
         }
-        if (hsmlObj) {
-            (attrs as any)._hsmlObj = hsmlObj;
+        if (hObj) {
+            (attrs as any)._hObj = hObj;
         }
 
         const skip = handler.open(tag, attrs, children, ctx);
 
-        if (hsmlFnc) {
-            handler.fnc(hsmlFnc, ctx);
+        if (hFnc) {
+            handler.fnc(hFnc, ctx);
         }
 
         if (!skip) {
@@ -220,8 +220,8 @@ export function hsml<C extends HsmlHandlerCtx>(hml: HsmlElement, handler: HsmlHa
     }
 }
 
-export function join(hsmls: HsmlFragment, sep: string | HsmlElement): HsmlFragment {
-    const r = hsmls.reduce<HsmlFragment>((p, c) => (p.push(c, sep), p), [] as HsmlFragment);
+export function hjoin(hsmls: HElements, sep: string | HElement): HElements {
+    const r = hsmls.reduce<HElements>((p, c) => (p.push(c, sep), p), [] as HElements);
     r.splice(-1);
     return r;
 }

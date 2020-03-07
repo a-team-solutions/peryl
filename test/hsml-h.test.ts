@@ -1,6 +1,6 @@
 import "jasmine";
 import { h } from "../src/hsml-h";
-import { HsmlElement } from "../src/hsml";
+import { HElement } from "../src/hsml";
 
 describe("hypescript", () => {
 
@@ -80,7 +80,7 @@ describe("hypescript", () => {
                     h("input.input-text", { type: "checkbox" }, "placeholder"),
                     h("button", { onclick: ["click"] }),
                     h("ul.todos",
-                        todos.map<HsmlElement>(todo =>
+                        todos.map<HElement>(todo =>
                             h("li", [
                                 h("a", { href: "#" }, todo)
                             ])
@@ -96,7 +96,7 @@ describe("hypescript", () => {
                     ["input.input-text", { type: "checkbox" }, ["placeholder"]],
                     ["button", { onclick: ["click"] }],
                     ["ul.todos",
-                        todos.map<HsmlElement>(todo =>
+                        todos.map<HElement>(todo =>
                             ["li", [
                                 ["a", { href: "#" }, [todo]]
                             ]]

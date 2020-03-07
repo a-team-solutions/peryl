@@ -1,22 +1,20 @@
-import { HsmlFragment, HsmlFnc } from "./hsml";
+import { HElements, HFnc } from "./hsml";
 
-export type MergebleState = { [k: string]: any };
-
-export interface Component<State extends MergebleState> {
+export interface HComponent<State> {
     type: string;
     state: State;
-    view: View<State>;
+    view: HView<State>;
 }
 
-export type Action = (action: string | number, data?: any, event?: Event) => void;
+export type HAction = (action: string | number, data?: any, event?: Event) => void;
 
-export type View<State extends MergebleState> = (
+export type HView<State> = (
     state: State,
-    action: Action,
-    mount: Mount) => HsmlFragment;
+    action: HAction,
+    mount: HMount) => HElements;
 
 
-export type Mount = <State extends MergebleState>(
-    component: Component<State>,
+export type HMount = <State>(
+    component: HComponent<State>,
     state?: State,
-    action?: Action) => HsmlFnc | HsmlFragment;
+    action?: HAction) => HFnc | HElements;
