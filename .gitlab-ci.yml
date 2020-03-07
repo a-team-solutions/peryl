@@ -32,7 +32,7 @@ pages:
         - npm run build
         - npx cpx 'build/**/' 'public/build/' -u -v
         - npx cpx 'demo/**/' 'public/demo/' -u -v
-        - ./mkindex.sh ./public
+        - ./mkindex.sh public
 
     artifacts:
         paths:
