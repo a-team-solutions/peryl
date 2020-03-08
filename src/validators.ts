@@ -53,6 +53,13 @@ export abstract class Validator<T, O, M> {
 
 }
 
+export function tpl(tmpl: string, data: { [k: string]: string }): string {
+    return Object.keys(data)
+        .map(k => [k, data[k]])
+        .reduce((t, d) =>
+            t.replace(new RegExp(`\\{\\{${d[0]}\\}\\}`, "g"), d[1]), tmpl);
+}
+
 export interface SelectValidatorOpts {
     required?: boolean;
     options?: string[];
@@ -374,6 +381,20 @@ export class BooleanValidator
 
 }
 
+type StrDict<O, Optional extends (true | false) = false> = {
+    0: string,
+    1: string[],
+    2: Optional extends true
+        ? { [prop in keyof O]+?: StrDict<O[prop], true> }
+        : { [prop in keyof O]: StrDict<O[prop], false> }
+}[O extends (string | number | boolean)
+    ? 0
+    : O extends string[]
+        ? 1
+        : O extends { [prop: string]: any }
+            ? 2
+            : never];
+
 export interface ArrayValidatorOpts {
     required?: boolean;
     min?: number;
@@ -433,19 +454,92 @@ export class ArrayValidator<T = any> {
 
 }
 
-type StrDict<O, Optional extends (true | false) = false> = {
-    0: string,
-    1: string[],
-    2: Optional extends true
-        ? { [prop in keyof O]+?: StrDict<O[prop], true> }
-        : { [prop in keyof O]: StrDict<O[prop], false> }
-}[O extends (string | number | boolean)
-    ? 0
-    : O extends string[]
-        ? 1
-        : O extends { [prop: string]: any }
-            ? 2
-            : never];
+type FormValidators<T> = { [key in keyof T]: Validator<any, any, any> };
+
+export type Str<T> = { [key in keyof T]: string };
+export type Obj<T> = { [key in keyof T]: any };
+export type Err<T> = { [key in keyof T]: string };
+
+export interface FormValidatorData<T> {
+    str: Str<T>;
+    obj: Obj<T>;
+    err: Err<T>;
+    valid: boolean;
+}
+
+export class FormValidator<T = any> {
+
+    readonly validators: FormValidators<T> = {} as FormValidators<T>;
+
+    readonly str?: Str<T>;
+    readonly obj?: Obj<T>;
+    readonly err?: Err<T>;
+
+    readonly valid?: boolean;
+
+    addValidator(field: keyof T, validator: Validator<any, any, any>): this {
+        this.validators[field] = validator;
+        return this;
+    }
+
+    validate(data: { [key in keyof T]: string },
+             defaults?: { [key in keyof T]: string }): this {
+        const d = {
+            ...defaults || Object.getOwnPropertyNames(this.validators)
+                .reduce<any>(
+                    (a, v) => { if (a[v] === undefined) a[v] = ""; return a; },
+                    {}),
+            ...data as object
+        };
+        const res = Object.keys(this.validators)
+            .reduce(
+                (a, k) => {
+                    const v = (d as any)[k];
+                    const r = (this.validators as any)[k].validate(v);
+                    (a.str as any)[k] = r.str;
+                    (a.obj as any)[k] = r.obj;
+                    (a.err as any)[k] = r.err;
+                    r.err && (a.valid = false);
+                    return a;
+                },
+                { str: {}, obj: {}, err: {}, valid: true });
+        (this.str as any) = res.str;
+        (this.obj as any) = res.obj;
+        (this.err as any) = res.err;
+        (this.valid as any) = res.valid;
+        return this;
+    }
+
+    format(data: { [key in keyof T]: any }): this {
+        const res = Object.keys(this.validators)
+            .reduce(
+                (a, k) => {
+                    const v = (data as any)[k];
+                    const r = (this.validators as any)[k].format(v);
+                    (a.str as any)[k] = r.str;
+                    (a.obj as any)[k] = v;
+                    (a.err as any)[k] = r.err;
+                    r.err && (a.valid = false);
+                    return a;
+                },
+                { str: {}, obj: {}, err: {}, valid: true });
+        (this.str as any) = res.str;
+        (this.obj as any) = res.obj;
+        (this.err as any) = res.err;
+        (this.valid as any) = res.valid;
+        return this;
+    }
+
+    data(): FormValidatorData<T> {
+        return {
+            str: this.str!,
+            obj: this.obj!,
+            err: this.err!,
+            valid: this.valid!
+        };
+    }
+
+}
 
 type ObjectValidators<T> = {
     [key in keyof T]?: Validator<any, any, any> |
@@ -532,100 +626,6 @@ export class ObjectValidator<T = any> {
         (this.err as any) = res.err;
         (this.valid as any) = res.valid;
         return this;
-    }
-
-}
-
-export function tpl(tmpl: string, data: { [k: string]: string }): string {
-    return Object.keys(data)
-        .map(k => [k, data[k]])
-        .reduce((t, d) =>
-            t.replace(new RegExp(`\\{\\{${d[0]}\\}\\}`, "g"), d[1]), tmpl);
-}
-
-type FormValidators<T> = { [key in keyof T]: Validator<any, any, any> };
-
-export type Str<T> = { [key in keyof T]: string };
-export type Obj<T> = { [key in keyof T]: any };
-export type Err<T> = { [key in keyof T]: string };
-
-export interface FormValidatorData<T> {
-    str: Str<T>;
-    obj: Obj<T>;
-    err: Err<T>;
-    valid: boolean;
-}
-
-export class FormValidator<T = any> {
-
-    readonly validators: FormValidators<T> = {} as FormValidators<T>;
-
-    readonly str?: Str<T>;
-    readonly obj?: Obj<T>;
-    readonly err?: Err<T>;
-
-    readonly valid?: boolean;
-
-    addValidator(field: keyof T, validator: Validator<any, any, any>): this {
-        this.validators[field] = validator;
-        return this;
-    }
-
-    validate(data: { [key in keyof T]: string },
-             defaults?: { [key in keyof T]: string }): this {
-        const d = {
-            ...defaults || Object.getOwnPropertyNames(this.validators)
-                .reduce<any>(
-                    (a, v) => { if (a[v] === undefined) a[v] = ""; return a; },
-                    {}),
-            ...data as object
-        };
-        const res = Object.keys(this.validators)
-            .reduce(
-                (a, k) => {
-                    const v = (d as any)[k];
-                    const r = (this.validators as any)[k].validate(v);
-                    (a.str as any)[k] = r.str;
-                    (a.obj as any)[k] = r.obj;
-                    (a.err as any)[k] = r.err;
-                    r.err && (a.valid = false);
-                    return a;
-                },
-                { str: {}, obj: {}, err: {}, valid: true });
-        (this.str as any) = res.str;
-        (this.obj as any) = res.obj;
-        (this.err as any) = res.err;
-        (this.valid as any) = res.valid;
-        return this;
-    }
-
-    format(data: { [key in keyof T]: any }): this {
-        const res = Object.keys(this.validators)
-            .reduce(
-                (a, k) => {
-                    const v = (data as any)[k];
-                    const r = (this.validators as any)[k].format(v);
-                    (a.str as any)[k] = r.str;
-                    (a.obj as any)[k] = v;
-                    (a.err as any)[k] = r.err;
-                    r.err && (a.valid = false);
-                    return a;
-                },
-                { str: {}, obj: {}, err: {}, valid: true });
-        (this.str as any) = res.str;
-        (this.obj as any) = res.obj;
-        (this.err as any) = res.err;
-        (this.valid as any) = res.valid;
-        return this;
-    }
-
-    data(): FormValidatorData<T> {
-        return {
-            str: this.str!,
-            obj: this.obj!,
-            err: this.err!,
-            valid: this.valid!
-        };
     }
 
 }
