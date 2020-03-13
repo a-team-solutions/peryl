@@ -41,6 +41,8 @@ const unschedule = window.cancelAnimationFrame ||
 
 export class HApp<State> implements HHandlerCtx {
 
+    static debug = false;
+
     state: State;
 
     readonly view: HView<State>;
@@ -59,10 +61,14 @@ export class HApp<State> implements HHandlerCtx {
     }
 
     action: HAction = (action: string | number, data?: any, event?: Event): void => {
+        HApp.debug && console.log("action", action, data, event);
         this.actions(this, action, data, event);
     }
 
-    render = (): HElements => this.view(this.state);
+    render = (): HElements => {
+        HApp.debug && console.log("render", this.state);
+        return this.view(this.state);
+    }
 
     onHsml = (action: string, data: HAttrOnData, event: Event): void => {
         data = (data && data.constructor === Function)

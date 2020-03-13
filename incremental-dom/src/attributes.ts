@@ -67,7 +67,7 @@ function applyAttr(el: Element, name: string, value: unknown) {
 function applyProp(el: Element, name: string, value: unknown) {
   if (value instanceof Boolean) {
     // tslint:disable-next-line: triple-equals
-    (el as any)[name] = value == true;
+    (el as any)[name] = (value == true);
   } else {
     (el as any)[name] = value;
   }

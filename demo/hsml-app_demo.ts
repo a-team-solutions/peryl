@@ -113,7 +113,9 @@ const view: HView<State> = (state: State): HElements => [
     ],
     ["h2", ["Props update"]],
     ["input", { type: "checkbox", name: "x", on: ["change", "x"] }],
-    ["input", {type: "checkbox", name: "xxxx", checked: state.x }],
+    ["input", { type: "checkbox", checked: state.x }],
+    ["input", { type: "radio", name: "y", checked: state.x }],
+    ["input", { type: "radio", name: "y", checked: !state.x }],
     ["input", { type: "button", value: "x", disabled: state.x }]
 ];
 
@@ -156,6 +158,7 @@ const actions: HActions<State> = (app, action, data, event): void => {
     }
 };
 
+// HApp.debug = true;
 const app = new HApp(state, view, actions).mount(document.getElementById("app"));
 
 (self as any).app = app;
