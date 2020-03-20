@@ -1,4 +1,4 @@
-import { html2hsml } from "../src/hsml-convert";
+import { html2hsmlStr, html2hsml } from "../src/hsml-convert";
 
 const html = `<div>
     Hello
@@ -15,22 +15,25 @@ const html = `<div>
     !
 </div>`;
 
-const formEl = (document.getElementById("form")! as HTMLFormElement);
-const htmlEl = (document.getElementById("html")! as HTMLTextAreaElement);
-const hsmlEl = (document.getElementById("hsml")! as HTMLTextAreaElement);
+const formEl = document.getElementById("form")! as HTMLFormElement;
+const htmlEl = document.getElementById("html")! as HTMLTextAreaElement;
+const hsmlEl = document.getElementById("hsml")! as HTMLTextAreaElement;
 
 htmlEl.value = html;
-hsmlEl.value = html2hsml(html);
+hsmlEl.value = html2hsmlStr(html);
 
 htmlEl.addEventListener("keyup", () => {
     const htmlIn = htmlEl.value;
-    hsmlEl.value = html2hsml(htmlIn);
+    hsmlEl.value = html2hsmlStr(htmlIn);
 });
 
 formEl.addEventListener("submit", e => {
     e.preventDefault();
     const htmlIn = htmlEl.value;
-    hsmlEl.value = html2hsml(htmlIn);
+    hsmlEl.value = html2hsmlStr(htmlIn);
 });
 
 htmlEl.focus();
+
+const hsml = html2hsml(html);
+console.log(JSON.stringify(hsml, undefined, 4));
