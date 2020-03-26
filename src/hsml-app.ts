@@ -1,22 +1,38 @@
 import { HElement, HElements, HAttrOnData, HAttrOnDataFnc, HHandlerCtx } from "./hsml";
 import { hsmls2idomPatch } from "./hsml-idom";
 
-export type HView<State> = (state: State) => HElements;
+const log = console.log;
 
-export type HAction = (action: string | number, data?: any, event?: Event) => void;
+export type HView<Model> = (model: Model) => HElements;
+export type HView1<Model> = (model: Model) => HElement;
 
-export type HActions<State> = (app: HApp<State>,
-                               action: string | number,
-                               data?: any,
-                               event?: Event) => void;
+export interface HAction {
+    type: string;
+    data?: any;
+    event?: Event;
+}
 
-export type Class<T = object> = new (...args: any[]) => T;
+export type HDispatch = (type: HAction["type"],
+                         data?: HAction["data"],
+                         event?: HAction["event"]) => void;
 
-export function happ<State>(state: State,
-                            view: HView<State>,
-                            actions?: HActions<State>,
+export type HUpdate = () => void;
+
+export interface HContext<Model> {
+    model: Model;
+    update: HUpdate;
+    dispatch: HDispatch;
+}
+
+export type HControl<Model> = (ctx: HContext<Model>, action: HAction) => void;
+
+// export type Class<T = object> = new (...args: any[]) => T;
+
+export function happ<Model>(model: Model,
+                            view: HView<Model>,
+                            control?: HControl<Model>,
                             element: Element | string | null = document.body) {
-    return new HApp<State>(state, view, actions).mount(element);
+    return new HApp<Model>(model, view, control).mount(element);
 }
 
 export enum HAppAction {
@@ -39,35 +55,41 @@ const unschedule = window.cancelAnimationFrame ||
     // (window as any).msCancelAnimationFrame ||
     function (handle: number) { window.clearTimeout(handle); };
 
-export class HApp<State> implements HHandlerCtx {
+export class HApp<Model> implements HContext<Model>, HHandlerCtx {
 
     static debug = false;
 
-    state: State;
-
-    readonly view: HView<State>;
-    readonly actions: HActions<State>;
+    readonly model: Model;
+    readonly view: HView<Model>;
+    readonly control: HControl<Model>;
 
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
     private _updateSched?: number;
 
-    constructor(state: State, view: HView<State>, actions?: HActions<State>) {
-        this.state = state;
+    constructor(model: Model, view: HView<Model>, control?: HControl<Model>) {
+        this.model = model;
         this.view = view;
-        this.actions = actions || ((_, a, d) => console.log("action:", a, d));
-        this.action(HAppAction._init);
+        this.control = control || ((_, a) => log("action:", a.type, a.data));
+        this.dispatch(HAppAction._init);
     }
 
-    action: HAction = (action: string | number, data?: any, event?: Event): void => {
-        HApp.debug && console.log("action", action, data, event);
-        this.actions(this, action, data, event);
+    dispatch: HDispatch = (type: string, data?: any, event?: Event): void => {
+        HApp.debug && log("HApp action", { type, data, event });
+        this.control(this, { type, data, event });
     }
 
     render = (): HElements => {
-        HApp.debug && console.log("render", this.state);
-        return this.view(this.state);
+        if (HApp.debug) {
+            const t0 = performance.now();
+            const hsml = this.view(this.model);
+            const t1 = performance.now();
+            HApp.debug && log("HApp render", `${t1 - t0} ms`, this.model);
+            return hsml;
+        } else {
+            return this.view(this.model);
+        }
     }
 
     onHsml = (action: string, data: HAttrOnData, event: Event): void => {
@@ -77,7 +99,7 @@ export class HApp<State> implements HHandlerCtx {
         if (data === undefined && event) {
             data = formData(event);
         }
-        this.action(action, data, event);
+        this.dispatch(action, data, event);
     }
 
     mount = (e: Element | string | null = document.body): this => {
@@ -85,28 +107,28 @@ export class HApp<State> implements HHandlerCtx {
             ? document.getElementById(e) || document.body
             : e || document.body;
         if ((el as any).app) {
-            const a = (el as any).app as HApp<State>;
+            const a = (el as any).app as HApp<Model>;
             a.umount();
         }
         if (!this.dom) {
             (this as any).dom = el;
             (el as any).app = this;
             const hsmls = (this as any).render();
-            hsmls2idomPatch(el, hsmls, this);
-            this.action(HAppAction._mount, this.dom);
+            updateDom(el, hsmls, this);
+            this.dispatch(HAppAction._mount, this.dom);
         }
         return this;
     }
 
     umount = (): this => {
         if (this.dom) {
-            this.action(HAppAction._umount, this.dom);
+            this.dispatch(HAppAction._umount, this.dom);
             if (this.dom.hasAttribute("app")) {
                 this.dom.removeAttribute("app");
             }
             const aNodes = this.dom.querySelectorAll("[app]");
             for (let i = 0; i < aNodes.length; i++) {
-                const a = (aNodes[i] as any).app as HApp<State>;
+                const a = (aNodes[i] as any).app as HApp<Model>;
                 a && a.umount();
             }
             while (this.dom.firstChild /*.hasChildNodes()*/) {
@@ -122,7 +144,7 @@ export class HApp<State> implements HHandlerCtx {
         if (this.dom && !this._updateSched) {
             this._updateSched = schedule(() => {
                 if (this.dom) {
-                    hsmls2idomPatch(this.dom, this.render(), this);
+                    updateDom(this.dom, this.render(), this);
                 }
                 this._updateSched = undefined;
             });
@@ -145,7 +167,7 @@ export class HApp<State> implements HHandlerCtx {
                 if (!this.dom) {
                     (this as any).dom = e;
                     (e as any).app = this;
-                    this.action(HAppAction._mount, this.dom);
+                    this.dispatch(HAppAction._mount, this.dom);
                 }
             });
         return ["div", hsmls];
@@ -157,62 +179,72 @@ export class HApp<State> implements HHandlerCtx {
 
 }
 
-function formData(e: Event): { [k: string]: string | null | Array<string | null> } {
+function updateDom(el: Element, hsml: HElements, ctx: HHandlerCtx): void {
+    if (HApp.debug) {
+        const t0 = performance.now();
+        hsmls2idomPatch(el, hsml, ctx);
+        const t1 = performance.now();
+        HApp.debug && log("HApp update", `${t1 - t0} ms`, el);
+    } else {
+        hsmls2idomPatch(el, hsml, ctx);
+    }
+}
+
+function formData(e: Event): { [k: string]: string | number | boolean | null | Array<string | null> } | string | number | boolean | null | Array<string | null> {
     const el = e.target as HTMLElement;
-    const data = {} as { [k: string]: string | null | Array<string | null> };
     switch (el.nodeName) {
         case "FORM":
             (e as Event).preventDefault();
             const els = (el as HTMLFormElement).elements;
+            const data = {} as { [k: string]: string | null | Array<string | null> };
             for (let i = 0; i < els.length; i++) {
                 const d = formInputData(els[i]);
-                const names = Object.keys(d);
-                if (names.length) {
-                    const name = names[0];
-                    const value = d[name];
-                    if (data[name] === undefined) {
-                        data[name] = value;
-                    } else if (typeof data[name] === "string" || data[name] instanceof String) {
-                        if (value instanceof Array) {
-                            data[name] = [data[name] as string, ...value];
+                if (typeof d === "object") {
+                    const names = Object.keys(d as object);
+                    if (names.length) {
+                        const name = names[0];
+                        const value = (d as any)[name];
+                        if (data[name] === undefined) {
+                            data[name] = value;
+                        } else if (typeof data[name] === "string" || data[name] instanceof String) {
+                            if (value instanceof Array) {
+                                data[name] = [data[name] as string, ...value];
+                            } else {
+                                data[name] = [data[name] as string, value as string];
+                            }
+                        } else if (data[name] instanceof Array) {
+                            if (value instanceof Array) {
+                                data[name] = (data[name] as Array<string | null>).concat(value);
+                            } else {
+                                (data[name] as Array<string | null>).push(value);
+                            }
                         } else {
-                            data[name] = [data[name] as string, value as string];
+                            if (value instanceof Array) {
+                                data[name] = [data[name] as string, ...value];
+                            } else {
+                                data[name] = [data[name] as string, value];
+                            }
                         }
-                    } else if (data[name] instanceof Array) {
-                        if (value instanceof Array) {
-                            data[name] = (data[name] as Array<string | null>).concat(value);
-                        } else {
-                            (data[name] as Array<string | null>).push(value);
-                        }
-                    } else {
-                        if (value instanceof Array) {
-                            data[name] = [data[name] as string, ...value];
-                        } else {
-                            data[name] = [data[name] as string, value];
-                        }
-                    }
-                    if (data[name] instanceof Array) {
-                        data[name] = (data[name] as Array<string | null>)
-                            .filter(d => d !== null);
-                        if ((els[i] as HTMLInputElement).type === "radio") {
-                            data[name] = (data[name] as Array<string | null>).length
-                                ? (data[name] as Array<string | null>)[0]
-                                : null;
+                        if (data[name] instanceof Array) {
+                            data[name] = (data[name] as Array<string | null>)
+                                .filter(d => d !== null);
+                            if ((els[i] as HTMLInputElement).type === "radio") {
+                                data[name] = (data[name] as Array<string | null>).length
+                                    ? (data[name] as Array<string | null>)[0]
+                                    : null;
+                            }
                         }
                     }
                 }
             }
-            break;
+            return data;
         default:
-            const d = formInputData(el);
-            Object.assign(data, d);
-            break;
+            return formInputData(el);
     }
-    return data;
 }
 
-function formInputData(el: Element): { [k: string]: string | null | string[] } {
-    const data = {} as { [k: string]: string | null | string[] };
+function formInputData(el: Element): { [k: string]: string | string[] | null } | string | string[] | number | boolean | null {
+    let data: { [k: string]: string | string[] | null }  | string | string[] | number | boolean | null = null;
     switch (el.nodeName) {
         case "INPUT":
             const iel = el as HTMLInputElement;
@@ -233,17 +265,33 @@ function formInputData(el: Element): { [k: string]: string | null | string[] } {
                 case "week":
                 case "submit":
                 case "button":
-                    iel.name && (data[iel.name] = iel.value);
+                    if (iel.name) {
+                        data = { [iel.name]: iel.value };
+                    } else {
+                        data = iel.value;
+                    }
                     break;
                 case "radio":
-                    iel.name && (data[iel.name] = iel.checked ? iel.value : null);
+                    if (iel.name) {
+                        data = { [iel.name]: iel.checked ? iel.value : null };
+                    } else {
+                        data = iel.checked ? iel.value : null;
+                    }
                     break;
                 case "checkbox":
-                    if (iel.name) {
-                        if (iel.value === "on") { // value not set in element
-                            data[iel.name] = String(iel.checked);
+                    if (iel.value === "on") { // value not set in element
+                        if (iel.name) {
+                            data = { [iel.name]: String(iel.checked) };
                         } else {
-                            data[iel.name] = iel.checked
+                            data = String(iel.checked);
+                        }
+                    } else {
+                        if (iel.name) {
+                            data = { [iel.name]: iel.checked
+                                ? String(iel.value)
+                                : null };
+                        } else {
+                            data = iel.checked
                                 ? String(iel.value)
                                 : null;
                         }
@@ -253,33 +301,47 @@ function formInputData(el: Element): { [k: string]: string | null | string[] } {
             break;
         case "SELECT":
             const sel = el as HTMLSelectElement;
-            if (sel.name) {
-                if (sel.multiple) {
-                    const values = Array.from(sel.selectedOptions).map(o => o.value);
-                    data[sel.name] = values;
+            if (sel.multiple) {
+                const values = Array.from(sel.selectedOptions).map(o => o.value);
+                if (sel.name) {
+                    data = { [sel.name]: values };
                 } else {
-                    data[sel.name] = sel.value;
+                    data = values;
+                }
+            } else {
+                if (sel.name) {
+                    data = { [sel.name]: sel.value };
+                } else {
+                    data = sel.value;
                 }
             }
             break;
         case "TEXTAREA":
             const tel = el as HTMLTextAreaElement;
-            tel.name && (data[tel.name] = tel.innerText);
+            if (tel.name) {
+                data = { [tel.name]: tel.innerText };
+            } else {
+                data = tel.innerText;
+            }
             break;
         case "BUTTON":
             const bel = el as HTMLButtonElement;
-            bel.name && (data[bel.name] = bel.value);
+            if (bel.name) {
+                data = { [bel.name]: bel.value };
+            } else {
+                data = bel.value;
+            }
             break;
     }
     return data;
 }
 
-// export const formInputData = <State>(actions: Actions<State>): Actions<State> =>
-//     (app: App<State>, action: string | number, data?: any, event?: Event): void => {
+// export const formInputData = <Model>(control: Actions<Model>): Actions<Model> =>
+//     (app: App<Model>, action: string | number, data?: any, event?: Event): void => {
 //         if (data === undefined && event) {
 //             data = inputEventData(event);
 //         }
-//         actions(app, action, data, event);
+//         control(app, action, data, event);
 //     };
 
 // // Decorator

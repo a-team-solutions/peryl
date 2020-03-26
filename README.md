@@ -30,7 +30,7 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
     <script src="https://peryl.gitlab.io/peryl/dist/umd/hsml-app.js"></script>
     <script>
 
-        const state = {
+        const model = {
             title: "Counter",
             count: 77
         };
@@ -42,17 +42,17 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
             clear: "clear"
         }
 
-        function view(state) {
+        function view(model) {
             return [
-                ["h2", { classes: [["w3-text-light-grey", !state.title]] }, [
-                    state.title || "No title"
+                ["h2", { classes: [["w3-text-light-grey", !model.title]] }, [
+                    model.title || "No title"
                 ]],
                 ["p", [
                     ["label", ["Title:"]],
                     ["input.w3-input.w3-border", {
                         type: "text",
                         name: "title",
-                        value: new String(state.title),
+                        value: new String(model.title),
                         on: ["input", Action.title]
                     }]
                 ]],
@@ -68,10 +68,10 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
                         "Count: ",
                         ["strong", {
                             classes: [ // conditional classes
-                                ["w3-text-red", state.count < 77],
-                                ["w3-text-green", state.count > 77],
+                                ["w3-text-red", model.count < 77],
+                                ["w3-text-green", model.count > 77],
                             ]},
-                            [state.count]
+                            [model.count]
                         ]
                     ]],
                     ["button.w3-button.w3-blue", { on: ["click", Action.dec, 1] }, ["<"]],
@@ -81,43 +81,43 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
             ]
         };
 
-        function actions(app, action, data, event) {
-            console.log("action:", action, data, event);
+        function control(app, action) {
+            console.log("action:", action);
 
-            switch (action) {
+            switch (action.type) {
                 case HAppAction._init:
                 case HAppAction._mount:
                 case HAppAction._umount:
                     break;
 
                 case Action.title:
-                    app.state.title = data.title;
+                    app.model.title = data.title;
                     app.update(data);
                     break;
 
                 case Action.inc:
-                    app.state.count = app.state.count + data;
+                    app.model.count = app.model.count + data;
                     app.update();
                     // async action call
-                    setTimeout(() => app.action(Action.dec, 1), 1e3);
+                    setTimeout(() => app.dispatch(Action.dec, 1), 1e3);
                     break;
 
                 case Action.dec:
-                    app.state.count = app.state.count - data;
+                    app.model.count = app.model.count - data;
                     app.update();
                     break;
 
                 case Action.clear:
-                    app.state.title = "";
+                    app.model.title = "";
                     app.update();
                     break;
 
                 default:
-                    console.warn("action unhandled:", action, data, event);
+                    console.warn("action unhandled:", action);
             }
         };
 
-        happ(state, view, actions, document.getElementById("app");
+        new HApp(model, view, control).mount(document.getElementById("app"));
 
     </script>
 </body>
