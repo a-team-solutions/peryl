@@ -1,5 +1,5 @@
 
-export type HHead = string; // "tag#id.class1.class2~handler"
+export type HHead = keyof HTMLElementTagNameMap | string; // "tag#id.class1.class2~handler"
 
 export type HAttrClasses = Array<string | [string, boolean]>;
 
@@ -11,7 +11,7 @@ export type HAttrOnAction = string | number;
 
 export type HAttrOnDataFnc = (e: Event) => any;
 
-export type HAttrOnData = string | number | Array<any> | Object | HAttrOnDataFnc;
+export type HAttrOnData = string | number | Array<any> | Object | HAttrOnDataFnc | null;
 
 export type HAttrOnCb = [keyof HTMLElementEventMap, EventListener];
 

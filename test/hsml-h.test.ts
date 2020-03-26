@@ -48,6 +48,20 @@ describe("hypescript", () => {
         ]]);
     });
 
+    it("nested elements with function", () => {
+        const focusFnc = (e: any) => (e && e.focus && e.focus());
+        expect(
+            h("div", [
+                h("input", { type: "text", value: "1." }, focusFnc),
+                h("input", { type: "text", value: "2." })
+            ])
+        )
+        .toEqual(["div", [
+            ["input", { type: "text", value: "1." }, focusFnc],
+            ["input", { type: "text", value: "2." }]
+        ]]);
+    });
+
     it("deeply nested", () => {
         expect(
             h("div#app", [
