@@ -62,6 +62,30 @@ describe("hypescript", () => {
         ]]);
     });
 
+    it("nested elements with ternary operator", () => {
+        const alwaysTrue: boolean = true;
+        expect(
+            h("div", [
+                h("section", [
+                    h("div", "Hello"),
+                    h("div", alwaysTrue
+                        ? [h("div", "body")]
+                        : "body")
+                ]),
+                h("footer", "Footer")
+            ])
+        )
+        .toEqual(["div", [
+            ["section", [
+                ["div", ["Hello"]],
+                ["div", alwaysTrue
+                    ? [["div", ["body"]]]
+                    : "body"]
+            ]],
+            ["footer", ["Footer"]]
+        ]]);
+    });
+
     it("deeply nested", () => {
         expect(
             h("div#app", [
