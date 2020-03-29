@@ -81,7 +81,7 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
             ]
         };
 
-        function control(app, action) {
+        function dispatcher(app, action) {
             console.log("action:", action);
 
             switch (action.type) {

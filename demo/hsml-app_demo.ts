@@ -1,4 +1,4 @@
-import { HView, HView1, HControl, HApp, HAppAction } from "../src/hsml-app";
+import { HView, HView1, HDispatcher, HApp, HAppAction } from "../src/hsml-app";
 import { HElements, HElement } from "../src/hsml";
 
 interface CounterModel {
@@ -22,7 +22,7 @@ const counterView: HView1<CounterModel> = (model: CounterModel): HElement => {
     ]];
 };
 
-const counterControl: HControl<CounterModel> = (ctx, action) => {
+const counterDispatcher: HDispatcher<CounterModel> = (ctx, action) => {
     switch (action.type) {
         case CounterAction.inc:
             ctx.model.count = ctx.model.count + action.data as number;
@@ -150,9 +150,9 @@ const view: HView<Model> = (model: Model): HElements => [
     ["input", { type: "button", value: "x", disabled: model.x }]
 ];
 
-const control: HControl<Model> = ({ model, update, dispatch }, action): void => {
+const dispatcher: HDispatcher<Model> = ({ model, update, dispatch }, action): void => {
     console.log("action:", action);
-    counterControl({ model: model.counter, update, dispatch }, action);
+    counterDispatcher({ model: model.counter, update, dispatch }, action);
     switch (action.type) {
         case HAppAction._init:
         case HAppAction._mount:
@@ -181,8 +181,56 @@ const control: HControl<Model> = ({ model, update, dispatch }, action): void => 
     }
 };
 
+// type HController<Model> = (this: HContext<Model>, data?: HAction["data"], event?: HAction["event"]) => void;
+
+// type HControllers<Model, Actions extends { [k: string]: string } | any> = { [key in keyof Actions]: HController<Model> };
+
+// function dispatch<Model, Action = {}>(controllers: HControllers<Model, Action>): HDispatcher<Model> {
+//     return (ctx, action): void => {
+//         if (controllers[action.type]) {
+//             controllers[action.type].apply<HContext<Model>>(ctx, action.data, action.event);
+//             ctx.update();
+//         } else {
+//             console.warn("missing controller for action", action);
+//         }
+//     };
+// }
+
+// const A = {
+//     title: "title",
+//     title1: "title1"
+// };
+
+// const controllers: HControllers<Model, any> = {
+
+//     // _mount: data => {
+//     //     this.model = data;
+//     //     this.update();
+//     //     this.dispatch("title", "data");
+//     // }
+
+//     title: (data, event) => {
+//         this.model = data;
+//         // this.update();
+//         this.dispatch("title", "data");
+//     },
+
+//     title1: (data, event) => {
+//         this.model = data;
+//         // this.update();
+//         this.dispatch("title", "data");
+//     }
+
+//     // title1: (model, data, event) => {
+//     //     model.data = data;
+//     //     return model;
+//     // }
+
+// };
+
 // HApp.debug = true;
-const app = new HApp(model, view, control).mount(document.getElementById("app"));
+const app = new HApp(model, view, dispatcher).mount(document.getElementById("app"));
+// const app = new HApp(model, view, dispatch(controllers)).mount(document.getElementById("app"));
 
 (self as any).app = app;
 

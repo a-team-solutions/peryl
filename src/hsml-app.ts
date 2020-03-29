@@ -24,15 +24,15 @@ export interface HContext<Model> {
     dispatch: HDispatch;
 }
 
-export type HControl<Model> = (ctx: HContext<Model>, action: HAction) => void;
+export type HDispatcher<Model> = (ctx: HContext<Model>, action: HAction) => void;
 
 // export type Class<T = object> = new (...args: any[]) => T;
 
 export function happ<Model>(model: Model,
                             view: HView<Model>,
-                            control?: HControl<Model>,
+                            dispatcher?: HDispatcher<Model>,
                             element: Element | string | null = document.body) {
-    return new HApp<Model>(model, view, control).mount(element);
+    return new HApp<Model>(model, view, dispatcher).mount(element);
 }
 
 export enum HAppAction {
@@ -61,23 +61,23 @@ export class HApp<Model> implements HContext<Model>, HHandlerCtx {
 
     readonly model: Model;
     readonly view: HView<Model>;
-    readonly control: HControl<Model>;
+    readonly dispatcher: HDispatcher<Model>;
 
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
     private _updateSched?: number;
 
-    constructor(model: Model, view: HView<Model>, control?: HControl<Model>) {
+    constructor(model: Model, view: HView<Model>, dispatcher?: HDispatcher<Model>) {
         this.model = model;
         this.view = view;
-        this.control = control || ((_, a) => log("action:", a.type, a.data));
+        this.dispatcher = dispatcher || ((_, a) => log("action:", a.type, a.data));
         this.dispatch(HAppAction._init);
     }
 
     dispatch: HDispatch = (type: string, data?: any, event?: Event): void => {
         HApp.debug && log("HApp action", { type, data, event });
-        this.control(this, { type, data, event });
+        this.dispatcher(this, { type, data, event });
     }
 
     render = (): HElements => {
@@ -336,12 +336,12 @@ function formInputData(el: Element): { [k: string]: string | string[] | null } |
     return data;
 }
 
-// export const formInputData = <Model>(control: Actions<Model>): Actions<Model> =>
+// export const formInputData = <Model>(dispatcher: Actions<Model>): Actions<Model> =>
 //     (app: App<Model>, action: string | number, data?: any, event?: Event): void => {
 //         if (data === undefined && event) {
 //             data = inputEventData(event);
 //         }
-//         control(app, action, data, event);
+//         dispatcher(app, action, data, event);
 //     };
 
 // // Decorator
