@@ -5,17 +5,43 @@ export type HAttrClasses = Array<string | [string, boolean]>;
 
 export type HAttrStyles = { [key: string]: string };
 
-export type HAttrData = { [key: string]: string | number | Array<any> | Object };
+export type HAttrData = {
+    [key: string]:
+        | string
+        | String
+        | number
+        | Number
+        | boolean
+        | Boolean
+        | Date
+        | Array<any>
+        | Object;
+};
 
-export type HAttrOnAction = string | number;
+export type HAttrOnAction = string;
 
 export type HAttrOnDataFnc = (e: Event) => any;
 
-export type HAttrOnData = string | number | Array<any> | Object | HAttrOnDataFnc | null;
+export type HAttrOnData =
+    | string
+    | String
+    | number
+    | Number
+    | boolean
+    | Boolean
+    | Date
+    | Array<any>
+    | Object
+    | HAttrOnDataFnc
+    | null;
 
 export type HAttrOnCb = [keyof HTMLElementEventMap, EventListener];
 
-export type HAttrOnAct = [keyof HTMLElementEventMap, HAttrOnAction, HAttrOnData?];
+export type HAttrOnAct = [
+    keyof HTMLElementEventMap,
+    HAttrOnAction,
+    HAttrOnData?
+];
 
 export type HAttrOn = HAttrOnCb | HAttrOnAct | Array<HAttrOnCb | HAttrOnAct>;
 
@@ -39,6 +65,7 @@ export interface HAttrs {
         | Number
         | boolean
         | Boolean
+        | Date
         | HAttrClasses
         | HAttrStyles
         // | HsmlAttrData
@@ -54,18 +81,40 @@ export interface HObj {
     toHsml?(): HElement;
 }
 
-export interface HElements extends Array<HElement> { }
+export interface HElements extends Array<HElement> {}
 
-export type HChildren = HElements | HFnc | HObj | string | boolean | number | Date | undefined | null;
-// export type HChildren = Hs | HFnc | HObj | string | boolean | number | Date;
+export type HChildren =
+    | HElements
+    | HFnc
+    | HObj
+    | string
+    | String
+    | boolean
+    | Boolean
+    | number
+    | Number
+    | Date
+    | undefined
+    | null;
 
 export type HTagNoAttr = [HHead, HChildren?];
 export type HTagAttr = [HHead, HAttrs, HChildren?];
 
 export type HTag = HTagNoAttr | HTagAttr;
-// export type HTag = [HTagHead, (HTagAttrs | HTagChildren)?, HTagChildren?];
 
-export type HElement = HFnc | HObj | HTag | string | boolean | number | Date | undefined | null;
+export type HElement =
+    | HFnc
+    | HObj
+    | HTag
+    | string
+    | String
+    | boolean
+    | Boolean
+    | number
+    | Number
+    | Date
+    | undefined
+    | null;
 
 export interface HHandlerCtx extends HObj {
     refs: { [name: string]: Element };
@@ -80,7 +129,9 @@ export interface HHandler<C extends HHandlerCtx> {
     obj(obj: HObj, ctx?: C): void;
 }
 
-export function hsml<C extends HHandlerCtx>(hml: HElement, handler: HHandler<C>, ctx?: C): void {
+export function hsml<C extends HHandlerCtx>(hml: HElement,
+                                            handler: HHandler<C>,
+                                            ctx?: C): void {
     // console.log("hsml", hsml);
     if (hml === undefined || hml === null) {
         return;
@@ -221,7 +272,10 @@ export function hsml<C extends HHandlerCtx>(hml: HElement, handler: HHandler<C>,
 }
 
 export function hjoin(hsmls: HElements, sep: string | HElement): HElements {
-    const r = hsmls.reduce<HElements>((p, c) => (p.push(c, sep), p), [] as HElements);
+    const r = hsmls.reduce<HElements>(
+        (p, c) => (p.push(c, sep), p),
+        [] as HElements
+    );
     r.splice(-1);
     return r;
 }
