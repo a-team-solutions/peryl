@@ -105,7 +105,9 @@
             }
         };
 
-        new HApp(model, view, control).mount(document.getElementById("app"));
+        // HApp.debug = true;
+
+        new HApp(model, view, dispatcher).mount(document.getElementById("app"));
 
     </script>
 </body>

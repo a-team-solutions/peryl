@@ -117,7 +117,7 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
             }
         };
 
-        new HApp(model, view, control).mount(document.getElementById("app"));
+        new HApp(model, view, dispatcher).mount(document.getElementById("app"));
 
     </script>
 </body>
