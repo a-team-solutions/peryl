@@ -56,7 +56,7 @@ export interface HObj {
 
 export interface HElements extends Array<HElement> { }
 
-export type HChildren = HElements | HFnc | HObj;
+export type HChildren = HElements | HFnc | HObj | string | boolean | number | Date | undefined | null;
 // export type HChildren = Hs | HFnc | HObj | string | boolean | number | Date;
 
 export type HTagNoAttr = [HHead, HChildren?];
@@ -65,7 +65,7 @@ export type HTagAttr = [HHead, HAttrs, HChildren?];
 export type HTag = HTagNoAttr | HTagAttr;
 // export type HTag = [HTagHead, (HTagAttrs | HTagChildren)?, HTagChildren?];
 
-export type HElement = string | boolean | number | Date | HFnc | HObj | HTag | undefined | null;
+export type HElement = HFnc | HObj | HTag | string | boolean | number | Date | undefined | null;
 
 export interface HHandlerCtx extends HObj {
     refs: { [name: string]: Element };
@@ -138,7 +138,7 @@ export function hsml<C extends HHandlerCtx>(hml: HElement, handler: HHandler<C>,
             const ds = d.toLocaleString ? d.toLocaleString() : d.toString();
             handler.text(ds, ctx);
             break;
-        default:
+        default: // HObj
             handler.obj(hml as HObj, ctx);
     }
 
@@ -167,12 +167,12 @@ export function hsml<C extends HHandlerCtx>(hml: HElement, handler: HHandler<C>,
             case Function:
                 hFnc = htc as HFnc;
                 break;
-            // case String:
-            // case Boolean:
-            // case Number:
-            // case Date:
-            //     children = [htc as Hsml];
-            //     break;
+            case String:
+            case Boolean:
+            case Number:
+            case Date:
+                children = [htc as string | boolean | number | Date];
+                break;
             default: // HObj
                 hObj = htc as HObj;
                 break;
@@ -289,36 +289,35 @@ export function hjoin(hsmls: HElements, sep: string | HElement): HElements {
 // TEST
 
 // import { hsmls2htmls } from "./hsml-html";
-// import { Action } from "./hsml-xwidget";
+// import { HDispatch } from "./hsml-app";
 
-// const action: Action = (name: string, data: any) => {
-//     console.log("action:", name, data);
+// const dispatch: HDispatch = (type: string, data?: any, event?: Event): void => {
+//     console.log("action:", type, data, event);
 // };
 
 // const data = { attr: "action-data" };
 
-// const hmls: Hsmls = [
-//     ["button",
-//         { on: ["click", "action", data] },
-//         ["send"]
-//     ],
+// const hmls: HElements = [
+//     ["button", { on: ["click", "action", data] }, "send"],
+//     ["h1", "aaa"],
 //     ["input",
 //         {
+//             type: "text",
 //             on: [
 //                 ["mouseover", "hover-action", data],
 //                 ["change", "click-action", e => (e.target as HTMLInputElement).value],
-//                 ["click", () => action("action-name", data)],
+//                 ["click", e => dispatch("action", data, e)],
 //             ],
-//             click: e => action("action-name", data)
+//             click: e => dispatch("action", data, e)
 //         }
 //     ],
 //     ["button",
 //         {
-//             on: ["click", () => action("action-name", data)],
-//             click: e => action("action-name", data)
+//             on: ["click", e => dispatch("action", data, e)],
+//             click: e => dispatch("action", data, e)
 //         },
-//         ["send"]
+//         ["Send"]
 //     ]
 // ];
 
-// console.log(hsmls2htmls(hmls).join("\n"));
+// console.log(hsmls2htmls(hmls, true).join(""));
