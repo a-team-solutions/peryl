@@ -44,11 +44,12 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
 
         function view(model) {
             return [
-                ["h2", { classes: [["w3-text-light-grey", !model.title]] }, [
+                ["h2",
+                    { classes: [["w3-text-light-grey", !model.title]] },
                     model.title || "No title"
-                ]],
+                ],
                 ["p", [
-                    ["label", ["Title:"]],
+                    ["label", "Title:"],
                     ["input.w3-input.w3-border", {
                         type: "text",
                         name: "title",
@@ -59,24 +60,32 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
                 ["p", [
                     ["button.w3-button.w3-blue",
                         { on: ["click", Action.clear] },
-                        ["Clear title"]
+                        "Clear title"
                     ]
                 ]],
                 ["hr"],
                 ["p", [
                     ["h2", [
                         "Count: ",
-                        ["strong", {
-                            classes: [ // conditional classes
-                                ["w3-text-red", model.count < 77],
-                                ["w3-text-green", model.count > 77],
-                            ]},
-                            [model.count]
+                        ["strong",
+                            {
+                                classes: [ // conditional classes
+                                    ["w3-text-red", model.count < 77],
+                                    ["w3-text-green", model.count > 77],
+                                ]
+                            },
+                            model.count
                         ]
                     ]],
-                    ["button.w3-button.w3-blue", { on: ["click", Action.dec, 1] }, ["<"]],
+                    ["button.w3-button.w3-blue",
+                        { on: ["click", Action.dec, 1] },
+                        [["i.fa.fa-chevron-left"]]
+                    ],
                     " ",
-                    ["button.w3-button.w3-blue", { on: ["click", Action.inc, 2] }, [">"]]
+                    ["button.w3-button.w3-blue",
+                        { on: ["click", Action.inc, 2] },
+                        [["i.fa.fa-chevron-right"]]
+                    ]
                 ]]
             ]
         };
@@ -91,19 +100,19 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
                     break;
 
                 case Action.title:
-                    app.model.title = data.title;
-                    app.update(data);
+                    app.model.title = action.data.title;
+                    app.update();
                     break;
 
                 case Action.inc:
-                    app.model.count = app.model.count + data;
+                    app.model.count = app.model.count + action.data;
                     app.update();
                     // async action call
                     setTimeout(() => app.dispatch(Action.dec, 1), 1e3);
                     break;
 
                 case Action.dec:
-                    app.model.count = app.model.count - data;
+                    app.model.count = app.model.count - action.data;
                     app.update();
                     break;
 
@@ -113,9 +122,11 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
                     break;
 
                 default:
-                    console.warn("action unhandled:", action);
+                    console.warn("unhandled action:", action);
             }
         };
+
+        // HApp.debug = true;
 
         new HApp(model, view, dispatcher).mount(document.getElementById("app"));
 
