@@ -3,8 +3,8 @@ import { hsmls2idomPatch } from "./hsml-idom";
 
 const log = console.log;
 
-export type HView<Model> = (model: Model) => HElements;
-export type HView1<Model> = (model: Model) => HElement;
+export type HView<State> = (state: State) => HElements;
+export type HView1<State> = (state: State) => HElement;
 
 export interface HAction {
     type: string;
@@ -18,21 +18,21 @@ export type HDispatch = (type: HAction["type"],
 
 export type HUpdate = () => void;
 
-export interface HContext<Model> {
-    model: Model;
+export interface HContext<State> {
+    state: State;
     update: HUpdate;
     dispatch: HDispatch;
 }
 
-export type HDispatcher<Model> = (ctx: HContext<Model>, action: HAction) => void;
+export type HDispatcher<State> = (ctx: HContext<State>, action: HAction) => void;
 
 // export type Class<T = object> = new (...args: any[]) => T;
 
-export function happ<Model>(model: Model,
-                            view: HView<Model>,
-                            dispatcher?: HDispatcher<Model>,
+export function happ<State>(state: State,
+                            view: HView<State>,
+                            dispatcher?: HDispatcher<State>,
                             element: Element | string | null = document.body) {
-    return new HApp<Model>(model, view, dispatcher).mount(element);
+    return new HApp<State>(state, view, dispatcher).mount(element);
 }
 
 export enum HAppAction {
@@ -55,21 +55,23 @@ const unschedule = window.cancelAnimationFrame ||
     // (window as any).msCancelAnimationFrame ||
     function (handle: number) { window.clearTimeout(handle); };
 
-export class HApp<Model> implements HContext<Model>, HHandlerCtx {
+export class HApp<State> implements HContext<State>, HHandlerCtx {
 
     static debug = false;
 
-    readonly model: Model;
-    readonly view: HView<Model>;
-    readonly dispatcher: HDispatcher<Model>;
+    readonly state: State;
+    readonly view: HView<State>;
+    readonly dispatcher: HDispatcher<State>;
 
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
     private _updateSched?: number;
 
-    constructor(model: Model, view: HView<Model>, dispatcher?: HDispatcher<Model>) {
-        this.model = model;
+    private _onUpdate?: (ctx: HContext<State>) => void;
+
+    constructor(state: State, view: HView<State>, dispatcher?: HDispatcher<State>) {
+        this.state = state;
         this.view = view;
         this.dispatcher = dispatcher || ((_, a) => log("action:", a.type, a.data));
         this.dispatch(HAppAction._init);
@@ -83,12 +85,12 @@ export class HApp<Model> implements HContext<Model>, HHandlerCtx {
     render = (): HElements => {
         if (HApp.debug) {
             const t0 = performance.now();
-            const hsml = this.view(this.model);
+            const hsml = this.view(this.state);
             const t1 = performance.now();
-            HApp.debug && log("HApp render", `${t1 - t0} ms`, this.model);
+            HApp.debug && log("HApp render", `${t1 - t0} ms`, this.state);
             return hsml;
         } else {
-            return this.view(this.model);
+            return this.view(this.state);
         }
     }
 
@@ -107,7 +109,7 @@ export class HApp<Model> implements HContext<Model>, HHandlerCtx {
             ? document.getElementById(e) || document.body
             : e || document.body;
         if ((el as any).app) {
-            const a = (el as any).app as HApp<Model>;
+            const a = (el as any).app as HApp<State>;
             a.umount();
         }
         if (!this.dom) {
@@ -128,7 +130,7 @@ export class HApp<Model> implements HContext<Model>, HHandlerCtx {
             }
             const aNodes = this.dom.querySelectorAll("[app]");
             for (let i = 0; i < aNodes.length; i++) {
-                const a = (aNodes[i] as any).app as HApp<Model>;
+                const a = (aNodes[i] as any).app as HApp<State>;
                 a && a.umount();
             }
             while (this.dom.firstChild /*.hasChildNodes()*/) {
@@ -146,10 +148,15 @@ export class HApp<Model> implements HContext<Model>, HHandlerCtx {
                 if (this.dom) {
                     updateDom(this.dom, this.render(), this);
                 }
+                this._onUpdate && this._onUpdate(this);
                 this._updateSched = undefined;
             });
         }
         return this;
+    }
+
+    onUpdate(cb: (ctx: HContext<State>) => void) {
+        this._onUpdate = cb;
     }
 
     toHsml = (): HElement => {
@@ -336,8 +343,8 @@ function formInputData(el: Element): { [k: string]: string | string[] | null } |
     return data;
 }
 
-// export const formInputData = <Model>(dispatcher: Actions<Model>): Actions<Model> =>
-//     (app: App<Model>, action: string | number, data?: any, event?: Event): void => {
+// export const formInputData = <State>(dispatcher: Actions<State>): Actions<State> =>
+//     (app: App<State>, action: string | number, data?: any, event?: Event): void => {
 //         if (data === undefined && event) {
 //             data = inputEventData(event);
 //         }

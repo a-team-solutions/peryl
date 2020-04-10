@@ -1,17 +1,25 @@
-import { html2hsmlStr, html2hsml } from "../src/hsml-convert";
+import { html2hsmlStr, html2hsml, hsml2str } from "../src/hsml-convert";
 
 const html = `<div>
     Hello
     <p>
+        <em> </em>
         text
         <b>
             text
         </b>
     </p>
-    <hr id="id1" class="c1 c2" data-x="dx" data-y="dy" />,
-    <em name="world">
-        world
-    </em>
+    <hr/>
+    <span
+        id="id1"
+        class="c1 c2"
+        data-x="dx"
+        data-y="dy">
+    </span>,
+    <button
+        name="myButton">
+        Click me
+    </button>
     !
 </div>`;
 
@@ -36,4 +44,5 @@ formEl.addEventListener("submit", e => {
 htmlEl.focus();
 
 const hsml = html2hsml(html);
-console.log(JSON.stringify(hsml, undefined, 4));
+// console.log(JSON.stringify(hsml, undefined, 4));
+console.log(hsml2str(hsml, true));
