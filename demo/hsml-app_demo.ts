@@ -1,7 +1,7 @@
 import { HView, HView1, HDispatcher, HApp, HAppAction } from "../src/hsml-app";
 import { HElements, HElement } from "../src/hsml";
 
-interface CounterModel {
+interface CounterState {
     count: number;
 }
 
@@ -10,11 +10,11 @@ enum CounterAction {
     inc = "counter-inc"
 }
 
-const counterView: HView1<CounterModel> = (model: CounterModel): HElement => {
+const counterView: HView1<CounterState> = (state: CounterState): HElement => {
     return ["div", [
         ["h2", ["Counter"]],
         ["p", [
-            ["em", ["Count"]], ": ", model.count,
+            ["em", ["Count"]], ": ", state.count,
             " ",
             ["button", { on: ["click", CounterAction.dec, 1] }, ["-"]],
             ["button", { on: ["click", CounterAction.inc, 2] }, ["+"]]
@@ -22,23 +22,23 @@ const counterView: HView1<CounterModel> = (model: CounterModel): HElement => {
     ]];
 };
 
-const counterDispatcher: HDispatcher<CounterModel> = (ctx, action) => {
+const counterDispatcher: HDispatcher<CounterState> = (ctx, action) => {
     switch (action.type) {
         case CounterAction.inc:
-            ctx.model.count = ctx.model.count + action.data as number;
+            ctx.state.count = ctx.state.count + action.data as number;
             ctx.update();
             setTimeout(() => ctx.dispatch(CounterAction.dec, 1), 1e3); // async call
             break;
         case CounterAction.dec:
-            ctx.model.count = ctx.model.count - action.data as number;
+            ctx.state.count = ctx.state.count - action.data as number;
             ctx.update();
             break;
     }
 };
 
-interface Model {
+interface State {
     title: string;
-    counter: CounterModel;
+    counter: CounterState;
     x?: boolean | Boolean;
 }
 
@@ -51,22 +51,22 @@ enum Action {
     x = "x"
 }
 
-const model: Model = {
+const state: State = {
     title: "Title",
     counter: {
         count: 77
     }
 };
 
-const view: HView<Model> = (model: Model): HElements => [
-    ["h2", [model.title]],
+const view: HView<State> = (state: State): HElements => [
+    ["h2", [state.title]],
     ["p", [
         "Title: ",
         ["input",
             {
                 type: "text",
                 // name: "title",
-                value: new String(model.title),
+                value: new String(state.title),
                 on: ["input", Action.title]
             }
         ], " ",
@@ -78,7 +78,7 @@ const view: HView<Model> = (model: Model): HElements => [
             ["Clear title"]
         ]
     ]],
-    counterView(model.counter),
+    counterView(state.counter),
     ["h2", ["Form"]],
     ["form",
         {
@@ -145,26 +145,26 @@ const view: HView<Model> = (model: Model): HElements => [
     ]],
     ["h2", ["Props update"]],
     ["input", { type: "checkbox", name: "x", on: ["change", Action.x] }],
-    ["input", { type: "checkbox", checked: model.x }],
-    ["input", { type: "radio", name: "y", checked: model.x }],
-    ["input", { type: "radio", name: "y", checked: !model.x }],
-    ["input", { type: "button", value: "x", disabled: model.x }]
+    ["input", { type: "checkbox", checked: state.x }],
+    ["input", { type: "radio", name: "y", checked: state.x }],
+    ["input", { type: "radio", name: "y", checked: !state.x }],
+    ["input", { type: "button", value: "x", disabled: state.x }]
 ];
 
-const dispatcher: HDispatcher<Model> = ({ model, update, dispatch }, action): void => {
+const dispatcher: HDispatcher<State> = ({ state, update, dispatch }, action): void => {
     console.log("action:", action);
-    counterDispatcher({ model: model.counter, update, dispatch }, action);
+    counterDispatcher({ state: state.counter, update, dispatch }, action);
     switch (action.type) {
         case HAppAction._init:
         case HAppAction._mount:
         case HAppAction._umount:
             break;
         case Action.title:
-            model.title = action.data;
+            state.title = action.data;
             update();
             break;
         case Action.clear:
-            model.title = "";
+            state.title = "";
             update();
             break;
         case Action.formSubmit:
@@ -172,9 +172,9 @@ const dispatcher: HDispatcher<Model> = ({ model, update, dispatch }, action): vo
             break;
         case "x":
             console.log("data.x", typeof action.data.x, action.data.x);
-            model.x = new Boolean(action.data.x === "true");
-            // app.model.x = data.x === "true";
-            // app.model.x = data.x;
+            state.x = new Boolean(action.data.x === "true");
+            // app.state.x = data.x === "true";
+            // app.state.x = data.x;
             update();
             break;
         // default:
@@ -184,22 +184,22 @@ const dispatcher: HDispatcher<Model> = ({ model, update, dispatch }, action): vo
 
 // HApp.debug = true;
 
-const app = new HApp(model, view, dispatcher)
+const app = new HApp(state, view, dispatcher)
     .mount(document.getElementById("app"));
 
 // // Controller Dispatcher Demo
 
-// type HController<Model> = (this: HContext<Model>,
+// type HController<State> = (this: HContext<State>,
 //                            data?: HAction["data"],
 //                            event?: HAction["event"]) => void;
 
-// type HControllers<Model, Actions> = { [key in keyof Actions]?: HController<Model> };
+// type HControllers<State, Actions> = { [key in keyof Actions]?: HController<State> };
 
 // const controllersDdispatcher =
-//     <Model, Action>(controllers: HControllers<Model, Action>): HDispatcher<Model> =>
+//     <State, Action>(controllers: HControllers<State, Action>): HDispatcher<State> =>
 //         (ctx, action): void => {
 //             if (controllers[action.type]) {
-//                 controllers[action.type].apply<HContext<Model>>(ctx, action.data, action.event);
+//                 controllers[action.type].apply<HContext<State>>(ctx, action.data, action.event);
 //                 ctx.update();
 //             } else {
 //                 console.warn("no controller for action", action);
@@ -207,7 +207,7 @@ const app = new HApp(model, view, dispatcher)
 //         };
 
 
-// const controllers: HControllers<Model, { [key in keyof typeof Action | HAppAction]: string }> = {
+// const controllers: HControllers<State, { [key in keyof typeof Action | HAppAction]: string }> = {
 //     _init: () => {
 //     },
 //     _mount: () => {
@@ -215,16 +215,16 @@ const app = new HApp(model, view, dispatcher)
 //     _umount: () => {
 //     },
 //     title: data => {
-//         model.title = data;
+//         state.title = data;
 //     },
 //     clear: () => {
-//         model.title = "";
+//         state.title = "";
 //     },
 //     x: data => {
 //         console.log("data.x", typeof data.x, data.x);
-//         model.x = new Boolean(data.x === "true");
-//         // app.model.x = data.x === "true";
-//         // app.model.x = data.x;
+//         state.x = new Boolean(data.x === "true");
+//         // app.state.x = data.x === "true";
+//         // app.state.x = data.x;
 //     },
 //     formChange: data => {},
 //     formSubmit: data => {},
@@ -232,7 +232,7 @@ const app = new HApp(model, view, dispatcher)
 // };
 
 // // HApp.debug = true;
-// const app = new HApp(model, view, controllersDdispatcher(controllers))
+// const app = new HApp(state, view, controllersDdispatcher(controllers))
 //     .mount(document.getElementById("app"));
 
 (self as any).app = app;

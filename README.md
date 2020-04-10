@@ -31,7 +31,7 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
     <script src="https://peryl.gitlab.io/peryl/dist/umd/hsml-app.js"></script>
     <script>
 
-        const model = {
+        const state = {
             title: "Counter",
             count: 77
         };
@@ -43,18 +43,18 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
             clear: "clear"
         }
 
-        function view(model) {
+        function view(state) {
             return [
                 ["h2",
-                    { classes: [["w3-text-light-grey", !model.title]] },
-                    model.title || "No title"
+                    { classes: [["w3-text-light-grey", !state.title]] },
+                    state.title || "No title"
                 ],
                 ["p", [
                     ["label", "Title:"],
                     ["input.w3-input.w3-border", {
                         type: "text",
                         name: "title",
-                        value: new String(model.title),
+                        value: new String(state.title),
                         on: ["input", Action.title]
                     }]
                 ]],
@@ -71,11 +71,11 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
                         ["strong",
                             {
                                 classes: [ // conditional classes
-                                    ["w3-text-red", model.count < 77],
-                                    ["w3-text-green", model.count > 77],
+                                    ["w3-text-red", state.count < 77],
+                                    ["w3-text-green", state.count > 77],
                                 ]
                             },
-                            model.count
+                            state.count
                         ]
                     ]],
                     ["button.w3-button.w3-blue",
@@ -101,24 +101,24 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
                     break;
 
                 case Action.title:
-                    app.model.title = action.data.title;
+                    app.state.title = action.data.title;
                     app.update();
                     break;
 
                 case Action.inc:
-                    app.model.count = app.model.count + action.data;
+                    app.state.count = app.state.count + action.data;
                     app.update();
                     // async action call
                     setTimeout(() => app.dispatch(Action.dec, 1), 1e3);
                     break;
 
                 case Action.dec:
-                    app.model.count = app.model.count - action.data;
+                    app.state.count = app.state.count - action.data;
                     app.update();
                     break;
 
                 case Action.clear:
-                    app.model.title = "";
+                    app.state.title = "";
                     app.update();
                     break;
 
@@ -129,7 +129,7 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
 
         // HApp.debug = true;
 
-        new HApp(model, view, dispatcher).mount(document.getElementById("app"));
+        new HApp(state, view, dispatcher).mount(document.getElementById("app"));
 
     </script>
 </body>

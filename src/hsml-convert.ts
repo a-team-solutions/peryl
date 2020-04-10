@@ -6,7 +6,7 @@ export function dom2hsmlStr(node: Node, depth = 0): string {
     let out = "";
     if (node.nodeType === Node.TEXT_NODE) {
         const t = node?.textContent?.trim();
-        out += `${indent(depth)}"${t}"`;
+        out += `${indent(depth)}${JSON.stringify(t)}`;
         return out;
     }
     if (node.nodeType === Node.ELEMENT_NODE) {
@@ -67,6 +67,16 @@ export function dom2hsmlStr(node: Node, depth = 0): string {
             out += `\n${indent(depth + 1)}]`;
         }
         out += `\n${indent(depth)}]`;
+    }
+    if (!depth) {
+        // condense
+        out = out.replace(/\[\s+\"\"\s+\]$/mg, "[]");
+        out = out.replace(/\[\s+\"\",?$/mg, "[");
+        out = out.replace(/,\s+\"\"(,?)$/mg, "$1");
+        out = out.replace(/,\s+\[\](\s+],?)$/mg, "$1");
+        out = out.replace(/(},\s+)\[\s+(\".+\")\s+\](,?)$/mg, "$1$2$3");
+        out = out.replace(/(\[\"[a-zA-Z0-9_\#\.-]+\",)\s+\[\s+(\".+\")\s+\]\s+(\],?)$/mg, "$1 $2$3");
+        out = out.replace(/(\[\"[a-zA-Z0-9_\#\.-]+\")\s+(\],?)$/mg, "$1$2");
     }
     return out;
 }
@@ -224,4 +234,17 @@ export function html2hsml(html: string): HElement {
         .getElementsByTagName("body")[0]
         .firstChild;
     return node && dom2hsml(node);
+}
+
+export function hsml2str(hsml: HElement, condense = true): HElement {
+    let str = JSON.stringify(hsml, undefined, 4);
+    if (condense) {
+        str = str.replace(/(\[)\s+(\"[a-zA-Z0-9_\#\.-]+\")\s+(\],?)$/mg, "$1$2$3");
+        str = str.replace(/(\[)\s+(\"[a-zA-Z0-9_\#\.-]+\",\s+(\[|{),?)$/mg, "$1$2");
+        str = str.replace(/(\[)\s+(\"[a-zA-Z0-9_\#\.-]+\",)\s+(\[\s*\".+\"\s*\])\s+(\],?)$/mg, "$1$2 $3$4");
+        str = str.replace(/(\[\"[a-zA-Z0-9_\#\.-]+\",\s+)({\s+(.*)\s+})(,?)$/mg,
+            (a, b, c, d, e) => b + attrsFormat(JSON.parse(c)) + e);
+        str = str.replace(/(},\s+)\[\s+(\".+\")\s+\](,?)$/mg, "$1$2$3");
+    }
+    return str;
 }
