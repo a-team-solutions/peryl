@@ -118,7 +118,7 @@ export type HElement =
 
 export interface HHandlerCtx extends HObj {
     refs: { [name: string]: Element };
-    onHsml(action: HAttrOnAction, data: HAttrOnData, e: Event): void;
+    actionCb(action: HAttrOnAction, data: HAttrOnData, e: Event): void;
 }
 
 export interface HHandler<C extends HHandlerCtx> {

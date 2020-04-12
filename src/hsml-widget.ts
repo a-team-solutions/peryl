@@ -60,7 +60,7 @@ export abstract class HWidget implements HObj, HHandlerCtx, IHWidget {
         this.actions(action, data);
     }
 
-    onHsml(action: string, data: HAttrOnData, e: Event) {
+    actionCb(action: string, data: HAttrOnData, e: Event) {
         data = (data && data.constructor === Function)
             ? (data as HAttrOnDataFnc)(e)
             : data === undefined ? e : data;

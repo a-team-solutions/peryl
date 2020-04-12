@@ -92,7 +92,7 @@ export class HApp<State> implements HHandlerCtx {
         }
     }
 
-    onHsml = (action: string, data: HAttrOnData, event: Event): void => {
+    actionCb = (action: string, data: HAttrOnData, event: Event): void => {
         data = (data && data.constructor === Function)
             ? (data as HAttrOnDataFnc)(event)
             : data;

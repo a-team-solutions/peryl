@@ -121,9 +121,9 @@ class HsmlIDomHandler implements HHandler<HHandlerCtx> {
                                 props.push("on" + attrOn[0], attrOn[1]);
                             } else {
                                 props.push("on" + attrOn[0], (e: Event) => {
-                                    ctx && ctx.onHsml &&
-                                    typeof ctx.onHsml === "function" &&
-                                    ctx.onHsml(attrOn[1] as HAttrOnAction,
+                                    ctx && ctx.actionCb &&
+                                    typeof ctx.actionCb === "function" &&
+                                    ctx.actionCb(attrOn[1] as HAttrOnAction,
                                             attrOn[2] as HAttrOnData,
                                             e);
                                 });
@@ -135,9 +135,9 @@ class HsmlIDomHandler implements HHandler<HHandlerCtx> {
                                         props.push("on" + attr[0], attr[1]);
                                     } else {
                                         props.push("on" + attr[0], (e: Event) => {
-                                            ctx && ctx.onHsml &&
-                                            typeof ctx.onHsml === "function" &&
-                                            ctx.onHsml(attr[1] as HAttrOnAction,
+                                            ctx && ctx.actionCb &&
+                                            typeof ctx.actionCb === "function" &&
+                                            ctx.actionCb(attr[1] as HAttrOnAction,
                                                     attr[2] as HAttrOnData,
                                                     e);
                                         });

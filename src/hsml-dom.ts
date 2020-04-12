@@ -84,9 +84,9 @@ class HsmlDomHandler implements HHandler<HHandlerCtx> {
                                 e.addEventListener(attrOn[0] as string, attrOn[1] as (e: Event) => void);
                             } else {
                                 e.addEventListener(attrOn[0] as string, (e: Event) => {
-                                    ctx && ctx.onHsml &&
-                                    typeof ctx.onHsml === "function" &&
-                                    ctx.onHsml(attrOn[1] as HAttrOnAction,
+                                    ctx && ctx.actionCb &&
+                                    typeof ctx.actionCb === "function" &&
+                                    ctx.actionCb(attrOn[1] as HAttrOnAction,
                                             attrOn[2] as HAttrOnData,
                                             e);
                                 });
@@ -98,9 +98,9 @@ class HsmlDomHandler implements HHandler<HHandlerCtx> {
                                         e.addEventListener(attrOn[0] as string, attrOn[1] as (e: Event) => void);
                                     } else {
                                         e.addEventListener(attrOn[0] as string, (e: Event) => {
-                                            ctx && ctx.onHsml &&
-                                            typeof ctx.onHsml === "function" &&
-                                            ctx.onHsml(attrOn[1] as HAttrOnAction,
+                                            ctx && ctx.actionCb &&
+                                            typeof ctx.actionCb === "function" &&
+                                            ctx.actionCb(attrOn[1] as HAttrOnAction,
                                                     attrOn[2] as HAttrOnData,
                                                     e);
                                         });
