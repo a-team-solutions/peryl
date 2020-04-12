@@ -31,6 +31,18 @@ describe("hypescript", () => {
         .toEqual(
             ["div.app", { title: "z" }]
         );
+        expect(
+            h("div.app", { title: "foo" }, "bar")
+        )
+        .toEqual(
+            ["div.app", { title: "foo" }, ["bar"]]
+        );
+        expect(
+            h("div.app", { title: "foo" }, 1)
+        )
+        .toEqual(
+            ["div.app", { title: "foo" }, [1]]
+        );
     });
 
     it("nested elements", () => {
@@ -38,13 +50,19 @@ describe("hypescript", () => {
             h("ul", [
                 h("li", "1. line"),
                 h("li", "2. line"),
-                h("li", "3. line")
+                h("li", "3. line"),
+                h("li", 1),
+                h("li", 2),
+                h("li", 3)
             ])
         )
         .toEqual(["ul", [
             ["li", ["1. line"]],
             ["li", ["2. line"]],
-            ["li", ["3. line"]]
+            ["li", ["3. line"]],
+            ["li", [1]],
+            ["li", [2]],
+            ["li", [3]]
         ]]);
     });
 
@@ -93,7 +111,10 @@ describe("hypescript", () => {
                 h("ul", [
                     h("li", "1. line"),
                     h("li", "2. line"),
-                    h("li", "3. line")
+                    h("li", "3. line"),
+                    h("li", 1),
+                    h("li", 2),
+                    h("li", 3)
                 ])
             ])
         )
@@ -103,7 +124,10 @@ describe("hypescript", () => {
                 ["ul", [
                     ["li", ["1. line"]],
                     ["li", ["2. line"]],
-                    ["li", ["3. line"]]
+                    ["li", ["3. line"]],
+                    ["li", [1]],
+                    ["li", [2]],
+                    ["li", [3]]
                 ]]
             ]]
         );
