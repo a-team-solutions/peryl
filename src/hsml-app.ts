@@ -18,13 +18,7 @@ export type HDispatch = (type: HAction["type"],
 
 export type HUpdate = () => void;
 
-export interface HContext<State> {
-    state: State;
-    update: HUpdate;
-    dispatch: HDispatch;
-}
-
-export type HDispatcher<State> = (ctx: HContext<State>, action: HAction) => void;
+export type HDispatcher<State> = (app: HApp<State>, action: HAction) => void;
 
 // export type Class<T = object> = new (...args: any[]) => T;
 
@@ -55,7 +49,7 @@ const unschedule = window.cancelAnimationFrame ||
     // (window as any).msCancelAnimationFrame ||
     function (handle: number) { window.clearTimeout(handle); };
 
-export class HApp<State> implements HContext<State>, HHandlerCtx {
+export class HApp<State> implements HHandlerCtx {
 
     static debug = false;
 
@@ -68,7 +62,7 @@ export class HApp<State> implements HContext<State>, HHandlerCtx {
 
     private _updateSched?: number;
 
-    private _onUpdate?: (ctx: HContext<State>) => void;
+    private _onUpdate?: (app: HApp<State>) => void;
 
     constructor(state: State, view: HView<State>, dispatcher?: HDispatcher<State>) {
         this.state = state;
@@ -80,6 +74,10 @@ export class HApp<State> implements HContext<State>, HHandlerCtx {
     dispatch: HDispatch = (type: string, data?: any, event?: Event): void => {
         HApp.debug && log("HApp action", { type, data, event });
         this.dispatcher(this, { type, data, event });
+    }
+
+    callDispatcher = <SubState>(dispatcher: HDispatcher<SubState>, state: SubState, action: HAction): void => {
+        dispatcher({ ...this, state } as any, action);
     }
 
     render = (): HElements => {
@@ -117,6 +115,7 @@ export class HApp<State> implements HContext<State>, HHandlerCtx {
             (el as any).app = this;
             const hsmls = (this as any).render();
             updateDom(el, hsmls, this);
+            this._onUpdate && this._onUpdate(this);
             this.dispatch(HAppAction._mount, this.dom);
         }
         return this;
@@ -148,15 +147,16 @@ export class HApp<State> implements HContext<State>, HHandlerCtx {
                 if (this.dom) {
                     updateDom(this.dom, this.render(), this);
                 }
-                this._onUpdate && this._onUpdate(this);
                 this._updateSched = undefined;
+                this._onUpdate && this._onUpdate(this);
             });
         }
         return this;
     }
 
-    onUpdate(cb: (ctx: HContext<State>) => void) {
+    onUpdate = (cb: (app: HApp<State>) => void): this => {
         this._onUpdate = cb;
+        return this;
     }
 
     toHsml = (): HElement => {

@@ -22,16 +22,16 @@ const counterView: HView1<CounterState> = (state: CounterState): HElement => {
     ]];
 };
 
-const counterDispatcher: HDispatcher<CounterState> = (ctx, action) => {
+const counterDispatcher: HDispatcher<CounterState> = (app, action) => {
     switch (action.type) {
         case CounterAction.inc:
-            ctx.state.count = ctx.state.count + action.data as number;
-            ctx.update();
-            setTimeout(() => ctx.dispatch(CounterAction.dec, 1), 1e3); // async call
+            app.state.count = app.state.count + action.data as number;
+            app.update();
+            setTimeout(() => app.dispatch(CounterAction.dec, 1), 1e3); // async call
             break;
         case CounterAction.dec:
-            ctx.state.count = ctx.state.count - action.data as number;
-            ctx.update();
+            app.state.count = app.state.count - action.data as number;
+            app.update();
             break;
     }
 };
@@ -151,31 +151,31 @@ const view: HView<State> = (state: State): HElements => [
     ["input", { type: "button", value: "x", disabled: state.x }]
 ];
 
-const dispatcher: HDispatcher<State> = ({ state, update, dispatch }, action): void => {
+const dispatcher: HDispatcher<State> = (app, action): void => {
     console.log("action:", action);
-    counterDispatcher({ state: state.counter, update, dispatch }, action);
+    app.callDispatcher<CounterState>(counterDispatcher, state.counter, action);
     switch (action.type) {
         case HAppAction._init:
         case HAppAction._mount:
         case HAppAction._umount:
             break;
         case Action.title:
-            state.title = action.data;
-            update();
+            app.state.title = action.data;
+            app.update();
             break;
         case Action.clear:
-            state.title = "";
-            update();
+            app.state.title = "";
+            app.update();
             break;
         case Action.formSubmit:
         case Action.formChange:
             break;
         case "x":
             console.log("data.x", typeof action.data.x, action.data.x);
-            state.x = new Boolean(action.data.x === "true");
-            // app.state.x = data.x === "true";
-            // app.state.x = data.x;
-            update();
+            app.state.x = new Boolean(action.data.x === "true");
+            // app.app.state.x = data.x === "true";
+            // app.app.state.x = data.x;
+            app.update();
             break;
         // default:
         //     console.warn("action unhandled:", action);
@@ -185,11 +185,12 @@ const dispatcher: HDispatcher<State> = ({ state, update, dispatch }, action): vo
 // HApp.debug = true;
 
 const app = new HApp(state, view, dispatcher)
+    .onUpdate(a => console.log("state:", JSON.stringify(a.state, null, 4)))
     .mount(document.getElementById("app"));
 
 // // Controller Dispatcher Demo
 
-// type HController<State> = (this: HContext<State>,
+// type HController<State> = (this: HApp<State>,
 //                            data?: HAction["data"],
 //                            event?: HAction["event"]) => void;
 
@@ -199,7 +200,7 @@ const app = new HApp(state, view, dispatcher)
 //     <State, Action>(controllers: HControllers<State, Action>): HDispatcher<State> =>
 //         (ctx, action): void => {
 //             if (controllers[action.type]) {
-//                 controllers[action.type].apply<HContext<State>>(ctx, action.data, action.event);
+//                 controllers[action.type].apply<HApp<State>>(ctx, action.data, action.event);
 //                 ctx.update();
 //             } else {
 //                 console.warn("no controller for action", action);
