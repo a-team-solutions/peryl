@@ -19,7 +19,7 @@ do
         echo -e "<a href=\"$d\">$d</a><br/>" >> index.html;
     done
 
-    echo -e "</p>\n</body>\n</html>" >> indsex.html;
+    echo -e "</p>\n</body>\n</html>" >> index.html;
 
     cd - || exit 3
 done
