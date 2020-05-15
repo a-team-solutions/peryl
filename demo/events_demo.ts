@@ -1,39 +1,40 @@
 import { Events } from "../src/events";
 
-const e = new Events<string>("ctx");
+type Evts = {
+    s: string;
+    s1: string;
+    s2: string;
+    s3: string;
+    sx1: string;
+    sx2: string;
+    n: number;
+    o: { x: string };
+};
+
+const e = new Events<Evts, string>("ctx");
 
 e.any((data, e, ctx) => console.log("any:", data, e, ctx));
 
-e.emit("e", "data-eee1");
-e.on("e", (data, ctx, e) => console.log(data, ctx, e));
-e.emit("e", "data-eee2");
-e.off("e");
-e.emit("e", "data-eee3");
+e.emit("s", "data-eee1");
+e.emit("s", "data-eee1");
+e.on("s", (data, e, ctx) => console.log(data, ctx, e));
+e.emit("s", "data-eee2");
+e.off("s");
+e.emit("s", "data-eee3");
 
 e.off();
 
-e.emit("e", "data-not-emitted");
+e.emit("s", "data-not-emitted");
 
 
-e.emit("o", "data-ooo1");
+e.emit("o", { x: "obj-1" });
 e.once("o", (data, ctx, e) => console.log(data, ctx, e));
-e.emit("o", "data-ooo2");
-e.emit("o", "data-ooo3");
+e.emit("o", { x: "obj-2" });
+e.emit("o", { x: "obj-3" });
 
-e.on(["e1", "data-e3"], (data, ctx, e) => console.log(data, ctx, e));
-e.emit("e1", "data-all-e1");
-e.emit("e2", "data-all-e2");
-e.emit("e3", "data-all-e3");
+e.emit("s1", "data-all-s1");
+e.emit("s2", "data-all-s2");
+e.emit("s3", "data-all-s3");
 
-e.many(
-    {
-        ex1 : (data, e, ctx) => console.log("ex1-1:", data, e, ctx),
-        ex2 : (data, e, ctx) => console.log("ex2-1:", data, e, ctx)
-    },
-    {
-        ex1 : (data, e, ctx) => console.log("ex1-1:", data, e, ctx),
-        ex2 : (data, e, ctx) => console.log("ex2-2:", data, e, ctx)
-    }
-);
-e.emit("ex1", "data-ex1");
-e.emit("ex2", "data-ex2");
+e.emit("sx1", "data-ex1");
+e.emit("sx2", "data-ex2");

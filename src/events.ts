@@ -1,19 +1,19 @@
-export type Callback<C> = (data: any, e: string, ctx?: C) => void;
+export type Callback<Ctx, E, Data> = (data: Data, e: E, ctx?: Ctx) => void;
 
-export class Events<C = any> {
+export class Events<Evt extends { [e: string]: any } = any, Ctx = undefined> {
 
-    private _ctx?: C;
-    private _cb: Array<Callback<C>> = [];
-    private _cbs: { [e: string]: Array<Callback<C>> } = {};
+    private _ctx?: Ctx;
+    private _cb: Array<Function> = [];
+    private _cbs: { [e: string]: Array<Function> } = {};
 
-    constructor(ctx?: C) {
+    constructor(ctx?: Ctx) {
         ctx && (this._ctx = ctx);
     }
 
-    emit(e: string, data?: any): this {
+    emit<E extends keyof Evt>(e: E, data?: Evt[E]): this {
         if (e in this._cbs) {
-            for (let i = 0, l = this._cbs[e].length; i < l; i++) {
-                this._cbs[e][i](data, e, this._ctx);
+            for (let i = 0, l = this._cbs[e as string].length; i < l; i++) {
+                this._cbs[e as string][i](data, e, this._ctx);
             }
         }
         for (let i = 0, l = this._cb.length; i < l; i++) {
@@ -22,41 +22,33 @@ export class Events<C = any> {
         return this;
     }
 
-    on(ev: string | string[], cb: Callback<C>): this {
-        if (ev.constructor === String) {
-            const e = ev as string;
-            if (!(e in this._cbs)) {
-                this._cbs[e] = [];
-            }
-            if (this._cbs[e].indexOf(cb) === -1) {
-                this._cbs[e].push(cb);
-            }
-        } else {
-            (ev as string[]).forEach(e => this.on(e, cb));
+    on<E extends keyof Evt>(ev: E, cb: Callback<Ctx, E, Evt[E]>): this {
+        const e = ev as string;
+        if (!(e in this._cbs)) {
+            this._cbs[e] = [];
+        }
+        if (this._cbs[e].indexOf(cb) === -1) {
+            this._cbs[e].push(cb);
         }
         return this;
     }
 
-    any(cb: Callback<C>): this {
+    any<E extends keyof Evt>(cb: Callback<Ctx, E, Evt[E]>): this {
         this._cb.push(cb);
         return this;
     }
 
-    once(ev: string | string[], cb: Callback<C>): this {
-        if (ev.constructor === String) {
-            const e = ev as string;
-            const wrap = (d: any, evt: string, c?: C) => {
-                this.off(e, wrap);
-                cb(d, evt, c);
-            };
-            this.on(ev, wrap);
-        } else {
-            (ev as string[]).forEach(e => this.once(e, cb));
-        }
+    once<E extends keyof Evt>(ev: E, cb: Callback<Ctx, E, Evt[E]>): this {
+        const e = ev;
+        const wrap = (d: Evt[E], evt: E, c?: Ctx) => {
+            this.off(e, wrap);
+            cb(d, evt, c);
+        };
+        this.on(ev, wrap);
         return this;
     }
 
-    off(e?: string, cb?: Callback<C>): this {
+    off<E extends keyof Evt>(e?: E, cb?: Callback<Ctx, E, Evt[E]>): this {
         if (e === undefined) {
             if (cb) {
                 this._cb = this._cb.filter(c => c !== cb);
@@ -66,19 +58,12 @@ export class Events<C = any> {
         }
         if (e && e in this._cbs) {
             if (cb) {
-                this._cbs[e].splice(this._cbs[e].indexOf(cb), 1);
+                this._cbs[e as string].splice(this._cbs[e as string].indexOf(cb), 1);
             } else {
-                this._cbs[e].length = 0;
-                delete this._cbs[e];
+                this._cbs[e as string].length = 0;
+                delete this._cbs[e as string];
             }
         }
-        return this;
-    }
-
-    many(...cbs: { [e: string]: Callback<C> }[]): this {
-        cbs.forEach(cb =>
-            Object.keys(cb).forEach(e =>
-                this.on(e, cb[e])));
         return this;
     }
 
@@ -87,40 +72,41 @@ export class Events<C = any> {
 
 // Test
 
-// const e = new Events<string>("ctx");
+// type Evts = {
+//     s: string;
+//     s1: string;
+//     s2: string;
+//     s3: string;
+//     sx1: string;
+//     sx2: string;
+//     n: number;
+//     o: { x: string };
+// };
+
+// const e = new Events<Evts, string>("ctx");
 
 // e.any((data, e, ctx) => console.log("any:", data, e, ctx));
 
-// e.emit("e", "data-eee1");
-// e.on("e", (data, ctx, e) => console.log(data, ctx, e));
-// e.emit("e", "data-eee2");
-// e.off("e");
-// e.emit("e", "data-eee3");
+// e.emit("s", "data-eee1");
+// e.emit("s", "data-eee1");
+// e.on("s", (data, e, ctx) => console.log(data, ctx, e));
+// e.emit("s", "data-eee2");
+// e.off("s");
+// e.emit("s", "data-eee3");
 
 // e.off();
 
-// e.emit("e", "data-not-emitted");
+// e.emit("s", "data-not-emitted");
 
 
-// e.emit("o", "data-ooo1");
+// e.emit("o", { x: "obj-1" });
 // e.once("o", (data, ctx, e) => console.log(data, ctx, e));
-// e.emit("o", "data-ooo2");
-// e.emit("o", "data-ooo3");
+// e.emit("o", { x: "obj-2" });
+// e.emit("o", { x: "obj-3" });
 
-// e.on(["e1", "data-e3"], (data, ctx, e) => console.log(data, ctx, e));
-// e.emit("e1", "data-all-e1");
-// e.emit("e2", "data-all-e2");
-// e.emit("e3", "data-all-e3");
+// e.emit("s1", "data-all-s1");
+// e.emit("s2", "data-all-s2");
+// e.emit("s3", "data-all-s3");
 
-// e.many(
-//     {
-//         ex1 : (data, e, ctx) => console.log("ex1-1:", data, e, ctx),
-//         ex2 : (data, e, ctx) => console.log("ex2-1:", data, e, ctx)
-//     },
-//     {
-//         ex1 : (data, e, ctx) => console.log("ex1-1:", data, e, ctx),
-//         ex2 : (data, e, ctx) => console.log("ex2-2:", data, e, ctx)
-//     }
-// );
-// e.emit("ex1", "data-ex1");
-// e.emit("ex2", "data-ex2");
+// e.emit("sx1", "data-ex1");
+// e.emit("sx2", "data-ex2");
