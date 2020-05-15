@@ -1,9 +1,11 @@
+import { Events } from "./events";
+
 export class Settings<T extends { [key: string]: any }> {
 
     readonly name: string;
     readonly props: T;
 
-    private _onChange?: (props: Partial<T>) => void;
+    readonly events = new Events<T & { "": Partial<T> }, Settings<T>>();
 
     constructor(props: T, name: string = "settings") {
         this.props = props;
@@ -16,24 +18,19 @@ export class Settings<T extends { [key: string]: any }> {
 
     setProps(props: Partial<T>): this {
         Object.keys(props).forEach(p => ((this.props as any)[p] = props[p]));
-        this._onChange && this._onChange(props);
+        this.events.emit("", props);
         return this;
     }
 
-    getProp<P extends T, K extends keyof P>(key: K): P[K] {
-        return (this.props as P)[key];
+    getProp<K extends keyof T>(key: K): T[K] {
+        return (this.props)[key];
     }
 
-    setProp<P extends T, K extends keyof P>(key: K, value: P[K]): this {
-        (this.props as any)[key] = value;
-        const props = {} as Partial<P>;
+    setProp<K extends keyof T>(key: K, value: T[K]): this {
+        (this.props)[key] = value;
+        const props: Partial<T> = {};
         props[key] = value;
-        this._onChange && this._onChange(props);
-        return this;
-    }
-
-    onChange(callback: (props: Partial<T>) => void): this {
-        this._onChange = callback;
+        this.events.emit(key as string, value);
         return this;
     }
 
@@ -44,8 +41,10 @@ export class Settings<T extends { [key: string]: any }> {
 // const x = { n: 2, s: "s" };
 // const s = new Settings<typeof x>(x);
 
+// s.setProps({ n: 3 });
+
 // console.log(typeof s.getProp("n")); // number
 // console.log(typeof s.getProp("s")); // string
 
 // s.setProps(JSON.parse(window.localStorage[s.name]));
-// s.onChange(() => (window.localStorage[s.name] = JSON.stringify(s.props)));
+// s.events.any(data => (window.localStorage[s.name] = JSON.stringify(s.props)));
