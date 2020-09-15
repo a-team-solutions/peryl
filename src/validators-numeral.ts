@@ -53,36 +53,40 @@ export class NumeralValidator
                 };
             }
         }
-        numeral.locale(opts.locale || localeDefault);
-        const n = numeral(str);
-        let err: boolean = false;
-        if (n.value() === null) {
-            err = true;
-        }
-        if ("strict" in opts) {
-            if (opts.strict && (str !== this.objToStr(n).str)) {
+        if (str) {
+            numeral.locale(opts.locale || localeDefault);
+            const n = numeral(str);
+            let err: boolean = false;
+            if (n.value() === null) {
                 err = true;
             }
+            if ("strict" in opts) {
+                if (opts.strict && (str !== this.objToStr(n).str)) {
+                    err = true;
+                }
+            }
+            if (err) {
+                const num = (n.value() !== null) ? n : numeral(1234.45);
+                return {
+                    obj: (n.value() !== null) ? n : undefined,
+                    err: msgs.invalid_format
+                        ? tpl(msgs.invalid_format,
+                            {
+                                num: this.objToStr(num).str || "",
+                                locale: ("locale" in opts)
+                                    ? opts.locale!
+                                    : localeDefault,
+                                format: ("format" in opts)
+                                    ? opts.format!
+                                    : numFormatDefault
+                            })
+                        : invalidFormatMsg
+                };
+            }
+            return { obj: n };
+        } else {
+            return { obj: undefined };
         }
-        if (err) {
-            const num = (n.value() !== null) ? n : numeral(1234.45);
-            return {
-                obj: (n.value() !== null) ? n : undefined,
-                err: msgs.invalid_format
-                    ? tpl(msgs.invalid_format,
-                        {
-                            num: this.objToStr(num).str || "",
-                            locale: ("locale" in opts)
-                                ? opts.locale!
-                                : localeDefault,
-                            format: ("format" in opts)
-                                ? opts.format!
-                                : numFormatDefault
-                        })
-                    : invalidFormatMsg
-            };
-        }
-        return { obj: n };
     }
 
     protected objCheck(obj: Numeral): string {

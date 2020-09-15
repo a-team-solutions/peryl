@@ -54,36 +54,40 @@ export class MomentValidator
                 };
             }
         }
-        const d = moment(str,
-            opts.format || dateFormatFefault,
-            opts.locale || localeDefault,
-            opts.strict || false);
-        let err: boolean = false;
-        if (!d.isValid()) {
-            err = true;
+        if (str) {
+            const d = moment(str,
+                opts.format || dateFormatFefault,
+                opts.locale || localeDefault,
+                opts.strict || false);
+            let err: boolean = false;
+            if (!d.isValid()) {
+                err = true;
+            }
+            if (opts.strict && (str !== this.objToStr(d).str)) {
+                err = true;
+            }
+            if (err) {
+                const date = d.isValid() ? d : moment(new Date());
+                return {
+                    obj: d.isValid() ? d : undefined,
+                    err: msgs.invalid_format
+                        ? tpl(msgs.invalid_format,
+                            {
+                                date: this.objToStr(date).str || "",
+                                locale: ("locale" in opts)
+                                    ? opts.locale!
+                                    : localeDefault,
+                                format: ("format" in opts)
+                                    ? opts.format!
+                                    : numFormatDefault
+                            })
+                        : invalidFormatMsg
+                };
+            }
+            return { obj: d };
+        } else {
+            return { obj: undefined };
         }
-        if (opts.strict && (str !== this.objToStr(d).str)) {
-            err = true;
-        }
-        if (err) {
-            const date = d.isValid() ? d : moment(new Date());
-            return {
-                obj: d.isValid() ? d : undefined,
-                err: msgs.invalid_format
-                    ? tpl(msgs.invalid_format,
-                        {
-                            date: this.objToStr(date).str || "",
-                            locale: ("locale" in opts)
-                                ? opts.locale!
-                                : localeDefault,
-                            format: ("format" in opts)
-                                ? opts.format!
-                                : numFormatDefault
-                        })
-                    : invalidFormatMsg
-            };
-        }
-        return { obj: d };
     }
 
     protected objCheck(obj: Moment): string {

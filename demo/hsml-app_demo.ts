@@ -194,21 +194,21 @@ const app = new HApp(state, view, dispatcher)
 //                            data?: HAction["data"],
 //                            event?: HAction["event"]) => void;
 
-// type HControllers<State, Actions> = { [key in keyof Actions]?: HController<State> };
+// type HControllers<State, Actions> = { [actionType in keyof Actions]?: HController<State> };
 
 // const controllersDdispatcher =
 //     <State, Action>(controllers: HControllers<State, Action>): HDispatcher<State> =>
-//         (ctx, action): void => {
+//         (app, action): void => {
 //             if (controllers[action.type]) {
-//                 controllers[action.type].apply<HApp<State>>(ctx, action.data, action.event);
-//                 ctx.update();
+//                 controllers[action.type].apply<HApp<State>>(app, action.data, action.event);
+//                 app.update();
 //             } else {
 //                 console.warn("no controller for action", action);
 //             }
 //         };
 
 
-// const controllers: HControllers<State, { [key in keyof typeof Action | HAppAction]: string }> = {
+// const controllers: HControllers<State, { [actionType in keyof typeof Action | HAppAction]: string }> = {
 //     _init: () => {
 //     },
 //     _mount: () => {

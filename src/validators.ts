@@ -218,6 +218,7 @@ export class StringValidator
 }
 
 export const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+export const phoneRgex = /"^\\+[0-9]*$"/;
 
 export interface NumberValidatorOpts {
     required?: boolean;
@@ -254,24 +255,28 @@ export class NumberValidator
                 };
             }
         }
-        const n = Number(str);
-        let err: boolean = false;
-        if (str !== this.objToStr(n).str) {
-            err = true;
+        if (str) {
+            const n = Number(str);
+            let err: boolean = false;
+            if (str !== this.objToStr(n).str) {
+                err = true;
+            }
+            if (err) {
+                const num = isNaN(n) ? 1234.45 : n;
+                return {
+                    obj: isNaN(n) ? undefined : n,
+                    err: msgs.invalid_format
+                        ? tpl(msgs.invalid_format,
+                            {
+                                num: this.objToStr(num).str || ""
+                            })
+                        : invalidFormatMsg
+                };
+            }
+            return { obj: n };
+        } else {
+            return { obj: undefined };
         }
-        if (err) {
-            const num = isNaN(n) ? 1234.45 : n;
-            return {
-                obj: isNaN(n) ? undefined : n,
-                err: msgs.invalid_format
-                    ? tpl(msgs.invalid_format,
-                        {
-                            num: this.objToStr(num).str || ""
-                        })
-                    : invalidFormatMsg
-            };
-        }
-        return { obj: n };
     }
 
     protected objCheck(obj: number): string {
@@ -663,17 +668,19 @@ export class ObjectValidator<T = any> {
 
 // console.log();
 
-// const nv = new NumberValidator(
-//     {
-//         required: true,
-//         min: 3,
-//         max: 5000
-//     },
-//     {
-//         required: "required {{min}} {{max}} {{locale}} {{format}}",
-//         invalid_format: "invalid_format {{num}} {{locale}} {{format}}",
-//         not_in_range: "not_in_range {{min}} {{max}}"
-//     });
+const nv = new NumberValidator(
+    {
+        required: false,
+        min: 3,
+        max: 5000
+    },
+    {
+        required: "required {{min}} {{max}} {{locale}} {{format}}",
+        invalid_format: "invalid_format {{num}} {{locale}} {{format}}",
+        not_in_range: "not_in_range {{min}} {{max}}"
+    });
+
+console.log(nv.validate("555"));
 
 // // const dv = new DateValidator(
 // //     {
