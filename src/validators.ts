@@ -668,19 +668,19 @@ export class ObjectValidator<T = any> {
 
 // console.log();
 
-const nv = new NumberValidator(
-    {
-        required: false,
-        min: 3,
-        max: 5000
-    },
-    {
-        required: "required {{min}} {{max}} {{locale}} {{format}}",
-        invalid_format: "invalid_format {{num}} {{locale}} {{format}}",
-        not_in_range: "not_in_range {{min}} {{max}}"
-    });
+// const nv = new NumberValidator(
+//     {
+//         required: false,
+//         min: 3,
+//         max: 5000
+//     },
+//     {
+//         required: "required {{min}} {{max}} {{locale}} {{format}}",
+//         invalid_format: "invalid_format {{num}} {{locale}} {{format}}",
+//         not_in_range: "not_in_range {{min}} {{max}}"
+//     });
 
-console.log(nv.validate("555"));
+// console.log(nv.validate("555"));
 
 // // const dv = new DateValidator(
 // //     {
