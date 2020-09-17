@@ -224,6 +224,7 @@ export interface NumberValidatorOpts {
     required?: boolean;
     min?: number;
     max?: number;
+    strict?: boolean;
 }
 
 export interface NumberValidatorMsgs {
@@ -258,7 +259,10 @@ export class NumberValidator
         if (str) {
             const n = Number(str);
             let err: boolean = false;
-            if (str !== this.objToStr(n).str) {
+            if (isNaN(n)) {
+                err = true;
+            }
+            if (opts.strict && (str !== this.objToStr(n).str)) {
                 err = true;
             }
             if (err) {
@@ -309,6 +313,105 @@ export class NumberValidator
                        format?: string): { str?: string, err?: string } {
         return {
             str: obj !== undefined ? ("" + obj) : undefined
+        };
+    }
+
+}
+
+export interface DateValidatorOpts {
+    required?: boolean;
+    min?: Date;
+    max?: Date;
+    strict?: boolean;
+}
+
+export interface DateValidatorMsgs {
+    required?: string;
+    invalid_format?: string;
+    not_in_range?: string;
+}
+
+export class DateValidator
+    extends Validator<Date, DateValidatorOpts, DateValidatorMsgs> {
+
+    constructor(opts?: DateValidatorOpts, msgs?: DateValidatorMsgs) {
+        super(opts, msgs);
+    }
+
+    protected strToObj(str: string): { obj?: Date, err?: string } {
+        const opts = this.opts;
+        const msgs = this.msgs;
+        if ("required" in opts) {
+            if (opts.required && !str) {
+                return {
+                    err: msgs.required
+                        ? tpl(msgs.required,
+                            {
+                                min: ("min" in opts) ? ("" + opts.min) : "",
+                                max: ("max" in opts) ? ("" + opts.max) : ""
+                            })
+                        : requiredMsg
+                };
+            }
+        }
+        if (str) {
+            const dt = Date.parse(str);
+            const d = new Date(dt);
+            let err: boolean = false;
+            if (isNaN(dt)) {
+                err = true;
+            }
+            if (opts.strict && (str !== this.objToStr(d).str)) {
+                err = true;
+            }
+            if (err) {
+                const date = isNaN(dt) ? new Date() : d;
+                return {
+                    obj: isNaN(dt) ? undefined : d,
+                    err: msgs.invalid_format
+                        ? tpl(msgs.invalid_format,
+                            {
+                                date: this.objToStr(date).str || ""
+                            })
+                        : invalidFormatMsg
+                };
+            }
+            return { obj: d };
+        } else {
+            return { obj: undefined };
+        }
+    }
+
+    protected objCheck(obj: Date): string {
+        const opts = this.opts;
+        const msgs = this.msgs;
+        let err: boolean = false;
+        if ("max" in opts) {
+            if (opts.max && obj > opts.max) {
+                err = true;
+            }
+        }
+        if ("min" in opts) {
+            if (opts.min && obj < opts.min) {
+                err = true;
+            }
+        }
+        if (err) {
+            return msgs.not_in_range
+                ? tpl(msgs.not_in_range,
+                    {
+                        min: ("min" in opts && opts.min) ? opts.min.toLocaleString() : "",
+                        max: ("max" in opts && opts.max) ? opts.max.toLocaleString() : ""
+                    })
+                : notInRangeMsg;
+        }
+        return "";
+    }
+
+    protected objToStr(obj: Date,
+                       format?: string): { str?: string, err?: string } {
+        return {
+            str: obj !== undefined ? obj.toLocaleString() : undefined
         };
     }
 
@@ -672,26 +775,43 @@ export class ObjectValidator<T = any> {
 //     {
 //         required: false,
 //         min: 3,
-//         max: 5000
+//         max: 50000
 //     },
 //     {
-//         required: "required {{min}} {{max}} {{locale}} {{format}}",
-//         invalid_format: "invalid_format {{num}} {{locale}} {{format}}",
+//         required: "required {{min}} {{max}}",
+//         invalid_format: "invalid_format {{num}}",
 //         not_in_range: "not_in_range {{min}} {{max}}"
 //     });
 
-// console.log(nv.validate("555"));
+// console.log(nv.validate("12345.6789"));
+// console.log(nv.validate("12345,6789"));
+// console.log(nv.validate("12,345.6789"));
 
-// // const dv = new DateValidator(
-// //     {
-// //         required: true,
-// //         strict: true
-// //     },
-// //     {
-// //         required: "required {{min}} {{max}} {{locale}} {{format}}",
-// //         invalid_format: "invalid_format {{date}} {{locale}}",
-// //         not_in_range: "not_in_range {{min}} {{max}} {{locale}} {{format}}"
-// //     });
+// const dv = new DateValidator(
+//     {
+//         required: false,
+//         // min: new Date(),
+//         max: new Date(),
+//         // strict: true
+//     },
+//     {
+//         required: "required {{min}} {{max}}",
+//         invalid_format: "invalid_format {{date}}",
+//         not_in_range: "not_in_range {{min}} {{max}}"
+//     });
+
+// console.log(dv.format(new Date));
+// console.log(dv.validate("9/17/2020, 10:46:07 AM"));
+// console.log(dv.validate("9/17/2020"));
+// console.log(dv.validate("2020-09-17T08:46:07.000Z"));
+// console.log(dv.validate(""));
+
+// console.log(new Date().toString());
+// console.log(new Date().toDateString());
+// console.log(new Date().toTimeString());
+// console.log(new Date().toLocaleString());
+// console.log(new Date().toLocaleDateString());
+// console.log(new Date().toLocaleTimeString());
 
 // const fvData = { str: "123a", num: "123.45", date: "02.01.2019 12:12" };
 
