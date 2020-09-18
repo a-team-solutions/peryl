@@ -25,20 +25,28 @@ export abstract class Validator<T, O, M> {
     protected abstract objToStr(obj?: T,
                                 format?: string): { str?: string, err?: string };
 
-    validate(value: string | T): { str?: string, obj?: T, err?: string } {
-        if (typeof value === "string") {
-            (this.str as any) = value;
-            const sto = this.strToObj(value);
+    validate(value?: string | T): { str?: string, obj?: T, err?: string } {
+        if (typeof value === "string" || value === undefined) {
+            const v = value as string | undefined;
+            (this.str as any) = v;
+            const sto = this.strToObj(v);
             (this.obj as any) = sto.obj;
             if (sto.err) {
                 (this.err as any) = sto.err;
-                return { str: value, obj: sto.obj, err: sto.err };
+                return {
+                    str: v === undefined ? "" : v,
+                    obj: sto.obj,
+                    err: sto.err };
             }
             const err = this.objCheck(sto.obj);
             (this.err as any) = err;
-            return { str: value, obj: sto.obj, err };
+            return {
+                str: v === undefined ? "" : v,
+                obj: sto.obj,
+                err
+            };
         } else {
-            (this.str as any) = value !== undefined ? ("" + value) : undefined;
+            (this.str as any) = value === undefined ? undefined : ("" + value);
             const err = this.objCheck(value);
             (this.err as any) = err;
             return { str: this.str, obj: value, err };
@@ -362,8 +370,8 @@ export class DateValidator
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
-                                min: ("min" in opts) ? ("" + opts.min) : "",
-                                max: ("max" in opts) ? ("" + opts.max) : ""
+                                min: ("min" in opts && opts.min) ? opts.min.toLocaleString() : "",
+                                max: ("max" in opts && opts.max) ? opts.max.toLocaleString() : ""
                             })
                         : requiredMsg
                 };
@@ -611,7 +619,7 @@ export class FormValidator<T = any> {
         return this;
     }
 
-    validate(data: { [key in keyof T]: string },
+    validate(data: { [key in keyof T]?: string },
              defaults?: { [key in keyof T]: string }): this {
         const d = {
             ...defaults || Object.getOwnPropertyNames(this.validators)
@@ -794,9 +802,9 @@ export class ObjectValidator<T = any> {
 
 // const nv = new NumberValidator(
 //     {
-//         required: false,
+//         required: true,
 //         min: 3,
-//         max: 50000
+//         max: 500000
 //     },
 //     {
 //         required: "required {{min}} {{max}}",
@@ -804,16 +812,19 @@ export class ObjectValidator<T = any> {
 //         not_in_range: "not_in_range {{min}} {{max}}"
 //     });
 
+// console.log(nv.format(undefined));
+// console.log(nv.format(12345.6789));
+
 // console.log(nv.validate("12345.6789"));
 // console.log(nv.validate("12345,6789"));
 // console.log(nv.validate("12,345.6789"));
 
 // const dv = new DateValidator(
 //     {
-//         required: false,
+//         required: true,
 //         // min: new Date(),
 //         max: new Date(),
-//         // strict: true
+//         strict: true
 //     },
 //     {
 //         required: "required {{min}} {{max}}",
@@ -836,15 +847,18 @@ export class ObjectValidator<T = any> {
 // console.log(new Date().toLocaleDateString());
 // console.log(new Date().toLocaleTimeString());
 
-// const fvData = { str: "123a", num: "123.45", date: "02.01.2019 12:12" };
+// // const formData = { str: "123a", num: "123456.789", date: "9/17/2020, 10:46:07 AM" };
+// // const formData = { str: "", num: "", date: "" };
+// const formData = { str: undefined, num: undefined, date: undefined };
 
-// const fv = new FormValidator<typeof fvData>()
+// const fv = new FormValidator<typeof formData>()
 //     .addValidator("str", sv)
 //     .addValidator("num", nv)
-//     // .addValidator("date", dv)
-//     .validate(fvData);
+//     .addValidator("date", dv)
+//     // .validate(formData);
+//     .validate({});
 
-// console.log(fv);
+// console.log(fv.data());
 
 // fv.format(fv.obj!);
 // console.log(fv);
