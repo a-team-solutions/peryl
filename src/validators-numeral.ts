@@ -31,7 +31,7 @@ export class NumeralValidator
         super(opts, msgs);
     }
 
-    protected strToObj(str: string): { obj?: Numeral, err?: string } {
+    protected strToObj(str?: string): { obj?: Numeral, err?: string } {
         const opts = this.opts;
         const msgs = this.msgs;
         if ("required" in opts) {
@@ -89,7 +89,10 @@ export class NumeralValidator
         }
     }
 
-    protected objCheck(obj: Numeral): string {
+    protected objCheck(obj?: Numeral): string {
+        if (obj === undefined) {
+            return "";
+        }
         if (obj.constructor === Number) {
             obj = numeral(obj);
         }
@@ -124,9 +127,9 @@ export class NumeralValidator
         return "";
     }
 
-    protected objToStr(obj: Numeral,
-        format?: string): { str?: string, err?: string } {
-        if (obj.constructor === Number) {
+    protected objToStr(obj?: Numeral,
+                       format?: string): { str?: string, err?: string } {
+        if (obj && obj.constructor === Number) {
             obj = numeral(obj);
         }
         numeral.locale(this.opts.locale || localeDefault);

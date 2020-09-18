@@ -32,7 +32,7 @@ export class MomentValidator
         super(opts, msgs);
     }
 
-    protected strToObj(str: string): { obj?: Moment, err?: string } {
+    protected strToObj(str?: string): { obj?: Moment, err?: string } {
         const opts = this.opts;
         const msgs = this.msgs;
         if ("required" in opts) {
@@ -90,7 +90,10 @@ export class MomentValidator
         }
     }
 
-    protected objCheck(obj: Moment): string {
+    protected objCheck(obj?: Moment): string {
+        if (obj === undefined) {
+            return "";
+        }
         if (obj.constructor === Date) {
             obj = moment(obj);
         }
@@ -125,9 +128,9 @@ export class MomentValidator
         return "";
     }
 
-    protected objToStr(obj: Moment,
-        format?: string): { str?: string, err?: string } {
-        if (obj.constructor === Date) {
+    protected objToStr(obj?: Moment,
+                       format?: string): { str?: string, err?: string } {
+        if (obj && obj.constructor === Date) {
             obj = moment(obj);
         }
         return {
