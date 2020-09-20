@@ -357,7 +357,9 @@ export interface DateValidatorOpts {
     required?: boolean;
     min?: Date;
     max?: Date;
-    strict?: boolean;
+    clearTime?: boolean;
+    // strict?: boolean;
+
 }
 
 export interface DateValidatorMsgs {
@@ -366,11 +368,23 @@ export interface DateValidatorMsgs {
     not_in_range?: string;
 }
 
+const dateToLocaleString = (date: Date) => date.toLocaleString();
+const dateToLocaleDateString = (date: Date) => date.toLocaleDateString();
+
 export class DateValidator
     extends Validator<Date, DateValidatorOpts, DateValidatorMsgs> {
 
+    dateToStr: (date: Date) => string;
+
     constructor(opts?: DateValidatorOpts, msgs?: DateValidatorMsgs) {
         super(opts, msgs);
+        this.dateToStr = opts?.clearTime ? dateToLocaleDateString : dateToLocaleString;
+        if (opts?.clearTime && opts?.min) {
+            opts.min = new Date(opts.min.getFullYear(), opts.min.getMonth(), opts.min.getDate());
+        }
+        if (opts?.clearTime && opts?.max) {
+            opts.max = new Date(opts.max.getFullYear(), opts.max.getMonth(), opts.max.getDate() + 1);
+        }
     }
 
     protected strToObj(str?: string | null): { obj: Date | null, err: string } {
@@ -383,8 +397,8 @@ export class DateValidator
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
-                                min: ("min" in opts && opts.min) ? opts.min.toLocaleString() : "",
-                                max: ("max" in opts && opts.max) ? opts.max.toLocaleString() : ""
+                                min: ("min" in opts && opts.min) ? this.dateToStr(opts.min) : "",
+                                max: ("max" in opts && opts.max) ? this.dateToStr(opts.max) : ""
                             })
                         : requiredMsg
                 };
@@ -392,14 +406,17 @@ export class DateValidator
         }
         if (str) {
             const dt = Date.parse(str);
-            const d = new Date(dt);
+            let d = new Date(dt);
+            if (opts.clearTime) {
+                d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            }
             let err: boolean = false;
             if (isNaN(dt)) {
                 err = true;
             }
-            if (opts.strict && (str !== this.objToStr(d).str)) {
-                err = true;
-            }
+            // if (opts.strict && (str !== this.objToStr(d).str)) {
+            //     err = true;
+            // }
             if (err) {
                 const date = isNaN(dt) ? new Date() : d;
                 return {
@@ -426,7 +443,7 @@ export class DateValidator
         const msgs = this.msgs;
         let err: boolean = false;
         if ("max" in opts) {
-            if (opts.max && obj > opts.max) {
+            if (opts.max && obj.getTime() > opts.max.getTime()) {
                 err = true;
             }
         }
@@ -439,8 +456,8 @@ export class DateValidator
             return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
-                        min: ("min" in opts && opts.min) ? opts.min.toLocaleString() : "",
-                        max: ("max" in opts && opts.max) ? opts.max.toLocaleString() : ""
+                        min: ("min" in opts && opts.min) ? this.dateToStr(opts.min) : "",
+                        max: ("max" in opts && opts.max) ? this.dateToStr(opts.max) : ""
                     })
                 : notInRangeMsg;
         }
@@ -450,7 +467,7 @@ export class DateValidator
     protected objToStr(obj?: Date | null,
                        format?: string): { str: string, err: string } {
         return {
-            str: (obj === undefined || obj === null) ? "" : obj.toLocaleString(),
+            str: (obj === undefined || obj === null) ? "" : this.dateToStr(obj),
             err: ""
         };
     }
@@ -840,7 +857,8 @@ export class ObjectValidator<T = any> {
 //         required: false,
 //         // min: new Date(),
 //         max: new Date(),
-//         strict: true
+//         clearTime: false
+//         // strict: true
 //     },
 //     {
 //         required: "required {{min}} {{max}}",
@@ -848,13 +866,20 @@ export class ObjectValidator<T = any> {
 //         not_in_range: "not_in_range {{min}} {{max}}"
 //     });
 
+// console.log(dv.opts);
+
 // console.log(dv.format(undefined));
 
 // console.log(dv.format(new Date));
+
 // console.log(dv.validate("9/17/2020, 10:46:07 AM"));
+// console.log(dv.format(dv.obj).str);
 // console.log(dv.validate("9/17/2020"));
+// console.log(dv.format(dv.obj).str);
 // console.log(dv.validate("2020-09-17T08:46:07.000Z"));
+// console.log(dv.format(dv.obj).str);
 // console.log(dv.validate(""));
+// console.log(dv.format(dv.obj).str);
 
 // console.log(new Date().toString());
 // console.log(new Date().toDateString());
