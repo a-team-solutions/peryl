@@ -31,12 +31,13 @@ export class NumeralValidator
         super(opts, msgs);
     }
 
-    protected strToObj(str?: string): { obj?: Numeral, err?: string } {
+    protected strToObj(str?: string | null): { obj: Numeral | null, err: string } {
         const opts = this.opts;
         const msgs = this.msgs;
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
+                    obj: null,
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
@@ -68,7 +69,7 @@ export class NumeralValidator
             if (err) {
                 const num = (n.value() !== null) ? n : numeral(1234.45);
                 return {
-                    obj: (n.value() !== null) ? n : undefined,
+                    obj: (n.value() !== null) ? n : null,
                     err: msgs.invalid_format
                         ? tpl(msgs.invalid_format,
                             {
@@ -83,14 +84,14 @@ export class NumeralValidator
                         : invalidFormatMsg
                 };
             }
-            return { obj: n };
+            return { obj: n, err: "" };
         } else {
-            return { obj: undefined };
+            return { obj: null, err: "" };
         }
     }
 
-    protected objCheck(obj?: Numeral): string {
-        if (obj === undefined) {
+    protected objCheck(obj?: Numeral | null): string {
+        if (obj === undefined || obj === null) {
             return "";
         }
         if (obj.constructor === Number) {
@@ -127,18 +128,19 @@ export class NumeralValidator
         return "";
     }
 
-    protected objToStr(obj?: Numeral,
-                       format?: string): { str?: string, err?: string } {
+    protected objToStr(obj?: Numeral | null,
+                       format?: string): { str: string, err: string } {
         if (obj && obj.constructor === Number) {
             obj = numeral(obj);
         }
         numeral.locale(this.opts.locale || localeDefault);
         return {
-            str: obj
-                ? obj.format(format
+            str: (obj === undefined || obj === null)
+                ? ""
+                : obj.format(format
                     ? format
-                    : this.opts.format || numFormatDefault)
-                : undefined
+                    : this.opts.format || numFormatDefault),
+            err: ""
         };
     }
 

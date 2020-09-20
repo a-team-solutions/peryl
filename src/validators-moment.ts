@@ -32,12 +32,13 @@ export class MomentValidator
         super(opts, msgs);
     }
 
-    protected strToObj(str?: string): { obj?: Moment, err?: string } {
+    protected strToObj(str?: string | null): { obj: Moment | null, err: string } {
         const opts = this.opts;
         const msgs = this.msgs;
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
+                    obj: null,
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
@@ -69,7 +70,7 @@ export class MomentValidator
             if (err) {
                 const date = d.isValid() ? d : moment(new Date());
                 return {
-                    obj: d.isValid() ? d : undefined,
+                    obj: d.isValid() ? d : null,
                     err: msgs.invalid_format
                         ? tpl(msgs.invalid_format,
                             {
@@ -84,14 +85,14 @@ export class MomentValidator
                         : invalidFormatMsg
                 };
             }
-            return { obj: d };
+            return { obj: d, err: "" };
         } else {
-            return { obj: undefined };
+            return { obj: null, err: "" };
         }
     }
 
     protected objCheck(obj?: Moment): string {
-        if (obj === undefined) {
+        if (obj === undefined || obj === null) {
             return "";
         }
         if (obj.constructor === Date) {
@@ -128,19 +129,20 @@ export class MomentValidator
         return "";
     }
 
-    protected objToStr(obj?: Moment,
-                       format?: string): { str?: string, err?: string } {
+    protected objToStr(obj?: Moment | null,
+                       format?: string): { str: string, err: string } {
         if (obj && obj.constructor === Date) {
             obj = moment(obj);
         }
         return {
-            str: obj
-                ? obj
+            str: (obj === undefined || obj === null)
+                ? ""
+                : obj
                     .locale(this.opts.locale || localeDefault)
                     .format(format
                         ? format
-                        : this.opts.format || dateFormatFefault)
-                : undefined
+                        : this.opts.format || dateFormatFefault),
+            err: ""
         };
     }
 

@@ -9,55 +9,59 @@ export abstract class Validator<T, O, M> {
     readonly opts: O;
     readonly msgs: M;
 
-    readonly str?: string;
-    readonly err?: string;
-    readonly obj?: T;
+    readonly str: string | null = null;
+    readonly err: string | null = null;
+    readonly obj: T | null = null;
 
     constructor(opts?: O, msgs?: M) {
         this.opts = opts || {} as O;
         this.msgs = msgs || {} as M;
     }
 
-    protected abstract strToObj(str?: string): { obj?: T, err?: string };
+    protected abstract strToObj(str?: string | null): { obj: T | null, err: string };
 
-    protected abstract objCheck(obj?: T): string;
+    protected abstract objCheck(obj?: T | null): string;
 
-    protected abstract objToStr(obj?: T,
-                                format?: string): { str?: string, err?: string };
+    protected abstract objToStr(obj?: T | null,
+                                format?: string): { str: string, err: string };
 
-    validate(value?: string | T): { str?: string, obj?: T, err?: string } {
-        if (typeof value === "string" || value === undefined) {
-            const v = value as string | undefined;
+    validate(value?: string | T): { str?: string | null, obj?: T | null, err: string } {
+        if (typeof value === "string" || value === undefined || value === null) {
+            const v = value as string | null | undefined;
             (this.str as any) = v;
             const sto = this.strToObj(v);
             (this.obj as any) = sto.obj;
             if (sto.err) {
                 (this.err as any) = sto.err;
                 return {
-                    str: v === undefined ? "" : v,
+                    str: (v === undefined || v === null) ? "" : v,
                     obj: sto.obj,
                     err: sto.err };
             }
             const err = this.objCheck(sto.obj);
             (this.err as any) = err;
             return {
-                str: v === undefined ? "" : v,
+                str: (v === undefined || v === null) ? "" : v,
                 obj: sto.obj,
                 err
             };
         } else {
-            (this.str as any) = value === undefined ? undefined : ("" + value);
+            (this.str as any) = (value === undefined || value === null) ? null : ("" + value);
             const err = this.objCheck(value);
             (this.err as any) = err;
-            return { str: this.str, obj: value, err };
+            return {
+                str: this.str,
+                obj: value,
+                err
+            };
         }
     }
 
-    format(obj?: T, format?: string): { str?: string, err?: string } {
+    format(obj?: T | null, format?: string): { str: string, err: string } {
         const err = this.objCheck(obj);
         const ots = this.objToStr(obj, format);
         return {
-            str: ots.str === undefined ? "" : ots.str,
+            str: (ots.str === undefined || ots.str === null) ? "" : ots.str,
             err: ots.err ? ots.err : err };
     }
 
@@ -87,12 +91,13 @@ export class SelectValidator
         super(opts, msgs);
     }
 
-    protected strToObj(str?: string): { obj?: string, err?: string } {
+    protected strToObj(str?: string | null): { obj: string | null, err: string } {
         const opts = this.opts;
         const msgs = this.msgs;
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
+                    obj: null,
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
@@ -104,21 +109,24 @@ export class SelectValidator
                 };
             }
         }
-        return { obj: str };
+        return {
+            obj: str === undefined ? null : str,
+            err: ""
+        };
     }
 
-    protected objCheck(obj?: string): string {
+    protected objCheck(obj?: string | null): string {
         if (obj === undefined) {
             return "";
         }
         const opts = this.opts;
         const msgs = this.msgs;
         if ("options" in opts) {
-            if (opts.options!.indexOf(obj) === -1) {
+            if (obj && opts.options!.indexOf(obj) === -1) {
                 return msgs.invalid_option
                     ? tpl(msgs.invalid_option,
                         {
-                            option: obj,
+                            option: obj === null ? "" : obj,
                             options: ("options" in opts)
                                 ? opts.options!.join(", ")
                                 : ""
@@ -129,9 +137,9 @@ export class SelectValidator
         return "";
     }
 
-    protected objToStr(obj?: string,
-                       format?: string): { str?: string, err?: string } {
-        return { str: obj || "" };
+    protected objToStr(obj?: string | null,
+                       format?: string): { str: string, err: string } {
+        return { str: obj || "", err: "" };
     }
 
 }
@@ -156,12 +164,13 @@ export class StringValidator
         super(opts, msgs);
     }
 
-    protected strToObj(str?: string): { obj?: string, err?: string } {
+    protected strToObj(str?: string | null): { obj: string | null, err: string } {
         const opts = this.opts;
         const msgs = this.msgs;
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
+                    obj: null,
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
@@ -179,6 +188,7 @@ export class StringValidator
             if ("regexp" in opts) {
                 if (!opts.regexp!.test(str)) {
                     return {
+                        obj: null,
                         err: msgs.invalid_format
                             ? tpl(msgs.invalid_format,
                                 {
@@ -190,14 +200,14 @@ export class StringValidator
                     };
                 }
             }
-            return { obj: str };
+            return { obj: str , err: "" };
         } else {
-            return { obj: undefined };
+            return { obj: null, err: "" };
         }
     }
 
-    protected objCheck(obj?: string): string {
-        if (obj === undefined) {
+    protected objCheck(obj?: string | null): string {
+        if (obj === undefined || obj === null) {
             return "";
         }
         const opts = this.opts;
@@ -230,9 +240,9 @@ export class StringValidator
         return "";
     }
 
-    protected objToStr(obj: string,
-                       format?: string): { str?: string, err?: string } {
-        return { str: obj || "" };
+    protected objToStr(obj?: string | null,
+                       format?: string): { str: string, err: string } {
+        return { str: obj || "", err: "" };
     }
 
 }
@@ -260,12 +270,13 @@ export class NumberValidator
         super(opts, msgs);
     }
 
-    protected strToObj(str?: string): { obj?: number, err?: string } {
+    protected strToObj(str?: string | null): { obj: number | null, err: string } {
         const opts = this.opts;
         const msgs = this.msgs;
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
+                    obj: null,
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
@@ -288,7 +299,7 @@ export class NumberValidator
             if (err) {
                 const num = isNaN(n) ? 1234.45 : n;
                 return {
-                    obj: isNaN(n) ? undefined : n,
+                    obj: isNaN(n) ? null : n,
                     err: msgs.invalid_format
                         ? tpl(msgs.invalid_format,
                             {
@@ -297,14 +308,14 @@ export class NumberValidator
                         : invalidFormatMsg
                 };
             }
-            return { obj: n };
+            return { obj: n, err: "" };
         } else {
-            return { obj: undefined };
+            return { obj: null, err: "" };
         }
     }
 
-    protected objCheck(obj?: number): string {
-        if (obj === undefined) {
+    protected objCheck(obj?: number | null): string {
+        if (obj === undefined || obj === null) {
             return "";
         }
         const opts = this.opts;
@@ -332,10 +343,11 @@ export class NumberValidator
         return "";
     }
 
-    protected objToStr(obj?: number,
-                       format?: string): { str?: string, err?: string } {
+    protected objToStr(obj?: number | null,
+                       format?: string): { str: string, err: string } {
         return {
-            str: obj === undefined ? undefined : ("" + obj)
+            str: (obj === undefined || obj === null) ? "" : ("" + obj),
+            err: ""
         };
     }
 
@@ -361,12 +373,13 @@ export class DateValidator
         super(opts, msgs);
     }
 
-    protected strToObj(str?: string): { obj?: Date, err?: string } {
+    protected strToObj(str?: string | null): { obj: Date | null, err: string } {
         const opts = this.opts;
         const msgs = this.msgs;
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
+                    obj: null,
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
@@ -390,7 +403,7 @@ export class DateValidator
             if (err) {
                 const date = isNaN(dt) ? new Date() : d;
                 return {
-                    obj: isNaN(dt) ? undefined : d,
+                    obj: isNaN(dt) ? null : d,
                     err: msgs.invalid_format
                         ? tpl(msgs.invalid_format,
                             {
@@ -399,14 +412,14 @@ export class DateValidator
                         : invalidFormatMsg
                 };
             }
-            return { obj: d };
+            return { obj: d, err: "" };
         } else {
-            return { obj: undefined };
+            return { obj: null, err: "" };
         }
     }
 
-    protected objCheck(obj?: Date): string {
-        if (obj === undefined) {
+    protected objCheck(obj?: Date | null): string {
+        if (obj === undefined || obj === null) {
             return "";
         }
         const opts = this.opts;
@@ -434,10 +447,11 @@ export class DateValidator
         return "";
     }
 
-    protected objToStr(obj?: Date,
-                       format?: string): { str?: string, err?: string } {
+    protected objToStr(obj?: Date | null,
+                       format?: string): { str: string, err: string } {
         return {
-            str: obj === undefined ? undefined : obj.toLocaleString()
+            str: (obj === undefined || obj === null) ? "" : obj.toLocaleString(),
+            err: ""
         };
     }
 
@@ -460,12 +474,13 @@ export class BooleanValidator
         super(opts, msgs);
     }
 
-    protected strToObj(str?: string): { obj?: boolean, err?: string } {
+    protected strToObj(str?: string | null): { obj: boolean | null, err: string } {
         const opts = this.opts;
         const msgs = this.msgs;
         if ("required" in opts) {
             if (opts.required && !str) {
                 return {
+                    obj: null,
                     err: msgs.required
                         ? tpl(msgs.required, {})
                         : requiredMsg
@@ -483,10 +498,10 @@ export class BooleanValidator
             default:
                 b = false;
         }
-        return { obj: b };
+        return { obj: b, err: "" };
     }
 
-    protected objCheck(obj?: boolean): string {
+    protected objCheck(obj?: boolean | null): string {
         if (obj === undefined) {
             return "";
         }
@@ -509,10 +524,11 @@ export class BooleanValidator
         return "";
     }
 
-    protected objToStr(obj?: boolean,
-                       format?: string): { str?: string, err?: string } {
+    protected objToStr(obj?: boolean | null,
+                       format?: string): { str: string, err: string } {
         return {
-            str: obj === undefined ? "" : "" + obj
+            str: (obj === undefined || obj === null) ? "" : ("" + obj),
+            err: ""
         };
     }
 
@@ -821,7 +837,7 @@ export class ObjectValidator<T = any> {
 
 // const dv = new DateValidator(
 //     {
-//         required: true,
+//         required: false,
 //         // min: new Date(),
 //         max: new Date(),
 //         strict: true
@@ -846,17 +862,25 @@ export class ObjectValidator<T = any> {
 // console.log(new Date().toLocaleString());
 // console.log(new Date().toLocaleDateString());
 // console.log(new Date().toLocaleTimeString());
+// console.log();
+// console.log(new Date(Date.parse(new Date().toString())));
+// console.log(new Date(Date.parse(new Date().toDateString())));
+// console.log(new Date(Date.parse(new Date().toTimeString())));
+// console.log(new Date(Date.parse(new Date().toLocaleString())));
+// console.log(new Date(Date.parse(new Date().toLocaleDateString())));
+// console.log(new Date(Date.parse(new Date().toLocaleTimeString())));
 
-// // const formData = { str: "123a", num: "123456.789", date: "9/17/2020, 10:46:07 AM" };
-// // const formData = { str: "", num: "", date: "" };
+// const formData = { str: "123a", num: "123456.789", date: "9/17/2020, 10:46:07 AM" };
+// const formData = { str: "", num: "", date: "" };
 // const formData = { str: undefined, num: undefined, date: undefined };
+
+// const formDataDefeults = { str: "", num: "", date: "" };
 
 // const fv = new FormValidator<typeof formData>()
 //     .addValidator("str", sv)
 //     .addValidator("num", nv)
 //     .addValidator("date", dv)
-//     // .validate(formData);
-//     .validate({});
+//     .validate(formData, formDataDefeults);
 
 // console.log(fv.data());
 
