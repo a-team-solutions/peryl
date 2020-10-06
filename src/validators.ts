@@ -248,7 +248,7 @@ export class StringValidator
 }
 
 export const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-export const phoneRgex = /"^\\+[0-9]*$"/;
+export const phoneRgex = /^(((00)([- ]?)|\+)(\d{1,3})([- ]?))?((\d{3})([- ]?))((\d{3})([- ]?))(\d{3})$/;
 
 export interface NumberValidatorOpts {
     required?: boolean;
