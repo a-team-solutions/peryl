@@ -4,6 +4,10 @@ const invalidFormatMsg = "invalid_format";
 const invalidOptionMsg = "invalid_option";
 const invalidValueMsg = "invalid_value";
 
+export const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+export const phoneRgex = /^(((00)([- ]?)|\+)(\d{1,3})([- ]?))?((\d{3})([- ]?))((\d{3})([- ]?))(\d{3})$/;
+export const pscRgex = /^\d{3} ?\d{2}$/;
+
 export abstract class Validator<T, O, M> {
 
     readonly opts: O;
@@ -247,9 +251,6 @@ export class StringValidator
 
 }
 
-export const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-export const phoneRgex = /^(((00)([- ]?)|\+)(\d{1,3})([- ]?))?((\d{3})([- ]?))((\d{3})([- ]?))(\d{3})$/;
-
 export interface NumberValidatorOpts {
     required?: boolean;
     min?: number;
@@ -357,7 +358,7 @@ export interface DateValidatorOpts {
     required?: boolean;
     min?: Date;
     max?: Date;
-    clearTime?: boolean;
+    dateOnly?: boolean;
     // strict?: boolean;
 
 }
@@ -378,11 +379,11 @@ export class DateValidator
 
     constructor(opts?: DateValidatorOpts, msgs?: DateValidatorMsgs) {
         super(opts, msgs);
-        this.dateToStr = opts?.clearTime ? dateToLocaleDateString : dateToLocaleString;
-        if (opts?.clearTime && opts?.min) {
+        this.dateToStr = opts?.dateOnly ? dateToLocaleDateString : dateToLocaleString;
+        if (opts?.dateOnly && opts?.min) {
             opts.min = new Date(opts.min.getFullYear(), opts.min.getMonth(), opts.min.getDate());
         }
-        if (opts?.clearTime && opts?.max) {
+        if (opts?.dateOnly && opts?.max) {
             opts.max = new Date(opts.max.getFullYear(), opts.max.getMonth(), opts.max.getDate() + 1);
         }
     }
@@ -407,7 +408,7 @@ export class DateValidator
         if (str) {
             const dt = Date.parse(str);
             let d = new Date(dt);
-            if (opts.clearTime) {
+            if (opts.dateOnly) {
                 d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
             }
             let err: boolean = false;
@@ -652,19 +653,11 @@ export class FormValidator<T = any> {
         return this;
     }
 
-    validate(data: { [key in keyof T]?: string },
-             defaults?: { [key in keyof T]: string }): this {
-        const d = {
-            ...defaults || Object.getOwnPropertyNames(this.validators)
-                .reduce<any>(
-                    (a, v) => { if (a[v] === undefined) a[v] = ""; return a; },
-                    {}),
-            ...data as object
-        };
+    validate(data: { [key in keyof T]?: string }): this {
         const res = Object.keys(this.validators)
             .reduce(
                 (a, k) => {
-                    const v = (d as any)[k];
+                    const v = (data as any)[k];
                     const r = (this.validators as any)[k].validate(v);
                     (a.str as any)[k] = r.str;
                     (a.obj as any)[k] = r.obj;
@@ -857,7 +850,7 @@ export class ObjectValidator<T = any> {
 //         required: false,
 //         // min: new Date(),
 //         max: new Date(),
-//         clearTime: false
+//         dateOnly: false
 //         // strict: true
 //     },
 //     {
@@ -899,13 +892,12 @@ export class ObjectValidator<T = any> {
 // const formData = { str: "", num: "", date: "" };
 // const formData = { str: undefined, num: undefined, date: undefined };
 
-// const formDataDefeults = { str: "", num: "", date: "" };
-
 // const fv = new FormValidator<typeof formData>()
 //     .addValidator("str", sv)
 //     .addValidator("num", nv)
 //     .addValidator("date", dv)
-//     .validate(formData, formDataDefeults);
+//     .validate(formData);
+//     // .validate({});
 
 // console.log(fv.data());
 
