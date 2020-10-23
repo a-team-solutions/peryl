@@ -1,5 +1,6 @@
 import "jasmine";
-import { StringValidator, ObjectValidator, NumberValidator } from "../../src/validators";
+import { StringValidator, NumberValidator } from "../../src/validators";
+import { ObjectValidator } from "../../src/validators-object";
 
 describe("ObjectValidator", () => {
 
