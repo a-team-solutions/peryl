@@ -3,22 +3,22 @@ import { HElement, HElements, HAttrOnData, HAttrOnDataFnc, HHandlerCtx, HFnc } f
 import { hsmls2idomPatch } from "./hsml-idom";
 import * as idom from "incremental-dom";
 
-export interface HComponent<State> extends SvacComponent<State> {
-    actions?: HActions<State>;
+export interface HComponent<STATE> extends SvacComponent<STATE> {
+    actions?: HActions<STATE>;
 }
 
-export type HActions<State> = (ctrl: HCtrl<State>,
+export type HActions<STATE> = (ctrl: HCtrl<STATE>,
                                action: string | number,
                                data?: any,
                                event?: Event) => void;
 
-const mount: HMount = <State>(
-    component: HComponent<State>,
-    state?: State,
+const mount: HMount = <STATE>(
+    component: HComponent<STATE>,
+    state?: STATE,
     action?: HAction): HFnc | HElements =>
     (e: Element) => {
         if ((e as any).ctrl) {
-            const c = (e as any).ctrl as HCtrl<State>;
+            const c = (e as any).ctrl as HCtrl<STATE>;
             if (c.view === component.view) {
                 if (state !== undefined) {
                     c.state = state;
@@ -26,14 +26,14 @@ const mount: HMount = <State>(
                 c.update();
             } else {
                 c.umount();
-                const c1 = new HCtrl<State>(component, action);
+                const c1 = new HCtrl<STATE>(component, action);
                 if (state !== undefined) {
                     c1.state = state;
                 }
                 c1.mount(e);
             }
         } else {
-            const c = new HCtrl<State>(component, action);
+            const c = new HCtrl<STATE>(component, action);
             if (state !== undefined) {
                 c.state = state;
             }
@@ -58,7 +58,7 @@ const unschedule = window.cancelAnimationFrame ||
 
 const ctrlAttr = "ctrl";
 
-export class HCtrl<State> implements HHandlerCtx {
+export class HCtrl<STATE> implements HHandlerCtx {
 
     static debug = false;
 
@@ -73,16 +73,16 @@ export class HCtrl<State> implements HHandlerCtx {
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
-    state: State;
+    state: STATE;
 
-    readonly view: HView<State>;
+    readonly view: HView<STATE>;
 
-    private _actions?: HActions<State>;
+    private _actions?: HActions<STATE>;
     private _extAction?: HAction;
 
     private _updateSched?: number;
 
-    constructor(component: HComponent<State>, extAction?: HAction) {
+    constructor(component: HComponent<STATE>, extAction?: HAction) {
         this.view = component.view;
         this.type = component.type;
         this.state = component.state;
@@ -96,7 +96,7 @@ export class HCtrl<State> implements HHandlerCtx {
         HCtrl.appActions && HCtrl.appActions(this, action, data, event);
     }
 
-    appActions(actions: HActions<State>): this {
+    appActions(actions: HActions<STATE>): this {
         HCtrl.appActions = actions;
         return this;
     }
@@ -134,7 +134,7 @@ export class HCtrl<State> implements HHandlerCtx {
             ? document.getElementById(e) || document.body
             : e || document.body;
         if ((el as any).ctrl) {
-            const c = (el as any).ctrl as HCtrl<State>;
+            const c = (el as any).ctrl as HCtrl<STATE>;
             c && c.umount();
         }
         if (!this.dom) {
@@ -158,7 +158,7 @@ export class HCtrl<State> implements HHandlerCtx {
             }
             const cNodes = this.dom.querySelectorAll(`[${ctrlAttr}]`);
             for (let i = 0; i < cNodes.length; i++) {
-                const c = (cNodes[i] as any).ctrl as HCtrl<State>;
+                const c = (cNodes[i] as any).ctrl as HCtrl<STATE>;
                 c && c.umount();
             }
             while (this.dom.firstChild) {

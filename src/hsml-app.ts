@@ -3,8 +3,8 @@ import { hsmls2idomPatch } from "./hsml-idom";
 
 const log = console.log;
 
-export type HView<State> = (state: State) => HElements;
-export type HView1<State> = (state: State) => HElement;
+export type HView<STATE> = (state: STATE) => HElements;
+export type HView1<STATE> = (state: STATE) => HElement;
 
 export interface HAction {
     type: string;
@@ -18,15 +18,15 @@ export type HDispatch = (type: HAction["type"],
 
 export type HUpdate = () => void;
 
-export type HDispatcher<State> = (app: HApp<State>, action: HAction) => void;
+export type HDispatcher<STATE> = (app: HApp<STATE>, action: HAction) => void;
 
 // export type Class<T = object> = new (...args: any[]) => T;
 
-export function happ<State>(state: State,
-                            view: HView<State>,
-                            dispatcher?: HDispatcher<State>,
+export function happ<STATE>(state: STATE,
+                            view: HView<STATE>,
+                            dispatcher?: HDispatcher<STATE>,
                             element: Element | string | null = document.body) {
-    return new HApp<State>(state, view, dispatcher).mount(element);
+    return new HApp<STATE>(state, view, dispatcher).mount(element);
 }
 
 export enum HAppAction {
@@ -49,22 +49,22 @@ const unschedule = window.cancelAnimationFrame ||
     // (window as any).msCancelAnimationFrame ||
     function (handle: number) { window.clearTimeout(handle); };
 
-export class HApp<State> implements HHandlerCtx {
+export class HApp<STATE> implements HHandlerCtx {
 
     static debug = false;
 
-    readonly state: State;
-    readonly view: HView<State>;
-    readonly dispatcher: HDispatcher<State>;
+    readonly state: STATE;
+    readonly view: HView<STATE>;
+    readonly dispatcher: HDispatcher<STATE>;
 
     readonly dom?: Element;
     readonly refs: { [key: string]: HTMLElement } = {};
 
     private _updateSched?: number;
 
-    private _onUpdate?: (app: HApp<State>) => void;
+    private _onUpdate?: (app: HApp<STATE>) => void;
 
-    constructor(state: State, view: HView<State>, dispatcher?: HDispatcher<State>) {
+    constructor(state: STATE, view: HView<STATE>, dispatcher?: HDispatcher<STATE>) {
         this.state = state;
         this.view = view;
         this.dispatcher = dispatcher || ((_, a) => log("action:", a.type, a.data));
@@ -76,7 +76,7 @@ export class HApp<State> implements HHandlerCtx {
         this.dispatcher(this, { type, data, event });
     }
 
-    callDispatcher = <SubState>(dispatcher: HDispatcher<SubState>, state: SubState, action: HAction): void => {
+    callDispatcher = <SUBSTATE>(dispatcher: HDispatcher<SUBSTATE>, state: SUBSTATE, action: HAction): void => {
         dispatcher({ ...this, state } as any, action);
     }
 
@@ -107,7 +107,7 @@ export class HApp<State> implements HHandlerCtx {
             ? document.getElementById(e) || document.body
             : e || document.body;
         if ((el as any).app) {
-            const a = (el as any).app as HApp<State>;
+            const a = (el as any).app as HApp<STATE>;
             a.umount();
         }
         if (!this.dom) {
@@ -129,7 +129,7 @@ export class HApp<State> implements HHandlerCtx {
             }
             const aNodes = this.dom.querySelectorAll("[app]");
             for (let i = 0; i < aNodes.length; i++) {
-                const a = (aNodes[i] as any).app as HApp<State>;
+                const a = (aNodes[i] as any).app as HApp<STATE>;
                 a && a.umount();
             }
             while (this.dom.firstChild /*.hasChildNodes()*/) {
@@ -154,7 +154,7 @@ export class HApp<State> implements HHandlerCtx {
         return this;
     }
 
-    onUpdate = (cb: (app: HApp<State>) => void): this => {
+    onUpdate = (cb: (app: HApp<STATE>) => void): this => {
         this._onUpdate = cb;
         return this;
     }
@@ -343,8 +343,8 @@ function formInputData(el: Element): { [k: string]: string | string[] | null } |
     return data;
 }
 
-// export const formInputData = <State>(dispatcher: Actions<State>): Actions<State> =>
-//     (app: App<State>, action: string | number, data?: any, event?: Event): void => {
+// export const formInputData = <STATE>(dispatcher: Actions<STATE>): Actions<STATE> =>
+//     (app: App<STATE>, action: string | number, data?: any, event?: Event): void => {
 //         if (data === undefined && event) {
 //             data = inputEventData(event);
 //         }

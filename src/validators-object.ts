@@ -1,16 +1,16 @@
 import { Validator } from "./validators";
 
-type StrDict<O, Optional extends (true | false) = false> = {
+type StrDict<OBJ, Optional extends (true | false) = false> = {
     0: string,
     1: string[],
     2: Optional extends true
-        ? { [prop in keyof O]+?: StrDict<O[prop], true> }
-        : { [prop in keyof O]: StrDict<O[prop], false> }
-}[O extends (string | number | boolean)
+        ? { [prop in keyof OBJ]+?: StrDict<OBJ[prop], true> }
+        : { [prop in keyof OBJ]: StrDict<OBJ[prop], false> }
+}[OBJ extends (string | number | boolean)
     ? 0
-    : O extends string[]
+    : OBJ extends string[]
         ? 1
-        : O extends { [prop: string]: any }
+        : OBJ extends { [prop: string]: any }
             ? 2
             : never];
 
@@ -26,24 +26,24 @@ export interface ArrayValidatorMsgs {
     invalid_format?: string;
 }
 
-export class ArrayValidator<T = any> {
+export class ArrayValidator<TYPE = any> {
 
-    readonly validator: Validator<T, any, any> | ObjectValidator<T>;
+    readonly validator: Validator<TYPE, any, any> | ObjectValidator<TYPE>;
     readonly opts: ArrayValidatorOpts;
 
-    readonly str?: string[] | StrDict<T>[];
-    readonly obj?: T[] | { [key in keyof T]: any }[];
-    readonly err?: string[] | StrDict<T>[];
+    readonly str?: string[] | StrDict<TYPE>[];
+    readonly obj?: TYPE[] | { [key in keyof TYPE]: any }[];
+    readonly err?: string[] | StrDict<TYPE>[];
 
     readonly valid?: boolean;
 
-    constructor(validator: Validator<T, any, any> | ObjectValidator<T>,
+    constructor(validator: Validator<TYPE, any, any> | ObjectValidator<TYPE>,
                 opts?: ArrayValidatorOpts) {
         this.validator = validator;
         this.opts = opts || {};
     }
 
-    validate(data: string[] | T[]): this {
+    validate(data: string[] | TYPE[]): this {
         (this.str as any) = [];
         (this.obj as any) = [];
         (this.err as any) = [];
@@ -53,15 +53,15 @@ export class ArrayValidator<T = any> {
 
         if (validator instanceof ObjectValidator) {
             (data as any).forEach((d: any) => {
-                const r = (validator as ObjectValidator<T>).validate(d);
-                (this.str as StrDict<T>[]).push(r.str!);
-                (this.obj as { [key in keyof T]: any }[]).push(r.obj!);
-                (this.err as StrDict<T>[]).push(r.err!);
+                const r = (validator as ObjectValidator<TYPE>).validate(d);
+                (this.str as StrDict<TYPE>[]).push(r.str!);
+                (this.obj as { [key in keyof TYPE]: any }[]).push(r.obj!);
+                (this.err as StrDict<TYPE>[]).push(r.err!);
                 !r.valid && ((this.valid as any) = false);
             });
         } else { // Validator<T, any, any>
             (data as any).forEach((d: any) => {
-                const r = (validator as Validator<T, any, any>).validate(d);
+                const r = (validator as Validator<TYPE, any, any>).validate(d);
                 this.str!.push(r.str as any);
                 this.obj!.push(r.obj!);
                 this.err!.push(r.err as any);
@@ -73,28 +73,28 @@ export class ArrayValidator<T = any> {
 
 }
 
-type ObjectValidators<T> = {
-    [key in keyof T]?: Validator<any, any, any> |
+type ObjectValidators<TYPE> = {
+    [key in keyof TYPE]?: Validator<any, any, any> |
     ObjectValidator<any> |
     ArrayValidator<any> };
 
-export class ObjectValidator<T = any> {
+export class ObjectValidator<TYPE = any> {
 
-    readonly validators: ObjectValidators<T> = {} as any;
+    readonly validators: ObjectValidators<TYPE> = {} as any;
 
-    readonly str?: StrDict<T>;
-    readonly obj?: { [key in keyof T]: any };
-    readonly err?: StrDict<T>;
+    readonly str?: StrDict<TYPE>;
+    readonly obj?: { [key in keyof TYPE]: any };
+    readonly err?: StrDict<TYPE>;
 
     readonly valid?: boolean;
 
-    constructor(validators?: ObjectValidators<T>) {
+    constructor(validators?: ObjectValidators<TYPE>) {
         if (validators) {
             this.validators = validators;
         }
     }
 
-    addValidator(field: keyof T,
+    addValidator(field: keyof TYPE,
                  validator: Validator<any, any, any>
                      | ObjectValidator<any>
                      | ArrayValidator<any>): this {
@@ -102,8 +102,8 @@ export class ObjectValidator<T = any> {
         return this;
     }
 
-    validate(data: StrDict<T, true>,
-             defaults: StrDict<T> = {} as any): this {
+    validate(data: StrDict<TYPE, true>,
+             defaults: StrDict<TYPE> = {} as any): this {
         const d = { ...defaults as object, ...data as object };
         (this as any).valid = true;
         const result = Object.keys(this.validators)
@@ -138,7 +138,7 @@ export class ObjectValidator<T = any> {
         return this;
     }
 
-    format(data: { [key in keyof T]: any }): this {
+    format(data: { [key in keyof TYPE]: any }): this {
         const res = Object.keys(this.validators)
             .reduce(
                 (a, k) => {

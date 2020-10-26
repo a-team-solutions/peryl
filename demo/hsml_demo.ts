@@ -1,13 +1,13 @@
 import { hsmls2idomPatch } from "../src/hsml-idom";
 import { HElements, HElement } from "../src/hsml";
 
-type View<State> = (state: State, dispatch: Dispatch) => HElements;
+type View<STATE> = (state: STATE, dispatch: Dispatch) => HElements;
 
 type Dispatch = (event: string, data?: any) => void;
 
-function render<State>(element: HTMLElement,
-                       view: View<State>,
-                       state: State,
+function render<STATE>(element: HTMLElement,
+                       view: View<STATE>,
+                       state: STATE,
                        dispatch: Dispatch): void {
     (render as any).scheduled || ((render as any).scheduled = null);
     if (!state) {

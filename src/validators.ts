@@ -8,28 +8,28 @@ export const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_
 export const phoneRgex = /^(((00)([- ]?)|\+)(\d{1,3})([- ]?))?((\d{3})([- ]?))((\d{3})([- ]?))(\d{3})$/;
 export const pscRgex = /^\d{3} ?\d{2}$/;
 
-export abstract class Validator<T, O, M> {
+export abstract class Validator<TYPE, OPTS, MSGS> {
 
-    readonly opts: O;
-    readonly msgs: M;
+    readonly opts: OPTS;
+    readonly msgs: MSGS;
 
     readonly str: string | null = null;
     readonly err: string | null = null;
-    readonly obj: T | null = null;
+    readonly obj: TYPE | null = null;
 
-    constructor(opts?: O, msgs?: M) {
-        this.opts = opts || {} as O;
-        this.msgs = msgs || {} as M;
+    constructor(opts?: OPTS, msgs?: MSGS) {
+        this.opts = opts || {} as OPTS;
+        this.msgs = msgs || {} as MSGS;
     }
 
-    protected abstract strToObj(str?: string | null): { obj: T | null, err: string };
+    protected abstract strToObj(str?: string | null): { obj: TYPE | null, err: string };
 
-    protected abstract objCheck(obj?: T | null): string;
+    protected abstract objCheck(obj?: TYPE | null): string;
 
-    protected abstract objToStr(obj?: T | null,
+    protected abstract objToStr(obj?: TYPE | null,
                                 format?: string): { str: string, err: string };
 
-    validate(value?: string | T): { str?: string | null, obj?: T | null, err: string } {
+    validate(value?: string | TYPE): { str?: string | null, obj?: TYPE | null, err: string } {
         if (typeof value === "string" || value === undefined || value === null) {
             const v = value as string | null | undefined;
             (this.str as any) = v;
@@ -61,7 +61,7 @@ export abstract class Validator<T, O, M> {
         }
     }
 
-    format(obj?: T | null, format?: string): { str: string, err: string } {
+    format(obj?: TYPE | null, format?: string): { str: string, err: string } {
         const err = this.objCheck(obj);
         const ots = this.objToStr(obj, format);
         return {
@@ -552,35 +552,35 @@ export class BooleanValidator
 
 }
 
-type FormValidators<T> = { [key in keyof T]: Validator<any, any, any> };
+type FormValidators<TYPE> = { [key in keyof TYPE]: Validator<any, any, any> };
 
-export type Str<T> = { [key in keyof T]: string };
-export type Obj<T> = { [key in keyof T]: any };
-export type Err<T> = { [key in keyof T]: string };
+export type Str<TYPE> = { [key in keyof TYPE]: string };
+export type Obj<TYPE> = { [key in keyof TYPE]: any };
+export type Err<TYPE> = { [key in keyof TYPE]: string };
 
-export interface FormValidatorData<T> {
-    str: Str<T>;
-    obj: Obj<T>;
-    err: Err<T>;
+export interface FormValidatorData<TYPE> {
+    str: Str<TYPE>;
+    obj: Obj<TYPE>;
+    err: Err<TYPE>;
     valid: boolean;
 }
 
-export class FormValidator<T = any> {
+export class FormValidator<TYPE extends { [key: string]: string }> {
 
-    readonly validators: FormValidators<T> = {} as FormValidators<T>;
+    readonly validators: FormValidators<TYPE> = {} as FormValidators<TYPE>;
 
-    readonly str?: Str<T>;
-    readonly obj?: Obj<T>;
-    readonly err?: Err<T>;
+    readonly str?: Str<TYPE>;
+    readonly obj?: Obj<TYPE>;
+    readonly err?: Err<TYPE>;
 
     readonly valid?: boolean;
 
-    addValidator(field: keyof T, validator: Validator<any, any, any>): this {
+    addValidator(field: keyof TYPE, validator: Validator<any, any, any>): this {
         this.validators[field] = validator;
         return this;
     }
 
-    validate(data: { [key in keyof T]?: string }): this {
+    validate(data: { [key in keyof TYPE]?: string }): this {
         const res = Object.keys(this.validators)
             .reduce(
                 (a, k) => {
@@ -600,7 +600,7 @@ export class FormValidator<T = any> {
         return this;
     }
 
-    format(data: { [key in keyof T]: any }): this {
+    format(data: { [key in keyof TYPE]: any }): this {
         const res = Object.keys(this.validators)
             .reduce(
                 (a, k) => {
@@ -620,7 +620,7 @@ export class FormValidator<T = any> {
         return this;
     }
 
-    data(): FormValidatorData<T> {
+    data(): FormValidatorData<TYPE> {
         return {
             str: this.str!,
             obj: this.obj!,
@@ -807,7 +807,7 @@ export class FormValidator<T = any> {
 //     b?: string;
 // }
 
-// const av = new ArrayValidator<D>(new ObjectValidator<D>()
+// const av = new ArrayValidator<T>(new ObjectValidator<T>()
 //     .addValidator("a", new NumberValidator())
 //     .addValidator("b", new StringValidator({ required: true }))
 // );
@@ -821,7 +821,7 @@ export class FormValidator<T = any> {
 // const r = av.validate(d);
 // console.log(r);
 
-// const ro = new ObjectValidator<D>()
+// const ro = new ObjectValidator<T>()
 //     .addValidator("a", new NumberValidator())
 //     .addValidator("b", new StringValidator({ required: true }))
 //     .validate({
