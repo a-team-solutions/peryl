@@ -565,7 +565,7 @@ export interface FormValidatorData<TYPE> {
     valid: boolean;
 }
 
-export class FormValidator<TYPE extends { [key: string]: string }> {
+export class FormValidator<TYPE extends { [key: string]: any }> {
 
     readonly validators: FormValidators<TYPE> = {} as FormValidators<TYPE>;
 
