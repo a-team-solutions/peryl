@@ -4,9 +4,17 @@ const invalidFormatMsg = "invalid_format";
 const invalidOptionMsg = "invalid_option";
 const invalidValueMsg = "invalid_value";
 
+// name@doamin.net
 export const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+
+// +421901123456 or +421 901 123 456 or +421-901-123-456 or 901123456 or 901 123 456 or 901-123-456
 export const phoneRgex = /^(((00)([- ]?)|\+)(\d{1,3})([- ]?))?((\d{3})([- ]?))((\d{3})([- ]?))(\d{3})$/;
+
+// 123 45 or 12345
 export const pscRgex = /^\d{3} ?\d{2}$/;
+
+// 450115/8346
+export const rodneCisloRgex = /^\s*(\d\d)(\d\d)(\d\d)[ /]*(\d\d\d)(\d?)\s*$/;
 
 export abstract class Validator<TYPE, OPTS, MSGS> {
 
@@ -71,14 +79,18 @@ export abstract class Validator<TYPE, OPTS, MSGS> {
 
 }
 
-export function tpl(tmpl: string, data: { [k: string]: string }): string {
+export function tpl(tmpl: string, data: { [k: string]: any }): string {
     return Object.keys(data)
         .map(k => [k, data[k]])
         .reduce((t, d) =>
-            t.replace(new RegExp(`\\{\\{${d[0]}\\}\\}`, "g"), d[1]), tmpl);
+            t.replace(new RegExp(`\\{\\{${d[0]}\\}\\}`, "g"), String(d[1])), tmpl);
 }
 
-export interface SelectValidatorOpts {
+export interface ValidatorDataOpts {
+    data?: { [key: string]: any };
+}
+
+export interface SelectValidatorOpts extends ValidatorDataOpts {
     required?: boolean;
     options?: string[];
 }
@@ -105,6 +117,7 @@ export class SelectValidator
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
+                                ...opts.data,
                                 options: ("options" in opts)
                                     ? opts.options!.join(", ")
                                     : ""
@@ -130,6 +143,7 @@ export class SelectValidator
                 return msgs.invalid_option
                     ? tpl(msgs.invalid_option,
                         {
+                            ...opts.data,
                             option: obj === null ? "" : obj,
                             options: ("options" in opts)
                                 ? opts.options!.join(", ")
@@ -148,7 +162,7 @@ export class SelectValidator
 
 }
 
-export interface StringValidatorOpts {
+export interface StringValidatorOpts extends ValidatorDataOpts {
     required?: boolean;
     min?: number;
     max?: number;
@@ -178,6 +192,7 @@ export class StringValidator
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
+                                ...opts.data,
                                 min: ("min" in opts) ? ("" + opts.min) : "",
                                 max: ("max" in opts) ? ("" + opts.max) : "",
                                 regexp: ("regexp" in opts)
@@ -196,6 +211,7 @@ export class StringValidator
                         err: msgs.invalid_format
                             ? tpl(msgs.invalid_format,
                                 {
+                                    ...opts.data,
                                     regexp: ("regexp" in opts)
                                         ? ("" + opts.regexp)
                                         : ""
@@ -236,6 +252,7 @@ export class StringValidator
             return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
+                        ...opts.data,
                         min: ("min" in opts) ? ("" + opts.min) : "",
                         max: ("max" in opts) ? ("" + opts.max) : "",
                     })
@@ -251,7 +268,7 @@ export class StringValidator
 
 }
 
-export interface NumberValidatorOpts {
+export interface NumberValidatorOpts extends ValidatorDataOpts {
     required?: boolean;
     min?: number;
     max?: number;
@@ -281,6 +298,7 @@ export class NumberValidator
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
+                                ...opts.data,
                                 min: ("min" in opts) ? ("" + opts.min) : "",
                                 max: ("max" in opts) ? ("" + opts.max) : "",
                             })
@@ -304,6 +322,7 @@ export class NumberValidator
                     err: msgs.invalid_format
                         ? tpl(msgs.invalid_format,
                             {
+                                ...opts.data,
                                 num: this.objToStr(num).str || ""
                             })
                         : invalidFormatMsg
@@ -336,6 +355,7 @@ export class NumberValidator
             return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
+                        ...opts.data,
                         min: ("min" in opts) ? ("" + opts.min) : "",
                         max: ("max" in opts) ? ("" + opts.max) : "",
                     })
@@ -354,7 +374,7 @@ export class NumberValidator
 
 }
 
-export interface DateValidatorOpts {
+export interface DateValidatorOpts extends ValidatorDataOpts {
     required?: boolean;
     min?: Date;
     max?: Date;
@@ -398,6 +418,7 @@ export class DateValidator
                     err: msgs.required
                         ? tpl(msgs.required,
                             {
+                                ...opts.data,
                                 min: ("min" in opts && opts.min) ? this.dateToStr(opts.min) : "",
                                 max: ("max" in opts && opts.max) ? this.dateToStr(opts.max) : ""
                             })
@@ -425,6 +446,7 @@ export class DateValidator
                     err: msgs.invalid_format
                         ? tpl(msgs.invalid_format,
                             {
+                                ...opts.data,
                                 date: this.objToStr(date).str || ""
                             })
                         : invalidFormatMsg
@@ -457,6 +479,7 @@ export class DateValidator
             return msgs.not_in_range
                 ? tpl(msgs.not_in_range,
                     {
+                        ...opts.data,
                         min: ("min" in opts && opts.min) ? this.dateToStr(opts.min) : "",
                         max: ("max" in opts && opts.max) ? this.dateToStr(opts.max) : ""
                     })
@@ -475,7 +498,7 @@ export class DateValidator
 
 }
 
-export interface BooleanValidatorOpts {
+export interface BooleanValidatorOpts extends ValidatorDataOpts {
     required?: boolean;
     value?: boolean;
 }
@@ -500,7 +523,10 @@ export class BooleanValidator
                 return {
                     obj: null,
                     err: msgs.required
-                        ? tpl(msgs.required, {})
+                        ? tpl(msgs.required,
+                            {
+                                ...opts.data
+                            })
                         : requiredMsg
                 };
             }
@@ -535,6 +561,7 @@ export class BooleanValidator
             return msgs.invalid_value
                 ? tpl(msgs.invalid_value,
                     {
+                        ...opts.data,
                         value: ("value" in opts) ? ("" + opts.value) : "",
                     })
                 : invalidValueMsg;
@@ -638,13 +665,16 @@ export class FormValidator<TYPE extends { [key: string]: any }> {
 //     {
 //         required: true,
 //         min: 3,
-//         max: 5
+//         max: 5,
 //         // regexp: /^[0123]+$/
+//         data: {
+//             xxx: "xXx"
+//         }
 //     },
 //     {
 //         required: "required {{min}} {{max}} {{regexp}}",
 //         invalid_format: "invalid_format {{regexp}}",
-//         not_in_range: "not_in_range {{min}} {{max}}"
+//         not_in_range: "not_in_range {{min}} {{max}} | data.xxx={{xxx}}"
 //     });
 
 // [
