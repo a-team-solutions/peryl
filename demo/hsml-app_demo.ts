@@ -168,6 +168,10 @@ const dispatcher: HDispatcher<State> = (app, action): void => {
             app.update();
             break;
         case Action.formSubmit:
+            const fe = action.event!.target as HTMLFormElement;
+            const fd = new FormData(fe);
+            console.log("FormData:", JSON.stringify([...fd.entries()]));
+            break;
         case Action.formChange:
             break;
         case "x":
