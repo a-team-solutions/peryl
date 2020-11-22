@@ -326,9 +326,9 @@ function formInputData(el: Element): { [k: string]: string | string[] | null } |
         case "TEXTAREA":
             const tel = el as HTMLTextAreaElement;
             if (tel.name) {
-                data = { [tel.name]: tel.innerText };
+                data = { [tel.name]: tel.value };
             } else {
-                data = tel.innerText;
+                data = tel.value;
             }
             break;
         case "BUTTON":

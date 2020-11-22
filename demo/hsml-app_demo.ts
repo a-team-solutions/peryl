@@ -134,6 +134,10 @@ const view: HView<State> = (state: State): HElements => [
                     .map<HElement>(l => ["option", { value: l }, [l]])
             ],
             ["br"],
+            ["textarea", { name: "ta" },
+                "text area"
+            ],
+            ["br"],
             ["button.w3-button.w3-blue",
                 ["submit"]
             ]
