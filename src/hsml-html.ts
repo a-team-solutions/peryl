@@ -169,7 +169,9 @@ class HsmlHtmlHandler implements HHandler<HHandlerCtx> {
         if (this._pretty) {
             html += this._mkIndent(this._depth);
         }
-        html += text;
+        html += (text as any) instanceof String
+            ? text
+            : escapeHtml(text);
         if (this._pretty) {
             html += "\n";
         }
@@ -230,9 +232,52 @@ export function hsmls2htmls(hsmls: HElements, pretty = false): string[] {
     return htmls;
 }
 
+const escapeHtmlRegExp = /["'&<>]/;
+
+function escapeHtml(html: string): string {
+    const str = "" + html;
+    const m = escapeHtmlRegExp.exec(str);
+    if (!m) {
+        return str;
+    }
+    let esc;
+    let escHtml = "";
+    let idx = 0;
+    let lastIdx = 0;
+    for (idx = m.index; idx < str.length; idx++) {
+        switch (str.charCodeAt(idx)) {
+            case 34: // "
+                esc = "&quot;";
+                break;
+            case 38: // &
+                esc = "&amp;";
+                break;
+            case 39: // '
+                esc = "&#39;";
+                break;
+            case 60: // <
+                esc = "&lt;";
+                break;
+            case 62: // >
+                esc = "&gt;";
+                break;
+            default:
+                continue;
+        }
+        if (lastIdx !== idx) {
+            escHtml += str.substring(lastIdx, idx);
+        }
+        lastIdx = idx + 1;
+        escHtml += esc;
+    }
+    return lastIdx !== idx
+        ? escHtml + str.substring(lastIdx, idx)
+        : escHtml;
+}
+
 // Test
 
-// const hsmls: Hsmls = [
+// const hsmls: HElements = [
 //     "text",
 //     ["tag", [
 //         "d",
@@ -240,12 +285,14 @@ export function hsmls2htmls(hsmls: HElements, pretty = false): string[] {
 //     ]],
 //     ["taga", { attr: "attr", classes: ["class"] }, [
 //         "text",
+//         "escape html entities: \" ' & < >",
+//         new String("escape html entities: \" ' & < >"),
 //         123,
 //         true
 //     ]]
 // ];
 
-// const hml: Hsml = ["xxx", {}, [
+// const hml: HElement = ["xxx", {}, [
 //         "types", " ", 1235.456, " ", new Date(), " ",
 //         ...hsmls,
 //         ["t", ["t", "a", ""]],
