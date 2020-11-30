@@ -27,8 +27,8 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
         <h1>PeRyL hsml app demo</h1>
         <div id="app"></div>
     </div>
-    <script src="https://peryl.gitlab.io/peryl/incremental-dom/dist/umd/incremental-dom.js"></script>
-    <script src="https://peryl.gitlab.io/peryl/dist/umd/hsml-app.js"></script>
+    <script src="https://unpkg.com/peryl@1.4.30/incremental-dom/dist/umd/incremental-dom.js"></script>
+    <script src="https://unpkg.com/peryl@1.4.30/dist/umd/hsml-app.js"></script>
     <script>
 
         const state = {
