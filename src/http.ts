@@ -7,7 +7,6 @@ export function isArray(obj: any) {
             (typeof obj.length === "number" && !(obj.propertyIsEnumerable("length")));
 }
 
-
 export function decodeUrlQuery(queryStr: string): { [key: string]: string } {
     const query: { [key: string]: string } = {};
     if (queryStr) {
@@ -221,7 +220,7 @@ export class HttpRequest {
         return this;
     }
 
-    async(async: boolean): this {
+    async(async: boolean = true): this {
         this._async = async;
         return this;
     }
@@ -423,3 +422,5 @@ export function patch(url: string, query?: Object): HttpRequest {
 export function del(url: string, query?: Object): HttpRequest {
     return new HttpRequest().method("DELETE").url(url, query);
 }
+
+export const http = { get, post, put, delete: del };

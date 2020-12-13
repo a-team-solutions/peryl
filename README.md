@@ -16,7 +16,7 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PeRyL hsml app demo</title>
+    <title>PeRyL HSML App demo</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -24,7 +24,7 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
 
 <body>
     <div class="w3-container">
-        <h1>PeRyL hsml app demo</h1>
+        <h1>PeRyL HSML App demo</h1>
         <div id="app"></div>
     </div>
     <script src="https://unpkg.com/peryl@1.4.30/incremental-dom/dist/umd/incremental-dom.js"></script>

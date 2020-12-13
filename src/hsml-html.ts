@@ -296,7 +296,8 @@ function escapeHtml(html: string): string {
 //         "types", " ", 1235.456, " ", new Date(), " ",
 //         ...hsmls,
 //         ["t", ["t", "a", ""]],
-//         ["t", {}, ["t", "a", ""]]
+//         ["t", {}, ["t", "a", ""]],
+//         ["a", { href: "url", onclick: "return confirm('Confirm please')" }, "link"]
 //     ]];
 
 // console.log(hsmls, hml);
