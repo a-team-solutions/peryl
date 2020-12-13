@@ -27,13 +27,13 @@
     "email": "pr.rybar@gmail.com",
     "url": "https://gitlab.com/peter-rybar"
   },
-  "homepage": "https://gitlab.com/peter-rybar/peryl",
+  "homepage": "https://gitlab.com/peryl/peryl",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/peter-rybar/peryl.git"
+    "url": "https://gitlab.com/peryl/peryl.git"
   },
   "bugs": {
-    "url": "https://gitlab.com/peter-rybar/peryl/issues"
+    "url": "https://gitlab.com/peryl/peryl/issues"
   },
   "private": false,
   "main": "dist/index.js",
