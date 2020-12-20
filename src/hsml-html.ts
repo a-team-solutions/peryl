@@ -234,6 +234,16 @@ export function hsmls2htmls(hsmls: HElements, pretty = false): string[] {
 
 const escapeHtmlRegExp = /["'&<>]/;
 
+// TODO: check performance
+// const escapeHTML = (html: string) => html.replace(/[&<>'"]/g,
+//     tag => (({
+//         '&': '&amp;',
+//         '<': '&lt;',
+//         '>': '&gt;',
+//         "'": '&#39;',
+//         '"': '&quot;'
+//     } as any)[tag]));
+
 function escapeHtml(html: string): string {
     const str = "" + html;
     const m = escapeHtmlRegExp.exec(str);

@@ -94,9 +94,9 @@ export class NumeralValidator
         if (obj === undefined || obj === null) {
             return "";
         }
-        if (obj.constructor === Number) {
-            obj = numeral(obj);
-        }
+        // if (obj.constructor === Number) {
+        //     obj = numeral(obj);
+        // }
         const opts = this.opts;
         const msgs = this.msgs;
         let err: boolean = false;
@@ -130,9 +130,9 @@ export class NumeralValidator
 
     protected objToStr(obj?: Numeral | null,
                        format?: string): { str: string, err: string } {
-        if (obj && obj.constructor === Number) {
-            obj = numeral(obj);
-        }
+        // if (obj && obj.constructor === Number) {
+        //     obj = numeral(obj);
+        // }
         numeral.locale(this.opts.locale || localeDefault);
         return {
             str: (obj === undefined || obj === null)
@@ -146,12 +146,43 @@ export class NumeralValidator
 
 }
 
+export class NumeralNumberValidator
+    extends Validator<number, NumeralValidatorOpts, NumeralValidatorMsgs> {
+
+    nv: NumeralValidator;
+
+    constructor(opts?: NumeralValidatorOpts, msgs?: NumeralValidatorMsgs) {
+        super(opts, msgs);
+        this.nv = new NumeralValidator(opts, msgs);
+    }
+
+    protected strToObj(str?: string | null): { obj: number | null, err: string } {
+        const res = (this.nv as any).strToObj(str);
+        if (res.obj) {
+            res.obj = res.obj.value();
+        }
+        return res;
+    }
+
+    protected objCheck(obj?: number | null): string {
+        const mObj = obj ? numeral(obj) : obj;
+        return (this.nv as any).objCheck(mObj);
+    }
+
+    protected objToStr(obj?: number | null,
+                       format?: string): { str: string, err: string } {
+        const mObj = obj ? numeral(obj) : obj;
+        return (this.nv as any).objToStr(mObj, format);
+    }
+
+}
 
 // TEST
 
 // import "numeral/locales";
 
-// const nv = new NumeralValidator(
+// // const nv = new NumeralValidator(
+// const nv = new NumeralNumberValidator(
 //     {
 //         required: true,
 //         min: 3,

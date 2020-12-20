@@ -96,9 +96,9 @@ export class MomentValidator
         if (obj === undefined || obj === null) {
             return "";
         }
-        if (obj.constructor === Date) {
-            obj = moment(obj);
-        }
+        // if (obj.constructor === Date) {
+        //     obj = moment(obj);
+        // }
         const opts = this.opts;
         const msgs = this.msgs;
         let err: boolean = false;
@@ -132,9 +132,9 @@ export class MomentValidator
 
     protected objToStr(obj?: Moment | null,
                        format?: string): { str: string, err: string } {
-        if (obj && obj.constructor === Date) {
-            obj = moment(obj);
-        }
+        // if (obj && obj.constructor === Date) {
+        //     obj = moment(obj);
+        // }
         return {
             str: (obj === undefined || obj === null)
                 ? ""
@@ -149,10 +149,41 @@ export class MomentValidator
 
 }
 
+export class MomentDateValidator
+    extends Validator<Date, MomentValidatorOpts, MomentValidatorMsgs> {
+
+    mv: MomentValidator;
+
+    constructor(opts?: MomentValidatorOpts, msgs?: MomentValidatorMsgs) {
+        super(opts, msgs);
+        this.mv = new MomentValidator(opts, msgs);
+    }
+
+    protected strToObj(str?: string | null): { obj: Date | null, err: string } {
+        const res = (this.mv as any).strToObj(str);
+        if (res.obj) {
+            res.obj = res.obj.toDate();
+        }
+        return res;
+    }
+
+    protected objCheck(obj?: Date | null): string {
+        const mObj = obj ? moment(obj) : obj;
+        return (this.mv as any).objCheck(mObj);
+    }
+
+    protected objToStr(obj?: Date | null,
+                       format?: string): { str: string, err: string } {
+        const mObj = obj ? moment(obj) : obj;
+        return (this.mv as any).objToStr(mObj, format);
+    }
+
+}
 
 // TEST
 
-// const mv = new MomentValidator(
+// // const mv = new MomentValidator(
+// const mv = new MomentDateValidator(
 //     {
 //         required: true,
 //         locale: "sk",
