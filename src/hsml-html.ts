@@ -115,7 +115,7 @@ class HsmlHtmlHandler implements HHandler<HHandlerCtx> {
         if (hObj && "type" in hObj) {
             props.unshift(["hObj", hObj.type]);
         }
-        const args = props.map(p => `${p[0]}="${p[1]}"`).join(" ");
+        const args = props.map(p => `${p[0]}="${escapeHtml(p[1])}"`).join(" ");
         let html = "";
         if (this._pretty) {
             html += this._mkIndent(this._depth);
@@ -283,13 +283,19 @@ function escapeHtml(html: string): string {
 //         "d",
 //         [""]
 //     ]],
-//     ["taga", { attr: "attr", classes: ["class"] }, [
-//         "text",
-//         "escape html entities: \" ' & < >",
-//         new String("escape html entities: \" ' & < >"),
-//         123,
-//         true
-//     ]]
+//     ["taga",
+//         {
+//             attr: "escape html attr entities: \" ' & < >",
+//             classes: ["class"]
+//         },
+//         [
+//             "text",
+//             "escape html entities: \" ' & < >",
+//             new String("escape html entities: \" ' & < >"),
+//             123,
+//             true
+//         ]
+//     ]
 // ];
 
 // const hml: HElement = ["xxx", {}, [
