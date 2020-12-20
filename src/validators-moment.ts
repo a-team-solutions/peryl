@@ -7,8 +7,7 @@ const notInRangeMsg = "not_in_range";
 const invalidFormatMsg = "invalid_format";
 
 const localeDefault = "en";
-const dateFormatFefault = "L";
-const numFormatDefault = "0,0.[00]";
+const dateFormatDefault = "L LT";
 
 export interface MomentValidatorOpts {
     required?: boolean;
@@ -49,7 +48,7 @@ export class MomentValidator
                                     : localeDefault,
                                 format: ("format" in opts)
                                     ? opts.format!
-                                    : numFormatDefault
+                                    : dateFormatDefault
                             })
                         : requiredMsg
                 };
@@ -57,15 +56,17 @@ export class MomentValidator
         }
         if (str) {
             const d = moment(str,
-                opts.format || dateFormatFefault,
+                opts.format || dateFormatDefault,
                 opts.locale || localeDefault,
                 opts.strict || false);
             let err: boolean = false;
             if (!d.isValid()) {
                 err = true;
             }
-            if (opts.strict && (str !== this.objToStr(d).str)) {
-                err = true;
+            if ("strict" in opts) {
+                if (opts.strict && (str !== this.objToStr(d).str)) {
+                    err = true;
+                }
             }
             if (err) {
                 const date = d.isValid() ? d : moment(new Date());
@@ -80,7 +81,7 @@ export class MomentValidator
                                     : localeDefault,
                                 format: ("format" in opts)
                                     ? opts.format!
-                                    : numFormatDefault
+                                    : dateFormatDefault
                             })
                         : invalidFormatMsg
                 };
@@ -91,7 +92,7 @@ export class MomentValidator
         }
     }
 
-    protected objCheck(obj?: Moment): string {
+    protected objCheck(obj?: Moment | null): string {
         if (obj === undefined || obj === null) {
             return "";
         }
@@ -122,7 +123,7 @@ export class MomentValidator
                             : localeDefault,
                         format: ("format" in opts)
                             ? opts.format!
-                            : numFormatDefault
+                            : dateFormatDefault
                     })
                 : notInRangeMsg;
         }
@@ -141,7 +142,7 @@ export class MomentValidator
                     .locale(this.opts.locale || localeDefault)
                     .format(format
                         ? format
-                        : this.opts.format || dateFormatFefault),
+                        : this.opts.format || dateFormatDefault),
             err: ""
         };
     }
@@ -151,11 +152,11 @@ export class MomentValidator
 
 // TEST
 
-// const dv = new MomentValidator(
+// const mv = new MomentValidator(
 //     {
 //         required: true,
 //         locale: "sk",
-//         format: "l LT",
+//         format: "L LT",
 //         min: moment("03/01/2017", "L", "en"),
 //         max: moment("03/01/2020", "L", "en"),
 //         strict: true
@@ -177,10 +178,10 @@ export class MomentValidator
 // ].forEach(v => {
 //     console.log();
 //     console.log(v);
-//     const r = dv.validate(v);
+//     const r = mv.validate(v);
 //     console.log(r);
 //     if (r.obj) {
-//         const f = dv.format(r.obj);
+//         const f = mv.format(r.obj);
 //         console.log(f);
 //     }
 // });
