@@ -133,7 +133,7 @@ export class SelectValidator
     }
 
     protected objCheck(obj?: string | null): string {
-        if (obj === undefined) {
+        if (obj === undefined || obj === null) {
             return "";
         }
         const opts = this.opts;
@@ -273,6 +273,7 @@ export interface NumberValidatorOpts extends ValidatorDataOpts {
     min?: number;
     max?: number;
     strict?: boolean;
+    decimals?: number;
 }
 
 export interface NumberValidatorMsgs {
@@ -366,8 +367,18 @@ export class NumberValidator
 
     protected objToStr(obj?: number | null,
                        format?: string): { str: string, err: string } {
+        let str;
+        if (obj === undefined || obj === null) {
+            str = "";
+        } else {
+            if ("decimals" in this.opts) {
+                str = obj.toFixed(this.opts.decimals);
+            } else {
+                str = String(obj);
+            }
+        }
         return {
-            str: (obj === undefined || obj === null) ? "" : ("" + obj),
+            str,
             err: ""
         };
     }
@@ -546,7 +557,7 @@ export class BooleanValidator
     }
 
     protected objCheck(obj?: boolean | null): string {
-        if (obj === undefined) {
+        if (obj === undefined || obj === null) {
             return "";
         }
         const opts = this.opts;
@@ -698,7 +709,9 @@ export class FormValidator<TYPE extends { [key: string]: any }> {
 //     {
 //         required: true,
 //         min: 3,
-//         max: 500000
+//         max: 500000,
+//         decimals: 2,
+//         strict: true
 //     },
 //     {
 //         required: "required {{min}} {{max}}",

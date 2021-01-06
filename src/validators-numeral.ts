@@ -165,7 +165,7 @@ export class NumeralNumberValidator
     }
 
     protected objCheck(obj?: number | null): string {
-        const mObj = obj ? numeral(obj) : obj;
+        const mObj = typeof obj === "number" ? numeral(obj) : obj;
         return (this.nv as any).objCheck(mObj);
     }
 
