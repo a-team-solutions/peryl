@@ -171,7 +171,7 @@ export class NumeralNumberValidator
 
     protected objToStr(obj?: number | null,
                        format?: string): { str: string, err: string } {
-        const mObj = obj ? numeral(obj) : obj;
+        const mObj = typeof obj === "number" ? numeral(obj) : obj;
         return (this.nv as any).objToStr(mObj, format);
     }
 
