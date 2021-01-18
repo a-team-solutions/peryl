@@ -197,7 +197,7 @@ export function hsml<C extends HHandlerCtx>(hml: HElement,
         // console.log("hsml tag", hmlTag);
 
         if (typeof hmlTag[0] !== "string") {
-            console.error("hsml tag head not string:", hmlTag);
+            console.error("HSML tag head not string:", hmlTag);
             return;
         }
 

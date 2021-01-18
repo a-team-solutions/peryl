@@ -2,6 +2,7 @@ import { HElement, HElements, HAttrOnData, HAttrOnDataFnc, HHandlerCtx } from ".
 import { hsmls2idomPatch } from "./hsml-idom";
 
 const log = console.log;
+const err = console.error;
 
 export type HView<STATE> = (state: STATE) => HElements;
 export type HView1<STATE> = (state: STATE) => HElement;
@@ -49,6 +50,11 @@ const unschedule = window.cancelAnimationFrame ||
     // (window as any).msCancelAnimationFrame ||
     function (handle: number) { window.clearTimeout(handle); };
 
+const msgAction = "HApp action:";
+const msgDispatch = "HApp dispatch:";
+const msgRender = "HApp render:";
+const msgUpdate = "HApp update:";
+
 export class HApp<STATE> implements HHandlerCtx {
 
     static debug = false;
@@ -67,13 +73,28 @@ export class HApp<STATE> implements HHandlerCtx {
     constructor(state: STATE, view: HView<STATE>, dispatcher?: HDispatcher<STATE>) {
         this.state = state;
         this.view = view;
-        this.dispatcher = dispatcher || ((_, a) => log("action:", a.type, a.data));
+        this.dispatcher = dispatcher || ((_, a) => log(msgAction, a.type, a.data));
         this.dispatch(HAppAction._init);
     }
 
     dispatch: HDispatch = (type: string, data?: any, event?: Event): void => {
-        HApp.debug && log("HApp action", { type, data, event });
-        this.dispatcher(this, { type, data, event });
+        if (HApp.debug) {
+            log(msgAction, { type, data, event });
+            const t0 = performance.now();
+            try {
+                this.dispatcher(this, { type, data, event });
+            } catch (e) {
+                err(msgDispatch, e);
+            }
+            const t1 = performance.now();
+            log(msgDispatch, `${t1 - t0} ms`, this.state);
+        } else {
+            try {
+                this.dispatcher(this, { type, data, event });
+            } catch (e) {
+                err(msgDispatch, e);
+            }
+        }
     }
 
     callDispatcher = <SUBSTATE>(dispatcher: HDispatcher<SUBSTATE>, state: SUBSTATE, action: HAction): void => {
@@ -83,12 +104,23 @@ export class HApp<STATE> implements HHandlerCtx {
     render = (): HElements => {
         if (HApp.debug) {
             const t0 = performance.now();
-            const hsml = this.view(this.state);
+            let hsmls;
+            try {
+                hsmls = this.view(this.state);
+            } catch (e) {
+                err(msgRender, e);
+            }
             const t1 = performance.now();
-            HApp.debug && log("HApp render", `${t1 - t0} ms`, this.state);
-            return hsml;
+            log(msgRender, `${t1 - t0} ms`, hsmls);
+            return hsmls || [];
         } else {
-            return this.view(this.state);
+            let hsmls;
+            try {
+                hsmls = this.view(this.state);
+            } catch (e) {
+                err(msgRender, e);
+            }
+            return hsmls || [];
         }
     }
 
@@ -145,7 +177,8 @@ export class HApp<STATE> implements HHandlerCtx {
         if (this.dom && !this._updateSched) {
             this._updateSched = schedule(() => {
                 if (this.dom) {
-                    updateDom(this.dom, this.render(), this);
+                    const hsmls = this.render();
+                    updateDom(this.dom, hsmls, this);
                 }
                 this._updateSched = undefined;
                 this._onUpdate && this._onUpdate(this);
@@ -168,7 +201,7 @@ export class HApp<STATE> implements HHandlerCtx {
                 return ["div", { _skip: true }];
             }
         }
-        const hsmls = this.render() as HElements;
+        const hsmls = this.render();
         hsmls.push(
             (e: Element) => {
                 if (!this.dom) {
@@ -191,7 +224,7 @@ function updateDom(el: Element, hsml: HElements, ctx: HHandlerCtx): void {
         const t0 = performance.now();
         hsmls2idomPatch(el, hsml, ctx);
         const t1 = performance.now();
-        HApp.debug && log("HApp update", `${t1 - t0} ms`, el);
+        log(msgUpdate, `${t1 - t0} ms`, el);
     } else {
         hsmls2idomPatch(el, hsml, ctx);
     }
