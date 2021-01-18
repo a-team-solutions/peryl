@@ -120,7 +120,11 @@ export class HttpRequest {
 
     static readonly xhrs: HttpRequest[] = [];
 
-    static abort() {
+    static onRequest?: (request: HttpRequest) => void;
+    static onResponse?: (response: HttpResponse) => void;
+    static onError?: (e: Event) => void;
+
+    static abortAll() {
         HttpRequest.xhrs.forEach(x => x.abort());
         HttpRequest.xhrs.length = 0;
     }
@@ -302,24 +306,27 @@ export class HttpRequest {
         }
 
         if ("ontimeout" in xhr) {
-            if (this._onError) {
+            if (this._onError || HttpRequest.onError) {
                 xhr.ontimeout = (e: ProgressEvent) => {
-                    this._onError!(e);
+                    HttpRequest.onError && HttpRequest.onError(e);
+                    this._onError && this._onError(e);
                 };
             }
         }
 
         if ("onabort" in xhr) {
-            if (this._onError) {
+            if (this._onError || HttpRequest.onError) {
                 xhr.onabort = (e: ProgressEvent) => {
-                    this._onError!(e);
+                    HttpRequest.onError && HttpRequest.onError(e);
+                    this._onError && this._onError(e);
                 };
             }
         }
 
-        if (this._onError) {
+        if (this._onError || HttpRequest.onError) {
             xhr.onerror = (e: ProgressEvent) => {
-                this._onError!(e);
+                HttpRequest.onError && HttpRequest.onError(e);
+                this._onError && this._onError(e);
             };
         }
 
@@ -328,10 +335,17 @@ export class HttpRequest {
                 xhr.onload = (e: ProgressEvent) => {
                     (HttpRequest as any).xhrs = HttpRequest.xhrs.filter(x => this !== x);
                     if (xhr.status >= 200 && xhr.status < 300) {
+                        const respone = new HttpResponse(xhr);
+                        if (HttpRequest.onResponse) {
+                            HttpRequest.onResponse(respone);
+                        }
                         if (this._onResponse) {
-                            this._onResponse(new HttpResponse(xhr));
+                            this._onResponse(respone);
                         }
                     } else {
+                        if (HttpRequest.onError) {
+                            HttpRequest.onError(e);
+                        }
                         if (this._onError) {
                             this._onError(e);
                         }
@@ -359,10 +373,17 @@ export class HttpRequest {
                             // const fileFtpStatusOk = xhr.status === 0 && !xhr.responseURL.match(/^https?:\/\//);
                             // if (httpStatusOk || fileFtpStatusOk) {
                             if ((xhr as any).status >= 200 && (xhr as any).status < 300) {
+                                const respone = new HttpResponse(xhr);
+                                if (HttpRequest.onResponse) {
+                                    HttpRequest.onResponse(respone);
+                                }
                                 if (this._onResponse) {
-                                    this._onResponse(new HttpResponse(xhr));
+                                    this._onResponse(respone);
                                 }
                             } else {
+                                if (HttpRequest.onError) {
+                                    HttpRequest.onError(e);
+                                }
                                 if (this._onError) {
                                     this._onError(e);
                                 }
@@ -423,4 +444,24 @@ export function del(url: string, query?: Object): HttpRequest {
     return new HttpRequest().method("DELETE").url(url, query);
 }
 
-export const http = { get, post, put, delete: del };
+export function onRequest(onRequest: (req: HttpRequest) => void): void {
+    HttpRequest.onRequest = onRequest;
+}
+
+export function onResponse(onResponse: (req: HttpResponse) => void): void {
+    HttpRequest.onResponse = onResponse;
+}
+
+export function onError(onError: (req: Event) => void): void {
+    HttpRequest.onError = onError;
+}
+
+export const http = {
+    get,
+    post,
+    put,
+    delete: del,
+    onRequest,
+    onResponse,
+    onError
+};

@@ -1,6 +1,19 @@
-import { get, authBasic } from "../src/http";
+import { authBasic, http } from "../src/http";
 
-get("http_demo.json")
+http.onRequest(req => {
+    req.headers({ "X-Requested-With": "XMLHttpRequest" });
+    console.log(req);
+});
+
+http.onResponse(res => {
+    console.log(res);
+});
+
+http.onError(e => {
+    console.log(e);
+});
+
+http.get("http_demo.json")
     .use(authBasic("login", "passwd"))
     .onProgress(progress => {
         console.log("progress: ", progress);
@@ -14,7 +27,7 @@ get("http_demo.json")
     .noCache()
     .send();
 
-get("http_demo.json")
+http.get("http_demo.json")
     .onProgress(progress => {
         console.log("progress: ", progress);
     })
@@ -62,4 +75,4 @@ get("http_demo.json")
 //     .send();
 
 
-// HttpRequest.abort();
+// HttpRequest.abortAll();
