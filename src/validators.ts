@@ -70,11 +70,13 @@ export abstract class Validator<TYPE, OPTS, MSGS> {
     }
 
     format(obj?: TYPE | null, format?: string): { str: string, err: string } {
-        const err = this.objCheck(obj);
+        // const err = this.objCheck(obj);
         const ots = this.objToStr(obj, format);
         return {
             str: (ots.str === undefined || ots.str === null) ? "" : ots.str,
-            err: ots.err ? ots.err : err };
+            // err: ots.err ? ots.err : err
+            err: ots.err
+        };
     }
 
 }
@@ -878,3 +880,8 @@ export class FormValidator<TYPE extends { [key: string]: any }> {
 // const str = undefined;
 // const sr = v.validate(str!);
 // console.log(sr);
+
+const v = new StringValidator({ required: true, min: 8 });
+const str = "";
+const sr = v.format(str);
+console.log(sr, v);
