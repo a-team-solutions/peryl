@@ -881,7 +881,7 @@ export class FormValidator<TYPE extends { [key: string]: any }> {
 // const sr = v.validate(str!);
 // console.log(sr);
 
-const v = new StringValidator({ required: true, min: 8 });
-const str = "";
-const sr = v.format(str);
-console.log(sr, v);
+// const v = new StringValidator({ required: true, min: 8 });
+// const str = "";
+// const sr = v.format(str);
+// console.log(sr, v);
