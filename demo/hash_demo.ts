@@ -4,7 +4,9 @@ import { select } from "../src/dom";
 const out = select("#output");
 out && (out.innerHTML = "test");
 
-const h = new hash.Hash<any>()
+const emitWritten = false;
+
+const h = new hash.Hash<any>(emitWritten)
     .coders(
         data => data ? JSON.stringify(data) : "",
         str => str ? JSON.parse(str) : undefined

@@ -4,8 +4,15 @@ export class Hash<T = string> {
     private _cb?: (data: T) => void;
     private _iId: any;
 
+    private _emitWritten: boolean;
+    private _hash?: string;
+
     private _encode = (data: T) => String(data);
     private _decode = (str: string) => str as any as T;
+
+    constructor(emitWritten = true) {
+        this._emitWritten = emitWritten;
+    }
 
     onChange(cb: (data: T) => void): this {
         this._cb = cb;
@@ -22,7 +29,13 @@ export class Hash<T = string> {
     listen(): this {
         this._cb && this._cb(this.read());
         if ("onhashchange" in window) {
-            onhashchange = () => this._cb && this._cb(this.read());
+            onhashchange = () => {
+                const written = this._hash === location.hash;
+                this._hash = undefined;
+                if (this._emitWritten || !written) {
+                    this._cb && this._cb(this.read());
+                }
+            };
         } else {
             console.warn(`browser "window.onhashchange" not implemented, running emulation`);
             let prevHash = location.hash;
@@ -32,7 +45,11 @@ export class Hash<T = string> {
             this._iId = setInterval(() => {
                 if (location.hash !== prevHash) {
                     prevHash = location.hash;
-                    this._cb && this._cb(this.read());
+                    const written = this._hash === location.hash;
+                    this._hash = undefined;
+                    if (this._emitWritten || !written) {
+                        this._cb && this._cb(this.read());
+                    }
                 }
             }, 500);
         }
@@ -45,6 +62,7 @@ export class Hash<T = string> {
 
     write(data: T): this {
         location.hash = "#" + encodeURIComponent(this._encode(data));
+        this._hash = location.hash;
         return this;
     }
 
