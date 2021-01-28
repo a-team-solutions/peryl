@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PeRyL HSML App</title>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script src="https://unpkg.com/peryl@1.4.41/incremental-dom/dist/umd/incremental-dom.js"></script>
+    <script src="https://unpkg.com/peryl@1.4.41/dist/umd/hsml-app.js"></script>
+
+    <script>
+        // App state definition and initialization
+        const state = {
+            message: ""
+        };
+
+        // Actions definition
+        const Action = {
+            say: "say"
+        }
+
+        // Template function, returns HSML markup generated from app state
+        function view(state) {
+            return [
+                ["p", [
+                    "Message: ", state.message
+                ]],
+                ["p", [
+                    ["button", { on: ["click", Action.say, "Hello"] }, "Say Hello"],
+                    " ",
+                    ["button", { on: ["click", Action.say, "Hi"] }, "Say Hi"],
+                ]]
+            ];
+        }
+
+        // Action dispatcher, app logic
+        function dispatcher(app, action) {
+            switch (action.type) {
+                // Dispatch action "say"
+                case Action.say:
+                    // Change app state by action data (3. parameter of on click action)
+                    app.state.message = action.data;
+                    // Ask app to update view with new state
+                    app.update();
+                    break;
+            }
+        }
+
+        // Debug mode logging HApp actions, rendering, dispatching info
+        HApp.debug = true;
+
+        new HApp(state, view, dispatcher)
+            .mount(document.getElementById("app"))
+    </script>
+</body>
+</html>

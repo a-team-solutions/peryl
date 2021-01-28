@@ -2,12 +2,13 @@
 
 TypeScript library and tools for rapid web development.
 
-## HSML App (SPA) example
+## HApp - PeRyL HSML App
 
-- HSML - hyper script markup language
-- SPA - single page web app
+`HApp` - HSML App, Javascript/Typescript Web UI framework for rapid SPA web applications development.
 
-Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
+Read [Tutorial](HApp.md) to learn how to write HApp.
+
+HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html), source code:
 
 ```html
 <!DOCTYPE html>
@@ -27,8 +28,8 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
         <h1>PeRyL HSML App demo</h1>
         <div id="app"></div>
     </div>
-    <script src="https://unpkg.com/peryl@1.4.30/incremental-dom/dist/umd/incremental-dom.js"></script>
-    <script src="https://unpkg.com/peryl@1.4.30/dist/umd/hsml-app.js"></script>
+    <script src="https://unpkg.com/peryl@1.4.41/incremental-dom/dist/umd/incremental-dom.js"></script>
+    <script src="https://unpkg.com/peryl@1.4.41/dist/umd/hsml-app.js"></script>
     <script>
 
         const state = {
@@ -136,3 +137,4 @@ Try HSML App [demo](https://peryl.gitlab.io/peryl/demo/hsml-app-js_demo.html).
 
 </html>
 ```
+
