@@ -1,5 +1,8 @@
+// https://www.typescriptlang.org/play?#code/C4TwDgpgBAEsC2AbAKgQwOYGcoF4oGsIQB7AM1mQFkAZAUUQnggDtg10A5VJy1MAbgBQoSLAQoMmAILBgAJ1xQARADolUAD7KAxOq1KAfkqGCIADzDE5wKCOgwYEVABMAPMijngLZ9kzyAS2Z0RX85IPQAPkUAAwASAG84JHZMAF8YzSh4pPFUtMTkiSwZeQKE5Az+IA
+type HtmlTags = keyof HTMLElementTagNameMap;
+type HtmlTagsAttr = "." | "#" | "~";
 
-export type HHead = keyof HTMLElementTagNameMap | string; // "tag#id.class1.class2~handler"
+export type HHead<T extends string = string> = `${HtmlTags}` | `${HtmlTags}${HtmlTagsAttr}${T}`;
 
 export type HAttrClasses = Array<string | [string, boolean]>;
 
