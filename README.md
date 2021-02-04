@@ -1,10 +1,10 @@
 # PeRyL
 
-TypeScript library and tools for rapid web development.
+TypeScript/JavaScript library and tools for rapid server and client side web applications development.
 
 ## HApp - PeRyL HSML App
 
-`HApp` - HSML App, Javascript/Typescript Web UI framework for rapid SPA web applications development.
+`HApp` - HSML App, TypeScript/JavaScript Web UI framework for rapid SPA web applications development.
 
 Read [Tutorial](HApp.md) to learn how to write HApp.
 

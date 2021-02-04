@@ -75,8 +75,12 @@ Basic HApp skeleton with `state`, `actions`, `view` template function and `actio
         // Debug mode logging HApp actions, rendering, dispatching info
         HApp.debug = true;
 
-        new HApp(state, view, dispatcher)
-            .mount(document.getElementById("app"))
+        // Create app
+        var app = new HApp(state, view, dispatcher);
+
+        // Run application - Mount HTML element (placeholder)
+        app.mount(document.getElementById("app"))
+
     </script>
 </body>
 </html>
